@@ -1638,16 +1638,19 @@ function remplirApropos() {
   poserIcones(corps);
 }
 
-/* Panneau ouvert, la molette lui appartient : si elle tourne hors du
-   corps du panneau — sur le voile, sur l'en-tête —, c'est quand même le
-   panneau qui défile, jamais la page derrière, que le CSS a de toute
-   façon verrouillée.
+/* Panneau ouvert, la molette passe par un seul moteur, partout.
 
-   Et elle défile avec l'inertie du navigateur, pas sans elle : assigner
-   scrollTop cran par cran donnait une navigation saccadée, dépouillée du
-   lissage natif. On le refait donc soi-même — une cible que la molette
-   déplace, une position qui la rejoint en s'amortissant. */
+   Il n'y a pas de "focus" perdu : le navigateur livre la molette à ce qui
+   se trouve sous le curseur. Sur le panneau, il défilait lui-même avec
+   son propre lissage ; à côté, l'événement partait derrière et un second
+   moteur maison prenait le relais. Deux moteurs, deux sensations — la
+   différence était structurelle. Un événement synthétique ne pouvant pas
+   déclencher le défilement natif, l'unification se fait dans l'autre
+   sens : tant qu'un panneau est ouvert, TOUTE molette est interceptée et
+   passe par la même inertie, souris dessus ou à côté. Un seul
+   comportement, au pixel près. */
 function initMolettePanneaux() {
+  const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let corps = null, cible = 0, anime = null;
 
   function pas() {
@@ -1664,13 +1667,23 @@ function initMolettePanneaux() {
     if (!dlg) { corps = null; return; }
     const c = dlg.querySelector(".modale-corps");
     if (!c) return;
-    if (c.contains(ev.target)) { corps = null; return; }   // molette native dans le corps
     ev.preventDefault();
-    if (corps !== c) { corps = c; cible = c.scrollTop; }   // resynchronisation
-    cible = Math.max(0, Math.min(c.scrollHeight - c.clientHeight, cible + ev.deltaY));
+    // deltaMode : 0 pixels, 1 lignes (Firefox), 2 pages.
+    const delta = ev.deltaMode === 1 ? ev.deltaY * 33
+      : ev.deltaMode === 2 ? ev.deltaY * c.clientHeight : ev.deltaY;
+    if (corps !== c) { corps = c; cible = c.scrollTop; }
+    cible = Math.max(0, Math.min(c.scrollHeight - c.clientHeight, cible + delta));
+    if (reduit) { corps.scrollTop = cible; return; }   // moins d'animations : saut direct
     if (!anime) anime = requestAnimationFrame(pas);
   }, { passive: false });
+
+  // Le corps peut aussi défiler par sa barre ou au clavier : la cible se
+  // resynchronise dès que le mouvement ne vient pas du moteur.
+  document.addEventListener("scroll", ev => {
+    if (corps && ev.target === corps && !anime) cible = corps.scrollTop;
+  }, true);
 }
+
 
 /* Le bouton monde et son menu. Seul le français vit pour l'instant : les
    autres langues sont des emplacements posés — visibles, désactivés,

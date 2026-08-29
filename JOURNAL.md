@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, un seul moteur de molette
+
+L'utilisateur sentait toujours une difference entre la molette sur le panneau et a cote, et a pose la bonne question : pourquoi une difference existe-t-elle, plutot que comment la regler ?
+
+Parce que deux moteurs tournaient. Le navigateur livre la molette a ce qui est sous le curseur : sur le panneau il defilait nativement avec son propre lissage, a cote un moteur maison prenait le relais — la difference etait structurelle, pas un reglage. Et comme un evenement synthetique ne peut pas declencher le defilement natif, l'unification s'est faite dans l'autre sens : panneau ouvert, toute molette est interceptee et passe par la meme inertie, dessus comme a cote. Gestion des deltaMode lignes et pages de Firefox, resynchronisation de la cible quand le corps defile par sa barre ou au clavier, saut direct sous prefers-reduced-motion.
+
 ## 2026-08-29, la mort n'existe qu'hors champ
 
 La dissolution en vol de la veille ne convenait pas : c'etait toujours une disparition sous les yeux, juste maquillee. L'utilisateur a tranche — la fin de vie doit se produire hors de l'ecran.
