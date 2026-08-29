@@ -1,0 +1,6 @@
+# Le hub se transmet par son lien, entre collègues de B27 : il n'a pas vocation
+# à remonter dans un moteur de recherche. La même consigne est portée par la
+# balise <meta name="robots"> de index.html, pour les robots qui lisent la page
+# sans passer par ce fichier.
+User-agent: *
+Disallow: /

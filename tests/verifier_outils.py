@@ -1,0 +1,265 @@
+#!/usr/bin/env python3
+"""Contrôle du catalogue du hub B27.
+
+Le fichier outils.js se modifie à la main : une catégorie mal orthographiée, un
+statut inventé, une icône qui n'existe pas ou deux fiches partageant le même id
+sont les fautes les plus probables. Le hub sait déjà les signaler dans la console
+du navigateur, mais il faut penser à l'ouvrir. Ce script fait le même contrôle en
+version stricte, hors navigateur, avant de publier.
+
+    python tests/verifier_outils.py
+
+Code de sortie 0 si tout va bien, 1 s'il reste au moins une erreur. Les
+avertissements n'empêchent pas la publication mais méritent un coup d'oeil.
+
+Bibliothèque standard uniquement, aucune dépendance à installer.
+"""
+
+import datetime
+import json
+import pathlib
+import re
+import sys
+
+# La console Windows est en cp1252 par defaut : sans cette ligne, les accents
+# des messages sortent en caracteres de remplacement.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except (AttributeError, OSError):
+    pass
+
+RACINE = pathlib.Path(__file__).resolve().parent.parent
+FICHIER_OUTILS = RACINE / "outils.js"
+FICHIER_HUB = RACINE / "hub.js"
+
+STATUTS_CONNUS = {"en-ligne", "beta", "a-venir", "bureau", "obsolete"}
+STATUTS_CLIQUABLES = {"en-ligne", "beta"}
+LONGUEUR_PITCH_MAX = 140
+CHAMPS_ATTENDUS = {"id", "nom", "pitch", "url", "categorie", "statut", "icone", "tags", "maj"}
+
+
+# --------------------------------------------------------------------------
+# Lecture des littéraux JavaScript
+#
+# outils.js n'est pas du JSON : il porte des commentaires, des clés sans
+# guillemets et des virgules finales. Plutôt que d'imposer un format moins
+# commode à écrire à la main, on le convertit ici. Le retrait des commentaires
+# se fait caractère par caractère et non par expression régulière, sinon le
+# "//" de "https://" serait pris pour le début d'un commentaire et la moitié
+# des adresses disparaîtrait silencieusement.
+# --------------------------------------------------------------------------
+
+def retirer_commentaires(source: str) -> str:
+    sortie = []
+    i, n = 0, len(source)
+    while i < n:
+        c = source[i]
+        if c in "\"'":
+            guillemet = c
+            sortie.append(c)
+            i += 1
+            while i < n:
+                sortie.append(source[i])
+                if source[i] == "\\":
+                    if i + 1 < n:
+                        sortie.append(source[i + 1])
+                        i += 2
+                        continue
+                elif source[i] == guillemet:
+                    i += 1
+                    break
+                i += 1
+            continue
+        if c == "/" and i + 1 < n and source[i + 1] == "/":
+            while i < n and source[i] != "\n":
+                i += 1
+            continue
+        if c == "/" and i + 1 < n and source[i + 1] == "*":
+            i += 2
+            while i + 1 < n and not (source[i] == "*" and source[i + 1] == "/"):
+                i += 1
+            i += 2
+            continue
+        sortie.append(c)
+        i += 1
+    return "".join(sortie)
+
+
+def extraire_litteral(source: str, nom: str):
+    """Renvoie la valeur Python du littéral affecté à `nom` dans le source."""
+    depart = re.search(r"\bconst\s+" + re.escape(nom) + r"\s*=\s*", source)
+    if not depart:
+        raise ValueError("déclaration '%s' introuvable dans outils.js" % nom)
+    i = depart.end()
+    ouvrant = source[i]
+    fermant = {"[": "]", "{": "}"}.get(ouvrant)
+    if not fermant:
+        raise ValueError("'%s' n'est pas un tableau ni un objet" % nom)
+
+    profondeur, debut = 0, i
+    while i < len(source):
+        c = source[i]
+        if c in "\"'":
+            guillemet = c
+            i += 1
+            while i < len(source):
+                if source[i] == "\\":
+                    i += 2
+                    continue
+                if source[i] == guillemet:
+                    break
+                i += 1
+        elif c == ouvrant:
+            profondeur += 1
+        elif c == fermant:
+            profondeur -= 1
+            if profondeur == 0:
+                brut = source[debut:i + 1]
+                break
+        i += 1
+    else:
+        raise ValueError("littéral '%s' non refermé" % nom)
+
+    # Clés sans guillemets vers clés JSON, apostrophes vers guillemets droits,
+    # puis retrait des virgules finales que JSON refuse.
+    txt = re.sub(r"([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:", r'\1"\2":', brut)
+    txt = re.sub(r",(\s*[\]}])", r"\1", txt)
+    return json.loads(txt)
+
+
+def cles_icones() -> set:
+    """Noms d'icônes déclarés dans TRACES_ICONES, côté hub.js."""
+    source = retirer_commentaires(FICHIER_HUB.read_text(encoding="utf-8"))
+    bloc = re.search(r"const\s+TRACES_ICONES\s*=\s*\{(.*?)\n\};", source, re.S)
+    if not bloc:
+        return set()
+    return set(re.findall(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:", bloc.group(1), re.M))
+
+
+# --------------------------------------------------------------------------
+# Contrôles
+# --------------------------------------------------------------------------
+
+def controler():
+    erreurs, avertissements = [], []
+
+    source = retirer_commentaires(FICHIER_OUTILS.read_text(encoding="utf-8"))
+    outils = extraire_litteral(source, "OUTILS")
+    categories = extraire_litteral(source, "CATEGORIES")
+    reglages = extraire_litteral(source, "REGLAGES")
+    icones = cles_icones()
+
+    # --- catégories
+    cles_categories = []
+    for i, c in enumerate(categories, 1):
+        ou = "catégorie %d" % i
+        for champ in ("cle", "nom", "icone"):
+            if not c.get(champ):
+                erreurs.append("%s : champ '%s' manquant." % (ou, champ))
+        if c.get("cle") in cles_categories:
+            erreurs.append("%s : clé '%s' déjà utilisée." % (ou, c["cle"]))
+        cles_categories.append(c.get("cle"))
+        if icones and c.get("icone") and c["icone"] not in icones:
+            erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, c["icone"]))
+
+    # --- réglages
+    for champ in ("titre", "sousTitre", "seuilFiltres", "seuilSections"):
+        if champ not in reglages:
+            erreurs.append("REGLAGES : champ '%s' manquant." % champ)
+    if "contact" not in reglages:
+        avertissements.append("REGLAGES : pas de champ 'contact', aucune adresse ne sera proposée.")
+
+    # --- outils
+    ids = []
+    aujourdhui = datetime.date.today()
+    for i, o in enumerate(outils, 1):
+        ou = "outil %d (%s)" % (i, o.get("nom") or o.get("id") or "sans nom")
+
+        oubliés = CHAMPS_ATTENDUS - set(o)
+        if oubliés:
+            erreurs.append("%s : champ(s) manquant(s) : %s." % (ou, ", ".join(sorted(oubliés))))
+        inconnus = set(o) - CHAMPS_ATTENDUS
+        if inconnus:
+            avertissements.append("%s : champ(s) ignoré(s) par le hub : %s." % (ou, ", ".join(sorted(inconnus))))
+
+        ident = o.get("id", "")
+        if ident in ids:
+            erreurs.append("%s : id '%s' déjà utilisé par une autre fiche." % (ou, ident))
+        elif ident and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", ident):
+            erreurs.append("%s : id '%s' hors format (minuscules, chiffres et tirets)." % (ou, ident))
+        ids.append(ident)
+
+        pitch = o.get("pitch") or ""
+        if len(pitch) > LONGUEUR_PITCH_MAX:
+            avertissements.append("%s : pitch de %d caractères, au-delà de %d il sera à l'étroit sur la carte."
+                                  % (ou, len(pitch), LONGUEUR_PITCH_MAX))
+
+        if o.get("categorie") not in cles_categories:
+            erreurs.append("%s : catégorie '%s' absente de CATEGORIES." % (ou, o.get("categorie")))
+
+        statut = o.get("statut")
+        if statut not in STATUTS_CONNUS:
+            erreurs.append("%s : statut '%s' inconnu (attendu : %s)."
+                           % (ou, statut, ", ".join(sorted(STATUTS_CONNUS))))
+
+        if icones and o.get("icone") and o["icone"] not in icones:
+            erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, o["icone"]))
+
+        url = o.get("url") or ""
+        if statut in STATUTS_CLIQUABLES:
+            if not url:
+                erreurs.append("%s : statut '%s' mais aucune url, la carte ne mènerait nulle part." % (ou, statut))
+            elif not url.startswith(("https://", "http://")):
+                erreurs.append("%s : url '%s' sans schéma http ou https." % (ou, url))
+            elif url.startswith("http://"):
+                avertissements.append("%s : url en http, préférer https." % ou)
+        elif url:
+            avertissements.append("%s : statut '%s' non cliquable, l'url renseignée ne sera pas utilisée." % (ou, statut))
+
+        maj = o.get("maj") or ""
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", maj):
+            erreurs.append("%s : date de mise à jour '%s' hors format AAAA-MM-JJ." % (ou, maj))
+        else:
+            try:
+                jour = datetime.date.fromisoformat(maj)
+                if jour > aujourdhui:
+                    avertissements.append("%s : date de mise à jour dans le futur (%s)." % (ou, maj))
+            except ValueError:
+                erreurs.append("%s : date de mise à jour '%s' inexistante au calendrier." % (ou, maj))
+
+        tags = o.get("tags")
+        if not isinstance(tags, list) or not all(isinstance(t, str) for t in tags):
+            erreurs.append("%s : 'tags' doit être une liste de chaînes." % ou)
+        elif len(tags) > 4:
+            avertissements.append("%s : %d mots-clés, la carte n'en affiche que 4 (les autres restent "
+                                  "cherchables)." % (ou, len(tags)))
+
+    return outils, categories, erreurs, avertissements
+
+
+def main():
+    try:
+        outils, categories, erreurs, avertissements = controler()
+    except Exception as exc:                      # noqa: BLE001
+        print("Lecture impossible : %s" % exc)
+        return 1
+
+    peuplees = {o.get("categorie") for o in outils}
+    en_ligne = [o for o in outils if o.get("statut") in STATUTS_CLIQUABLES and o.get("url")]
+    print("Catalogue : %d outil(s), %d en ligne, %d catégorie(s) utilisée(s) sur %d déclarée(s)."
+          % (len(outils), len(en_ligne), len(peuplees), len(categories)))
+
+    for a in avertissements:
+        print("  avertissement : %s" % a)
+    for e in erreurs:
+        print("  ERREUR : %s" % e)
+
+    if erreurs:
+        print("\n%d erreur(s) : corriger outils.js avant de publier." % len(erreurs))
+        return 1
+    print("\nCatalogue conforme%s." % (", %d avertissement(s)" % len(avertissements) if avertissements else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

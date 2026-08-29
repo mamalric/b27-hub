@@ -1,0 +1,351 @@
+/* =====================================================================
+   hub.css : habillage du hub d'accueil des outils B27.
+   =====================================================================
+
+   La palette, les rayons, les ombres et la pile de polices sont repris tels
+   quels du Sélectionneur de radiateurs et de la Calculette ECS et Bouclage,
+   pour qu'un collègue qui passe du hub à un outil ne change pas d'univers.
+   Primaire olive #7da32f sur des surfaces neutres papier et encre, clair par
+   défaut, sombre via [data-theme="dark"] ou le réglage du système.
+
+   Le vert #7da32f est la déclinaison "outils" du vert de marque B27 (#95BE4E,
+   variante lisible en texte #5F7F2E). Les deux outils déjà publiés portent
+   l'olive : c'est lui qui fait la continuité visuelle, pas le vert du site.
+
+   Aucune requête externe : pas de Google Fonts, pas de CDN. Segoe UI prend le
+   relais d'Inter sur Windows, où travaillent les postes B27.
+   ===================================================================== */
+
+:root{
+  color-scheme: light;
+  --fond:#eef0ed;
+  --papier:#ffffff;
+  --papier-2:#f4f6f3;
+  --papier-3:#e8ebe6;
+  --encre:#1e2220;
+  --encre-2:#525754;
+  --discret:#676e69;
+  --ligne:#dde0dc;
+  --ligne-2:#ebeee9;
+  --primaire:#7da32f;
+  --primaire-fond:#eaf3d8;
+  --primaire-bord:#c3daa0;
+  --primaire-encre:#4c6a19;
+  --lien:#4c6a19;
+  --haute:#bc3f38;
+  --haute-fond:#fbeae8;
+  --moyenne:#b87a15;
+  --moyenne-fond:#fdf3e2;
+  --note-fond:#fdf6e6;
+  --note-bord:#e2b45f;
+  --sur-primaire:#ffffff;
+  --anneau:rgba(125,163,47,.20);
+  --rayon:10px;
+  --rayon-s:7px;
+  --ombre:0 1px 2px rgba(30,34,32,.05), 0 6px 20px rgba(30,34,32,.06);
+  /* Ombre de survol d'une carte : même famille que --ombre, portée plus loin,
+     pour que le décollement se lise sans virer à l'effet de relief. */
+  --ombre-haute:0 2px 4px rgba(30,34,32,.06), 0 12px 28px rgba(30,34,32,.10);
+  --vitesse:.12s;
+}
+[data-theme="dark"]{
+  color-scheme: dark;
+  --fond:#101211;
+  --papier:#1a1d1b;
+  --papier-2:#232725;
+  --papier-3:#2c312e;
+  --encre:#e9ebe8;
+  --encre-2:#b2b7b3;
+  --discret:#929991;
+  --ligne:#343a36;
+  --ligne-2:#272c29;
+  --primaire:#a5cc52;
+  --primaire-fond:#2b3a17;
+  --primaire-bord:#4a6626;
+  --primaire-encre:#c9e58f;
+  --lien:#b8d67c;
+  --haute:#e5837c;
+  --haute-fond:#3b2321;
+  --moyenne:#e3ad63;
+  --moyenne-fond:#382c15;
+  --note-fond:#332a14;
+  --note-bord:#8a6520;
+  --sur-primaire:#12180a;
+  --anneau:rgba(165,204,82,.22);
+  --ombre:0 1px 2px rgba(0,0,0,.35), 0 6px 20px rgba(0,0,0,.30);
+  --ombre-haute:0 2px 4px rgba(0,0,0,.45), 0 12px 28px rgba(0,0,0,.45);
+}
+@media (prefers-reduced-motion: reduce){
+  :root{ --vitesse:0s }
+  *{ animation:none !important; transition:none !important }
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:Inter,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  margin:0;color:var(--encre);background:var(--fond);font-size:14px;line-height:1.5;
+  transition:background-color var(--vitesse),color var(--vitesse);
+}
+a{color:var(--lien);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--primaire);outline-offset:2px;border-radius:4px}
+.ico{vertical-align:-3px;flex:none}
+
+/* ---------------------------------------------------------------- en-tête */
+header{
+  display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;
+  padding:12px 22px;background:var(--papier);border-bottom:1px solid var(--ligne);
+  position:sticky;top:0;z-index:6;box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+header .logo{
+  width:30px;height:30px;border-radius:var(--rayon-s);background:var(--primaire);color:var(--sur-primaire);
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+}
+header .titre{display:flex;flex-direction:column;gap:1px;min-width:0;flex:0 1 auto}
+header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.3px;color:var(--encre);line-height:1.2}
+header .sub{font-size:12.5px;color:var(--discret);font-weight:400}
+header .espace{flex:1}
+.bouton-icone{
+  background:transparent;border:1px solid var(--ligne);color:var(--encre-2);border-radius:var(--rayon-s);
+  width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:background-color var(--vitesse),transform var(--vitesse);flex:none;
+}
+.bouton-icone:hover{background:var(--papier-3);transform:rotate(15deg)}
+
+.wrap{padding:22px 22px 20px;max-width:1200px;margin:0 auto}
+
+/* Sur un téléphone, les marges latérales de 22 px prennent une part sensible
+   de la largeur utile : la carte y gagne à être plus large que la marge. */
+@media (max-width:560px){
+  /* flex-wrap:nowrap : par défaut, un conteneur qui déborde préfère renvoyer à
+     la ligne plutôt que rétrécir ses éléments. Les deux boutons partaient donc
+     sur une troisième ligne. En interdisant le renvoi, le bloc de titre rétrécit
+     et le sous-titre passe sur deux lignes, boutons à droite. */
+  header{padding:10px 16px;gap:6px 12px;flex-wrap:nowrap}
+  header h1{font-size:17px}
+  .wrap{padding:18px 16px 16px}
+  footer.pied{padding:6px 16px 30px}
+}
+
+/* ------------------------------------------------------- phrase d'accueil
+   Elle s'adresse à quelqu'un qui découvre le lien : mesurée en ch, pour tenir
+   la longueur de ligne confortable quelle que soit la largeur de l'écran. */
+.chapeau{
+  margin:0 0 18px;max-width:64ch;
+  font-size:13.5px;color:var(--encre-2);line-height:1.6;
+}
+
+/* ------------------------------------------ barre de recherche et de filtres
+   Cette barre n'est rendue qu'à partir de REGLAGES.seuilFiltres outils, voir
+   hub.js. Le style est donc écrit pour un hub déjà fourni, pas pour deux cartes. */
+.barre{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 18px}
+.recherche{position:relative;flex:1 1 260px;max-width:380px}
+.recherche .ico{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:var(--discret);pointer-events:none;
+}
+.recherche input{
+  width:100%;font:inherit;font-size:13.5px;color:var(--encre);
+  background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon-s);
+  padding:8px 30px 8px 32px;
+  transition:border-color var(--vitesse),box-shadow var(--vitesse);
+}
+.recherche input::placeholder{color:var(--discret)}
+/* type="search" apporte gratuitement la touche Échap pour vider le champ, mais
+   aussi une croix déjà dessinée par le navigateur. Elle ferait doublon avec la
+   nôtre, qui elle suit la palette et reste identique d'un navigateur à l'autre. */
+.recherche input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.recherche input:focus{outline:none;border-color:var(--primaire);box-shadow:0 0 0 3px var(--anneau)}
+.recherche .vider{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;padding:0;border:none;border-radius:50%;
+  background:transparent;color:var(--discret);cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+}
+.recherche .vider:hover{background:var(--papier-3);color:var(--encre)}
+.recherche.remplie .vider{display:inline-flex}
+
+.filtres{display:flex;gap:6px;flex-wrap:wrap}
+.filtres button{
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;border:1px solid var(--ligne);color:var(--encre-2);
+  padding:6px 12px;font:inherit;font-size:12.5px;font-weight:600;
+  border-radius:999px;cursor:pointer;
+  transition:background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
+}
+.filtres button:hover{background:var(--papier-3);color:var(--encre)}
+.filtres button[aria-pressed="true"]{
+  background:var(--primaire-fond);color:var(--primaire-encre);border-color:var(--primaire-bord);
+}
+
+/* ---------------------------------------------------------------- sections */
+.section{margin:0 0 26px}
+.section:last-child{margin-bottom:0}
+.section > h2{
+  margin:0 0 12px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--discret);display:flex;align-items:center;gap:7px;
+}
+.section > h2 .compte{
+  font-weight:600;letter-spacing:0;text-transform:none;font-size:11.5px;
+  color:var(--discret);opacity:.75;
+}
+
+/* ------------------------------------------------------------------ grille
+   auto-fill et non auto-fit : avec deux outils, auto-fit étirerait chaque carte
+   sur la moitié de l'écran et le hub aurait l'air d'une page mal remplie.
+   auto-fill garde les cartes à leur largeur de lecture et laisse le vide à
+   droite, ce qui est aussi ce qui se passera quand la liste grandira. */
+.grille{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,340px));
+  gap:14px;
+}
+@media (max-width:700px){ .grille{grid-template-columns:1fr} }
+
+/* ------------------------------------------------------------------- carte */
+.carte{
+  position:relative;display:flex;flex-direction:column;gap:9px;
+  background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon);
+  box-shadow:var(--ombre);padding:15px 16px 14px;
+  color:var(--encre);text-decoration:none;
+  transition:transform var(--vitesse),box-shadow var(--vitesse),border-color var(--vitesse);
+}
+a.carte:hover{
+  text-decoration:none;transform:translateY(-2px);
+  box-shadow:var(--ombre-haute);border-color:var(--primaire-bord);
+}
+a.carte:active{transform:translateY(0)}
+a.carte:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
+
+.carte .tete{display:flex;align-items:flex-start;gap:11px}
+.carte .vignette{
+  width:36px;height:36px;flex:none;border-radius:var(--rayon-s);
+  background:var(--primaire-fond);color:var(--primaire-encre);
+  border:1px solid var(--primaire-bord);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
+}
+a.carte:hover .vignette{background:var(--primaire);color:var(--sur-primaire);border-color:var(--primaire)}
+.carte h3{
+  margin:0;font-size:14.5px;font-weight:700;line-height:1.3;color:var(--encre);
+  letter-spacing:-.2px;flex:1;min-width:0;
+}
+/* Flèche de sortie : elle dit que la carte quitte le hub pour un autre site.
+   Discrète au repos, elle part légèrement dans son sens au survol. */
+.carte .sortie{
+  flex:none;color:var(--discret);margin-top:1px;
+  transition:color var(--vitesse),transform var(--vitesse);
+}
+a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
+
+.carte .pitch{margin:0;font-size:12.5px;color:var(--encre-2);line-height:1.5;flex:1}
+.carte .bas{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:1px}
+.carte .tags{display:flex;gap:5px;flex-wrap:wrap;flex:1;min-width:0}
+.carte .tag{
+  font-size:11px;color:var(--discret);background:var(--papier-2);
+  border:1px solid var(--ligne-2);border-radius:999px;padding:1px 8px;white-space:nowrap;
+}
+
+/* Pastille de statut. Le statut "en-ligne" n'en porte pas : le cas normal n'a
+   pas besoin d'être annoncé, seules les exceptions méritent un signe. */
+.pastille{
+  font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  border-radius:999px;padding:2px 8px;white-space:nowrap;flex:none;
+  border:1px solid transparent;
+}
+.pastille.beta{background:var(--primaire-fond);color:var(--primaire-encre);border-color:var(--primaire-bord)}
+.pastille.a-venir{background:var(--note-fond);color:var(--moyenne);border-color:var(--note-bord)}
+.pastille.bureau{background:var(--papier-3);color:var(--encre-2);border-color:var(--ligne)}
+.pastille.obsolete{background:var(--haute-fond);color:var(--haute);border-color:var(--haute)}
+
+/* Cartes non cliquables : à venir, application de bureau, outil retiré. Elles
+   restent lisibles mais ne prétendent pas mener quelque part. */
+.carte.inerte{box-shadow:none;background:var(--papier-2);border-style:dashed}
+.carte.inerte .vignette{background:var(--papier-3);color:var(--discret);border-color:var(--ligne)}
+.carte.inerte h3{color:var(--encre-2)}
+.carte.obsolete h3{text-decoration:line-through;text-decoration-thickness:1px}
+
+/* --------------------------------------------------- message aucun résultat */
+.vide{
+  border:1px dashed var(--ligne);border-radius:var(--rayon);background:var(--papier-2);
+  padding:26px 20px;text-align:center;color:var(--discret);font-size:13px;
+}
+.vide b{display:block;color:var(--encre-2);font-size:14px;margin-bottom:4px}
+
+/* -------------------------------------------------------------- pied de page */
+footer.pied{
+  padding:8px 22px 34px;max-width:1200px;margin:0 auto;
+  font-size:12px;color:var(--discret);line-height:1.7;
+}
+footer.pied .sep{margin:0 7px;opacity:.5}
+
+/* ------------------------------------- panneau "À propos", repris des outils */
+.modale{
+  border:none;padding:0;border-radius:var(--rayon);background:var(--papier);color:var(--encre);
+  box-shadow:0 8px 32px rgba(35,31,32,.22);width:min(680px,94vw);max-height:88vh;overflow:hidden;
+}
+[data-theme="dark"] .modale{box-shadow:0 8px 32px rgba(0,0,0,.6);border:1px solid var(--ligne)}
+.modale::backdrop{background:rgba(0,0,0,.45)}
+.modale-tete{
+  display:flex;align-items:center;gap:10px;padding:13px 18px;
+  border-bottom:1px solid var(--ligne);background:var(--papier-2);
+}
+.modale-tete h2{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+.modale-tete .espace{flex:1}
+.modale-corps{padding:16px 18px;overflow:auto;max-height:calc(88vh - 56px);font-size:13px}
+.stats-groupe{margin:0 0 18px}
+.stats-groupe:last-child{margin-bottom:0}
+.stats-groupe h3{
+  margin:0 0 8px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--discret);display:flex;align-items:center;gap:6px;
+}
+.stats-liste{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:0}
+.stats-liste dt{color:var(--encre-2)}
+.stats-liste dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stats-liste.gauche dd{text-align:left;font-weight:400}
+.note{
+  background:var(--note-fond);border:1px solid var(--note-bord);border-radius:var(--rayon-s);
+  padding:10px 12px;font-size:12.5px;color:var(--encre-2);line-height:1.55;
+}
+.note code{
+  font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12px;
+  background:var(--papier);border:1px solid var(--ligne);border-radius:4px;padding:1px 5px;
+}
+
+.changelog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.changelog li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.changelog .cl-ver{
+  grid-row:1 / span 2;align-self:start;
+  display:inline-block;min-width:34px;text-align:center;
+  padding:2px 8px;border-radius:11px;font-size:11.5px;font-weight:700;
+  background:var(--primaire-fond);color:var(--primaire-encre);border:1px solid var(--primaire-bord);
+}
+.changelog li.actuelle .cl-ver{background:var(--primaire);color:var(--sur-primaire);border-color:var(--primaire)}
+.changelog .cl-titre{font-weight:600;color:var(--encre)}
+.changelog .cl-date{font-weight:400;color:var(--discret);font-size:11.5px}
+.changelog .cl-txt{color:var(--encre-2);line-height:1.5}
+
+/* ---------------------------------------------------------------- impression
+   Un hub s'imprime rarement, mais s'il l'est il doit sortir en clair et porter
+   les adresses : sur papier, une carte cliquable sans son URL ne sert à rien. */
+@media print{
+  :root,[data-theme="dark"]{
+    color-scheme:light;
+    --fond:#fff;--papier:#fff;--papier-2:#f7f8f6;--papier-3:#eef0ec;
+    --encre:#1e2220;--encre-2:#4a4f4c;--discret:#636965;
+    --ligne:#c7cbc6;--ligne-2:#dcdfda;
+    --primaire:#7da32f;--primaire-fond:#eaf3d8;--primaire-bord:#a9c67d;--primaire-encre:#3f5a12;
+    --ombre:none;--ombre-haute:none;
+  }
+  body{background:#fff}
+  header{position:static;box-shadow:none}
+  .noprint,.barre{display:none !important}
+  .grille{grid-template-columns:repeat(2,1fr)}
+  .carte{break-inside:avoid;box-shadow:none}
+  .carte .sortie{display:none}
+  a.carte[href]::after{
+    content:" " attr(href);display:block;margin-top:6px;
+    font-size:10px;color:#636965;overflow-wrap:anywhere;
+  }
+}
