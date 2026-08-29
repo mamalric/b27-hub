@@ -2,6 +2,16 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, v7 validee, trois retouches
+
+« Beaucoup mieux, j'adore. » La direction portail est la bonne. Trois retouches dans la foulee.
+
+**Les tuiles vivantes gagnent le coin haut gauche**, en colonne reduite, meteo puis calendrier — l'utilisateur a d'abord demande un coin chacune, puis les deux empilees a gauche. Sous 1240 px elles reviennent sous la recherche ; le seuil est calcule pour que la colonne de 288 px ne touche jamais la recherche centree de 620 px.
+
+**L'embleme devient opaque** : la plaque translucide laissait passer les lignes de flux a travers le logo, et une marque ne se regarde pas en transparence.
+
+**Les trainees du champ d'ecoulement expirent desormais fermement.** L'utilisateur a repere qu'elles n'avaient pas de delai maximal : l'estompage par voile translucide est asymptotique, et l'arrondi 8 bits laisse un residu permanent qui s'accumule en toile. Le moteur a ete reecrit — effacement complet a chaque image, memoire bornee de cinquante-cinq positions par particule — l'expiration est garantie mathematiquement, plus approchee.
+
 ## 2026-08-29, refonte en portail (v7)
 
 Rien de ce qui précède ne convient à l'utilisateur : il se dit perdu, trouve le résultat plat, et pose enfin le concept qui manquait depuis le début. Un portail public de visibilité, à la Thermexcel mais en version 2026, ouvert à tous — collègues, clients, n'importe qui — sans portail de connexion. Une démonstration de maîtrise technologique, moderne et sérieuse sans faire geek. Consigne : tout balayer sauf la pastille de signalement.

@@ -20,7 +20,7 @@ Donner un point d'entrée unique, en ligne, vers les outils, les sites et les re
 ## État actuel
 Version v7 en ligne sur GitHub Pages, publiée depuis `main` : la refonte en portail. Tout est centré sous le logo — emblème sur plaque de verre avec aura, titre en dégradé, accroche, recherche filtrante (raccourci `/`), compteurs. Un champ d'écoulement animé, calculé en local, occupe le fond de page ; il s'immobilise si le poste demande moins d'animations. Sombre par défaut, thème clair mémorisé par navigateur.
 
-Deux tuiles vivantes sous la recherche : la météo en données réelles Open-Meteo (sans clé ni compte, lieu par défaut Dijon, bouton « ma position », relevé en cache vingt minutes, tuile absente sans réseau) et un calendrier en semaines ISO, semaines sur l'axe vertical, week-ends teintés, jour et semaine courants marqués, navigation de mois en mois.
+Deux tuiles vivantes, en colonne dans le coin haut gauche sur grand écran et sous la recherche en dessous de 1240 px : la météo en données réelles Open-Meteo (sans clé ni compte, lieu par défaut Dijon, bouton « ma position », relevé en cache vingt minutes, tuile absente sans réseau) et un calendrier en semaines ISO, semaines sur l'axe vertical, week-ends teintés, jour et semaine courants marqués, navigation de mois en mois.
 
 Le catalogue se lit en deux rayons — Nos outils en cartes, Ressources en rangées groupées par domaine — plus la fiche de contact. La métaphore des portes et la navigation par dossiers ont disparu, ainsi que les épingles et les récents ; il n'y a plus d'adresse à fragment. Les couleurs de lot B27 restent sur les pastilles d'icônes, contrôlées sur trois fronts par le validateur.
 
@@ -29,7 +29,7 @@ La page est construite à l'exécution à partir de `catalogue.js`, seul fichier
 Aucune donnée collectée, balise `noindex` et `robots.txt`. Deux requêtes externes facultatives : la météo, et la géolocalisation si le visiteur la demande.
 
 ## Prochaine étape
-Faire regarder la v7 par l'utilisateur et itérer sur ce qui ne lui convient pas encore : c'est une refonte complète, elle appelle un aller-retour.
+La v7 est validée par l'utilisateur (« beaucoup mieux, j'adore ») et retouchée dans la foulée : tuiles en coin haut gauche, emblème opaque, traînées à expiration ferme. Continuer d'itérer sur ses retours.
 
 Trancher si le portail doit rester en `noindex` : il se veut désormais ouvert à tous, clients compris, et la balise comme `robots.txt` l'excluent des moteurs de recherche. C'est une décision d'entreprise, pas technique.
 

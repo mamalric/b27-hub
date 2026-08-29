@@ -287,12 +287,21 @@ function initTheme() {
    --------------------------------------------------------------------- */
 const FOND = { ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0 };
 
+// Le délai maximal d'une traînée, en images : au-delà, le tracé expire et
+// disparaît, sans exception. La première version estompait par voile
+// translucide, et c'était une erreur : l'estompage est asymptotique, et
+// l'arrondi 8 bits fait qu'un pixel sombre n'atteint jamais tout à fait le
+// fond. Les traînées ne mouraient donc jamais, elles s'accumulaient en toile.
+// Ici, le fond est repeint en entier à chaque image et chaque particule ne
+// garde que ses dernières positions : l'expiration est ferme, pas approchée.
+const DUREE_TRAINEE = 55;
+
 function fondCouleurs() {
   const sombre = document.documentElement.dataset.theme !== "light";
   return sombre
-    ? { fond: "#0a0d08", voile: "rgba(10,13,8,.06)",
+    ? { fond: "#0a0d08",
         traits: ["rgba(149,192,61,", "rgba(95,127,31,", "rgba(201,232,138,"] }
-    : { fond: "#f3f5f0", voile: "rgba(243,245,240,.07)",
+    : { fond: "#f3f5f0",
         traits: ["rgba(95,127,31,", "rgba(85,122,58,", "rgba(149,192,61,"] };
 }
 
@@ -305,38 +314,56 @@ function fondAngle(x, y, t) {
 function fondGraine(p, L, H) {
   p.x = Math.random() * L;
   p.y = Math.random() * H;
-  p.vie = 100 + Math.random() * 220;
-  p.v = 0.45 + Math.random() * 0.75;
+  p.vie = 120 + Math.random() * 260;
+  p.v = 0.55 + Math.random() * 0.85;
   // Le vert clair reste rare : équiprobable, l'ensemble vire à la paille.
   const r = Math.random();
   p.c = r < 0.14 ? 2 : (r < 0.6 ? 0 : 1);
-  p.a = 0.04 + Math.random() * 0.05;
+  p.a = 0.1 + Math.random() * 0.1;
   p.e = 0.6 + Math.random() * 0.7;
+  p.pts = [[p.x, p.y]];
   return p;
+}
+
+// Trace une portion de traînée d'un seul trait. Deux passes par particule,
+// la vieille moitié plus pâle : la traînée s'éteint vers sa queue sans payer
+// un trait par segment.
+function fondTracer(ctx, pts, de, jusque, couleur, a, e) {
+  if (jusque - de < 1) return;
+  ctx.strokeStyle = couleur + a + ")";
+  ctx.lineWidth = e;
+  ctx.beginPath();
+  ctx.moveTo(pts[de][0], pts[de][1]);
+  for (let i = de + 1; i <= jusque; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.stroke();
 }
 
 function fondPas() {
   const { ctx, parts, L, H } = FOND;
   FOND.t += 0.5;
   const c = fondCouleurs();
-  ctx.fillStyle = c.voile;
-  ctx.fillRect(0, 0, L, H);
+  ctx.fillStyle = c.fond;
+  ctx.fillRect(0, 0, L, H);   // effacement complet : rien ne survit au délai
   for (const p of parts) {
     const a = fondAngle(p.x, p.y, FOND.t);
-    const nx = p.x + Math.cos(a) * p.v;
-    const ny = p.y + Math.sin(a) * p.v * 0.72;   // aplati : le flux file à l'horizontale
-    ctx.strokeStyle = c.traits[p.c] + p.a + ")";
-    ctx.lineWidth = p.e;
-    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny); ctx.stroke();
-    p.x = nx; p.y = ny; p.vie--;
-    if (p.vie < 0 || nx < -9 || ny < -9 || nx > L + 9 || ny > H + 9) fondGraine(p, L, H);
+    p.x += Math.cos(a) * p.v;
+    p.y += Math.sin(a) * p.v * 0.72;   // aplati : le flux file à l'horizontale
+    p.pts.push([p.x, p.y]);
+    if (p.pts.length > DUREE_TRAINEE) p.pts.shift();
+    const mi = Math.floor(p.pts.length / 2);
+    fondTracer(ctx, p.pts, 0, mi, c.traits[p.c], p.a * 0.35, p.e);
+    fondTracer(ctx, p.pts, mi, p.pts.length - 1, c.traits[p.c], p.a, p.e);
+    p.vie--;
+    if (p.vie < 0 || p.x < -9 || p.y < -9 || p.x > L + 9 || p.y > H + 9) {
+      fondGraine(p, L, H);
+    }
   }
   FOND.anime = requestAnimationFrame(fondPas);
 }
 
 function fondTheme() {
-  // Au changement de thème, tout repartir de zéro : les traînées de
-  // l'ancien fond resteraient visibles en négatif sous le nouveau.
+  // Au changement de thème, repeindre le fond tout de suite : la prochaine
+  // image le referait, mais la version immobile n'en a pas.
   if (!FOND.ctx) return;
   FOND.ctx.fillStyle = fondCouleurs().fond;
   FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
@@ -350,7 +377,7 @@ function fondStatique() {
   const c = fondCouleurs();
   for (let i = 0; i < 60; i++) {
     const p = fondGraine({}, L, H);
-    ctx.strokeStyle = c.traits[p.c] + (p.a * 0.9) + ")";
+    ctx.strokeStyle = c.traits[p.c] + (p.a * 0.5) + ")";
     ctx.lineWidth = p.e;
     ctx.beginPath(); ctx.moveTo(p.x, p.y);
     for (let k = 0; k < 160; k++) {
@@ -383,7 +410,7 @@ function initFond() {
 
   if (FOND.statique) return;
 
-  FOND.parts = Array.from({ length: 80 }, () => fondGraine({}, FOND.L, FOND.H));
+  FOND.parts = Array.from({ length: 90 }, () => fondGraine({}, FOND.L, FOND.H));
   FOND.anime = requestAnimationFrame(fondPas);
 
   // Un onglet caché n'a pas besoin de brûler la carte graphique.

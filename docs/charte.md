@@ -18,17 +18,19 @@ Le vert d'accent est le `#95C03D` du logo, exactement. Sur le fond sombre `#0a0d
 
 Le fond de page est un champ de vecteurs animé : des particules qui suivent des lignes de flux, comme de l'air ou de l'eau en mouvement. C'est le métier d'un bureau d'études fluides, en fond de page, et c'est calculé en local — pas une image, pas une vidéo, pas une bibliothèque.
 
-Le champ est une somme de sinus déphasés dans le temps, pas du vrai bruit de Perlin : à l'écran la différence ne se voit pas et le calcul tient en une ligne. L'équilibre entre le tracé et l'estompage est réglé fin : trop de particules ou des traits trop opaques et le fond vire à la paille, l'erreur a été faite et corrigée. Le vert clair y est volontairement rare, un trait sur sept environ.
+Le champ est une somme de sinus déphasés dans le temps, pas du vrai bruit de Perlin : à l'écran la différence ne se voit pas et le calcul tient en une ligne. Le vert clair y est volontairement rare, un trait sur sept environ.
+
+Les traînées ont un délai d'expiration ferme, et c'est une leçon payée deux fois. La première version estompait par voile translucide : trop dense, elle virait à la paille, et surtout l'estompage est asymptotique — l'arrondi 8 bits fait qu'un pixel sombre n'atteint jamais tout à fait le fond, les traînées ne mouraient jamais et s'accumulaient en toile. Désormais le fond est repeint en entier à chaque image et chaque particule ne garde que ses cinquante-cinq dernières positions : l'expiration est garantie, pas approchée.
 
 Si le poste demande moins d'animations (`prefers-reduced-motion`), le champ est dessiné une fois, immobile : moins d'animations, pas moins de dessin. Un onglet caché suspend le tracé.
 
 ## L'emblème
 
-Le monogramme B27 n'est pas redessiné : c'est la marque, elle appartient à l'entreprise. C'est sa mise en scène qui change : une plaque de verre aux coins arrondis, une aura verte qui respire lentement derrière. Le titre du portail passe du blanc au vert en dégradé sur ses derniers caractères.
+Le monogramme B27 n'est pas redessiné : c'est la marque, elle appartient à l'entreprise. C'est sa mise en scène qui change : une plaque opaque aux coins arrondis — opaque volontairement, translucide les lignes de flux passaient à travers le logo — et une aura verte qui respire lentement derrière. Le titre du portail passe du blanc au vert en dégradé sur ses derniers caractères.
 
 ## Les tuiles vivantes
 
-Deux tuiles sous la recherche, qui font du portail autre chose qu'une liste de liens.
+Deux tuiles qui font du portail autre chose qu'une liste de liens. Sur grand écran elles occupent le coin haut gauche en colonne, la météo puis le calendrier, en version réduite ; sous 1240 px elles reprennent leur place sous la recherche. Elles sont positionnées dans la page, pas fixées : elles appartiennent à l'entrée du portail et n'ont pas à suivre le lecteur dans les rayons.
 
 **La météo** affiche des données réelles, Open-Meteo, sans clé ni compte. Les mesures secondaires — pression au dixième d'hectopascal, ressenti au dixième de degré — sont là pour la précision qu'elles suggèrent, et ce sont pourtant de vraies mesures : le service les fournit à ce pas. Le lieu par défaut vient du catalogue ; « ma position » l'affine, et ce choix reste dans le navigateur du visiteur. Sans réseau, la tuile n'apparaît pas : rien ne clignote, rien ne s'excuse.
 
