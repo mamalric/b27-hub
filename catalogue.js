@@ -1,11 +1,13 @@
 /* =====================================================================
-   outils.js : le seul fichier à modifier pour faire vivre le hub.
+   catalogue.js : le seul fichier à modifier pour faire vivre le hub.
    =====================================================================
 
-   Ajouter une porte au hall, c'est ajouter un objet dans le tableau PORTES
-   ci-dessous. Aucun autre fichier n'est à toucher : ni index.html, ni
-   hub.js, ni hub.css. Les sections, les compteurs, les filtres, l'annuaire
-   et le panneau "À propos" se recalculent seuls à partir de ces données.
+   Le hall se parcourt comme une armoire : on ouvre un dossier, parfois un
+   sous-dossier, et on tombe sur les portes. Ajouter quelque chose, c'est
+   ajouter un objet dans un des tableaux ci-dessous. Aucun autre fichier
+   n'est à toucher : ni index.html, ni hub.js, ni hub.css. Les dossiers,
+   les compteurs, le fil d'Ariane, la recherche et le panneau "À propos"
+   se recalculent seuls à partir de ces données.
 
    Pourquoi un .js et non un .json : chargé par <script src>, ce fichier
    fonctionne aussi quand on ouvre index.html directement depuis le disque
@@ -21,6 +23,7 @@
        pitch: "Une phrase.",       // ce que c'est, 140 caractères maximum
        url: "https://...",         // page à ouvrir ; chaîne vide si pas encore en ligne
        categorie: "cvc",           // une clé de CATEGORIES, plus bas
+       sousCategorie: "",          // facultatif : une clé de SOUS_CATEGORIES
        statut: "en-ligne",         // en-ligne | beta | a-venir | bureau | obsolete
        type: "outil",              // outil | lien  (voir plus bas)
        icone: "radiateur",         // une clé de TRACES_ICONES, dans hub.js
@@ -28,14 +31,17 @@
        maj: "2026-08-29"           // AAAA-MM-JJ, dernière mise à jour de la porte
      }
 
+   Le champ sousCategorie est facultatif. Une catégorie dont aucune porte
+   n'en déclare s'ouvre directement sur ses portes ; dès qu'au moins une en
+   déclare une, la catégorie s'ouvre sur des sous-dossiers, et les portes
+   sans sous-catégorie sont regroupées dans un dossier "Divers".
+
    ---------------------------------------------------------------------
    LES DEUX TYPES
 
      outil   ce que nous fabriquons : carte pleine, avec pitch et mots-clés.
-             C'est la vedette du hall, elle occupe la place qu'il faut.
      lien    une ressource extérieure que nous ne maintenons pas : carte
-             compacte, sans mots-clés. Vingt liens ne doivent pas noyer
-             deux outils, d'où la carte plus petite.
+             compacte, sans mots-clés.
 
    ---------------------------------------------------------------------
    LES CINQ STATUTS
@@ -47,7 +53,7 @@
      obsolete   conservé pour mémoire, carte estompée, à ne plus utiliser
 
    Après modification, vérifier que le fichier reste cohérent :
-       python tests/verifier_outils.py
+       python tests/verifier_catalogue.py
    ===================================================================== */
 
 const PORTES = [
@@ -109,19 +115,21 @@ const PORTES = [
   },
 
   /* ---- Ressources et référentiels ----------------------------------
-     Sites extérieurs, que nous ne maintenons pas. Type "lien" : carte
-     compacte, pour qu'ils ne prennent pas le pas sur les outils. */
+     Sites extérieurs, que nous ne maintenons pas. Assez nombreux pour
+     mériter des sous-dossiers : c'est la catégorie qui montre le mieux
+     la navigation à trois niveaux. */
 
   {
-    id: "base-inies",
-    nom: "Base INIES",
-    pitch: "Données environnementales et sanitaires de référence pour l'ACV.",
-    url: "https://www.base-inies.fr",
+    id: "legifrance",
+    nom: "Légifrance",
+    pitch: "Textes réglementaires, arrêtés et codes en vigueur.",
+    url: "https://www.legifrance.gouv.fr",
     categorie: "ressources",
+    sousCategorie: "reglementation",
     statut: "en-ligne",
     type: "lien",
-    icone: "feuille",
-    tags: ["ACV", "RE2020", "FDES", "carbone"],
+    icone: "livre",
+    tags: ["réglementation", "arrêtés", "code"],
     maj: "2026-08-29"
   },
 
@@ -131,6 +139,7 @@ const PORTES = [
     pitch: "La réglementation environnementale, sur le site du ministère.",
     url: "https://www.ecologie.gouv.fr/politiques-publiques/reglementation-environnementale-re2020",
     categorie: "ressources",
+    sousCategorie: "reglementation",
     statut: "en-ligne",
     type: "lien",
     icone: "thermometre",
@@ -139,15 +148,30 @@ const PORTES = [
   },
 
   {
-    id: "legifrance",
-    nom: "Légifrance",
-    pitch: "Textes réglementaires, arrêtés et codes en vigueur.",
-    url: "https://www.legifrance.gouv.fr",
+    id: "base-inies",
+    nom: "Base INIES",
+    pitch: "Données environnementales et sanitaires de référence pour l'ACV.",
+    url: "https://www.base-inies.fr",
     categorie: "ressources",
+    sousCategorie: "donnees",
     statut: "en-ligne",
     type: "lien",
-    icone: "livre",
-    tags: ["réglementation", "arrêtés", "code"],
+    icone: "feuille",
+    tags: ["ACV", "RE2020", "FDES", "carbone"],
+    maj: "2026-08-29"
+  },
+
+  {
+    id: "ademe",
+    nom: "ADEME",
+    pitch: "Études, aides et données de l'agence de la transition écologique.",
+    url: "https://www.ademe.fr",
+    categorie: "ressources",
+    sousCategorie: "donnees",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "nuage",
+    tags: ["énergie", "carbone", "aides"],
     maj: "2026-08-29"
   },
 
@@ -157,6 +181,7 @@ const PORTES = [
     pitch: "Guides et abaques du centre technique génie climatique et sanitaire.",
     url: "https://www.costic.com",
     categorie: "ressources",
+    sousCategorie: "technique",
     statut: "en-ligne",
     type: "lien",
     icone: "regle",
@@ -170,23 +195,11 @@ const PORTES = [
     pitch: "Avis techniques et documents techniques d'application des produits.",
     url: "https://evaluation.cstb.fr",
     categorie: "ressources",
+    sousCategorie: "technique",
     statut: "en-ligne",
     type: "lien",
     icone: "valider",
     tags: ["avis technique", "ATec", "DTA", "produits"],
-    maj: "2026-08-29"
-  },
-
-  {
-    id: "ademe",
-    nom: "ADEME",
-    pitch: "Études, aides et données de l'agence de la transition écologique.",
-    url: "https://www.ademe.fr",
-    categorie: "ressources",
-    statut: "en-ligne",
-    type: "lien",
-    icone: "nuage",
-    tags: ["énergie", "carbone", "aides"],
     maj: "2026-08-29"
   }
 
@@ -195,9 +208,9 @@ const PORTES = [
 /* ---------------------------------------------------------------------
    ANNUAIRE
 
-   Fiches de contact, rendues à part des cartes : ce ne sont pas des portes,
-   on ne clique pas dessus pour aller ailleurs, on y prend une adresse ou un
-   numéro. Tableau vide : la section entière disparaît.
+   Fiches de contact. Elles occupent leur propre dossier dans le hall : ce
+   ne sont pas des portes, on ne clique pas dessus pour aller ailleurs, on
+   y prend une adresse ou un numéro. Tableau vide : le dossier disparaît.
 
    Gabarit :
      { id: "slug", nom: "Prénom Nom", role: "Fonction", agence: "Dijon",
@@ -224,11 +237,10 @@ const CONTACTS = [
 /* ---------------------------------------------------------------------
    CATÉGORIES
 
-   Une catégorie regroupe les cartes sous un même titre et alimente les
-   filtres. L'ordre de ce tableau est l'ordre d'affichage des sections.
-   Une catégorie sans aucune porte n'apparaît pas : elles peuvent donc être
-   déclarées d'avance, elles restent invisibles jusqu'à la première porte
-   qui s'y range.
+   Les dossiers du premier niveau. L'ordre de ce tableau est l'ordre
+   d'affichage. Une catégorie sans aucune porte n'apparaît pas : elles
+   peuvent donc être déclarées d'avance, elles restent invisibles jusqu'à
+   la première porte qui s'y range.
    --------------------------------------------------------------------- */
 
 const CATEGORIES = [
@@ -244,6 +256,20 @@ const CATEGORIES = [
 ];
 
 /* ---------------------------------------------------------------------
+   SOUS-CATÉGORIES
+
+   Les dossiers du deuxième niveau. Chacune appartient à une catégorie.
+   Facultatif : une catégorie sans sous-catégorie peuplée s'ouvre
+   directement sur ses portes.
+   --------------------------------------------------------------------- */
+
+const SOUS_CATEGORIES = [
+  { cle: "reglementation", categorie: "ressources", nom: "Réglementation", icone: "livre" },
+  { cle: "donnees",        categorie: "ressources", nom: "Données et bases", icone: "base_donnees" },
+  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", icone: "regle" }
+];
+
+/* ---------------------------------------------------------------------
    RÉGLAGES DU HUB
    --------------------------------------------------------------------- */
 
@@ -254,23 +280,18 @@ const REGLAGES = {
 
   // Bandeau d'accueil. L'accroche est la grande phrase sous le logo, le
   // chapeau la ligne d'explication qui la suit. Chaîne vide : l'élément
-  // disparaît, le bandeau se resserre.
+  // disparaît. Le bandeau se resserre dès qu'on entre dans un dossier.
   accroche: "Toutes les portes, au même endroit.",
-  chapeau: "Chaque carte ouvre un outil ou un site dans un nouvel onglet. Ce que nous fabriquons fonctionne dans le navigateur : rien à installer, aucun compte à créer.",
+  chapeau: "Ouvrez un dossier pour trouver un outil, un site ou une ressource. Ce que nous fabriquons fonctionne dans le navigateur : rien à installer, aucun compte à créer.",
 
   // Adresse affichée dans le pied de page et le panneau "À propos".
   // Chaîne vide : la ligne de contact disparaît.
   contact: "mamalric@b27.fr",
 
-  // La barre de recherche et les filtres n'apparaissent qu'à partir de ce
-  // nombre de portes. En dessous ils encombrent plus qu'ils n'aident : la
-  // page tient déjà tout entière sous les yeux.
-  seuilFiltres: 6,
-
-  // Les titres de section par catégorie ne se forment qu'à partir de ce
-  // nombre de catégories réellement peuplées. En dessous, une grille simple
-  // se lit mieux qu'une suite de sections d'une carte chacune.
-  seuilSections: 3
+  // La barre de recherche n'apparaît qu'à partir de ce nombre de portes.
+  // En dessous elle encombre plus qu'elle n'aide : le hall tient déjà tout
+  // entier sous les yeux.
+  seuilFiltres: 6
 };
 
 /* ---------------------------------------------------------------------
@@ -292,9 +313,7 @@ const REGLAGES = {
                   formulaire (Formspree, Web3Forms, EmailJS) et son adresse
                   d'envoi dans "endpoint". Attention : sur ces trois
                   services, les pièces jointes sont réservées aux offres
-                  payantes. Sans offre payante, le texte part tout seul mais
-                  la capture reste dans le presse-papiers, à coller à la main
-                  dans la réponse.
+                  payantes.
 
      "endpoint"   Envoi direct vers votre propre point de collecte (un
                   Worker Cloudflare, par exemple), capture comprise. Rien ne
@@ -314,22 +333,16 @@ const SIGNALEMENT = {
   transport: "mailto",
 
   // Adresse d'envoi, pour "formulaire" et "endpoint". Ignorée en "mailto".
-  // Exemple Formspree : "https://formspree.io/f/xxxxxxxx"
   endpoint: "",
 
-  // Nom de l'application, repris dans l'objet du message. Sur un autre
-  // outil, c'est la seule ligne à changer avec le destinataire.
+  // Nom de l'application, repris dans l'objet du message.
   application: "Hub Outils B27",
 
   // Proposer la capture d'écran. Le navigateur demandera toujours une
-  // confirmation avant de capturer : aucune page ne peut filmer un écran
-  // sans accord explicite, et c'est très bien ainsi.
+  // confirmation avant de capturer.
   capture: true,
 
-  // Proposer la dictée vocale. Ne fonctionne que sur Chrome et Edge ; le
-  // bouton se cache tout seul ailleurs. À savoir : sur ces navigateurs, la
-  // reconnaissance vocale n'est pas locale, la voix est envoyée au service
-  // de transcription de l'éditeur du navigateur. Le panneau le dit à
-  // l'utilisateur avant le premier enregistrement.
+  // Proposer la dictée vocale. Chrome et Edge seulement ; ailleurs le
+  // bouton est grisé avec la raison et la sortie de secours Win + H.
   dictee: true
 };

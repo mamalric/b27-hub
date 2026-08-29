@@ -38,6 +38,8 @@ TYPES_CONNUS = {"outil", "lien"}
 TRANSPORTS_CONNUS = {"mailto", "formulaire", "endpoint"}
 LONGUEUR_PITCH_MAX = 140
 CHAMPS_PORTE = {"id", "nom", "pitch", "url", "categorie", "statut", "type", "icone", "tags", "maj"}
+# sousCategorie est facultatif : une porte sans sous-dossier reste valable.
+CHAMPS_PORTE_FACULTATIFS = {"sousCategorie"}
 CHAMPS_CONTACT = {"id", "nom", "role", "agence", "mail", "tel", "sujets"}
 
 
@@ -150,6 +152,7 @@ def controler():
     portes = extraire_litteral(source, "PORTES")
     contacts = extraire_litteral(source, "CONTACTS")
     categories = extraire_litteral(source, "CATEGORIES")
+    sous_categories = extraire_litteral(source, "SOUS_CATEGORIES")
     reglages = extraire_litteral(source, "REGLAGES")
     signalement = extraire_litteral(source, "SIGNALEMENT")
     icones = cles_icones()
@@ -167,8 +170,26 @@ def controler():
         if icones and c.get("icone") and c["icone"] not in icones:
             erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, c["icone"]))
 
+    # --- sous-catégories
+    cles_sous = []
+    sous_par_cle = {}
+    for i, sc in enumerate(sous_categories, 1):
+        ou = "sous-catégorie %d (%s)" % (i, sc.get("nom") or sc.get("cle") or "sans nom")
+        for champ in ("cle", "categorie", "nom", "icone"):
+            if not sc.get(champ):
+                erreurs.append("%s : champ '%s' manquant." % (ou, champ))
+        if sc.get("cle") in cles_sous:
+            erreurs.append("%s : clé '%s' déjà utilisée." % (ou, sc["cle"]))
+        cles_sous.append(sc.get("cle"))
+        sous_par_cle[sc.get("cle")] = sc
+        if sc.get("categorie") not in cles_categories:
+            erreurs.append("%s : rattachée à la catégorie '%s' qui n'existe pas."
+                           % (ou, sc.get("categorie")))
+        if icones and sc.get("icone") and sc["icone"] not in icones:
+            erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, sc["icone"]))
+
     # --- réglages
-    for champ in ("titre", "sousTitre", "seuilFiltres", "seuilSections"):
+    for champ in ("titre", "sousTitre", "seuilFiltres"):
         if champ not in reglages:
             erreurs.append("REGLAGES : champ '%s' manquant." % champ)
     if not reglages.get("accroche"):
@@ -199,7 +220,7 @@ def controler():
         manquants = CHAMPS_PORTE - set(o)
         if manquants:
             erreurs.append("%s : champ(s) manquant(s) : %s." % (ou, ", ".join(sorted(manquants))))
-        inconnus = set(o) - CHAMPS_PORTE
+        inconnus = set(o) - CHAMPS_PORTE - CHAMPS_PORTE_FACULTATIFS
         if inconnus:
             avertissements.append("%s : champ(s) ignoré(s) par le hub : %s." % (ou, ", ".join(sorted(inconnus))))
 
@@ -217,6 +238,18 @@ def controler():
 
         if o.get("categorie") not in cles_categories:
             erreurs.append("%s : catégorie '%s' absente de CATEGORIES." % (ou, o.get("categorie")))
+
+        # Une sous-catégorie rattachée à une autre catégorie que celle de la
+        # porte est le piège discret : la porte n'apparaîtrait dans aucun
+        # dossier, sans que rien ne le signale à l'écran.
+        sc = o.get("sousCategorie")
+        if sc:
+            if sc not in sous_par_cle:
+                erreurs.append("%s : sous-catégorie '%s' absente de SOUS_CATEGORIES." % (ou, sc))
+            elif sous_par_cle[sc].get("categorie") != o.get("categorie"):
+                erreurs.append("%s : sous-catégorie '%s' rattachée à '%s' et non à '%s', "
+                               "la porte n'apparaîtrait dans aucun dossier."
+                               % (ou, sc, sous_par_cle[sc].get("categorie"), o.get("categorie")))
 
         statut = o.get("statut")
         if statut not in STATUTS_CONNUS:
@@ -277,12 +310,12 @@ def controler():
         if c.get("tel") and not re.fullmatch(r"\+?[\d\s.\-()]{6,}", c["tel"]):
             avertissements.append("%s : téléphone '%s' d'aspect inhabituel, il doit rester cliquable." % (ou, c["tel"]))
 
-    return portes, contacts, categories, erreurs, avertissements
+    return portes, contacts, categories, sous_categories, erreurs, avertissements
 
 
 def main():
     try:
-        portes, contacts, categories, erreurs, avertissements = controler()
+        portes, contacts, categories, sous_categories, erreurs, avertissements = controler()
     except Exception as exc:                      # noqa: BLE001
         print("Lecture impossible : %s" % exc)
         return 1
@@ -290,9 +323,12 @@ def main():
     peuplees = {o.get("categorie") for o in portes}
     ouvertes = [o for o in portes if o.get("statut") in STATUTS_CLIQUABLES and o.get("url")]
     liens = [o for o in portes if o.get("type") == "lien"]
+    sous_utilisees = {o.get("sousCategorie") for o in portes if o.get("sousCategorie")}
     print("Catalogue : %d porte(s), %d ouverte(s), %d ressource(s) extérieure(s), "
-          "%d catégorie(s) utilisée(s) sur %d déclarée(s), %d fiche(s) d'annuaire."
-          % (len(portes), len(ouvertes), len(liens), len(peuplees), len(categories), len(contacts)))
+          "%d catégorie(s) utilisée(s) sur %d déclarée(s), "
+          "%d sous-dossier(s) utilisé(s) sur %d déclaré(s), %d fiche(s) d'annuaire."
+          % (len(portes), len(ouvertes), len(liens), len(peuplees), len(categories),
+             len(sous_utilisees), len(sous_categories), len(contacts)))
 
     for a in avertissements:
         print("  avertissement : %s" % a)

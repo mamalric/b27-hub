@@ -4,14 +4,12 @@
 
    La palette, les rayons, les ombres et la pile de polices sont repris tels
    quels du Sélectionneur de radiateurs et de la Calculette ECS et Bouclage,
-   pour qu'un collègue qui passe du hub à un outil ne change pas d'univers.
+   pour qu'un collègue qui passe du hall à un outil ne change pas d'univers.
 
    Deux verts, et ils ne font pas le même travail :
      --marque    #95c03d, le vert exact du logo B27. Il ne sert qu'au logo.
      --primaire  #7da32f, sa variante assombrie, pour tout ce qui porte du
-                 texte ou doit tenir un contraste : vignettes, filtres
-                 actifs, survols. C'est le vert des deux outils déjà
-                 publiés, et c'est lui qui fait la continuité visuelle.
+                 texte ou doit tenir un contraste.
 
    Aucune requête externe : pas de Google Fonts, pas de CDN. Segoe UI prend
    le relais d'Inter sur Windows, où travaillent les postes B27.
@@ -45,11 +43,14 @@
   --anneau:rgba(125,163,47,.20);
   --rayon:10px;
   --rayon-s:7px;
+  --rayon-g:14px;
   --ombre:0 1px 2px rgba(30,34,32,.05), 0 6px 20px rgba(30,34,32,.06);
-  /* Ombre de survol d'une carte : même famille que --ombre, portée plus loin,
-     pour que le décollement se lise sans virer à l'effet de relief. */
   --ombre-haute:0 2px 4px rgba(30,34,32,.06), 0 12px 28px rgba(30,34,32,.10);
   --vitesse:.12s;
+  /* Les dossiers ont leur propre allure de mouvement : un peu plus lente et
+     décélérée, pour que le nom qui se révèle ait le temps de se lire. */
+  --vitesse-dossier:.22s;
+  --courbe:cubic-bezier(.2,.7,.3,1);
 }
 [data-theme="dark"]{
   color-scheme: dark;
@@ -62,8 +63,6 @@
   --discret:#929991;
   --ligne:#343a36;
   --ligne-2:#272c29;
-  /* Le vert du logo est déjà clair : sur fond sombre il tient largement le
-     contraste, il garde donc sa valeur exacte de marque. */
   --marque:#95c03d;
   --marque-lavis:rgba(149,192,61,.10);
   --primaire:#a5cc52;
@@ -83,7 +82,7 @@
   --ombre-haute:0 2px 4px rgba(0,0,0,.45), 0 12px 28px rgba(0,0,0,.45);
 }
 @media (prefers-reduced-motion: reduce){
-  :root{ --vitesse:0s }
+  :root{ --vitesse:0s; --vitesse-dossier:0s }
   *{ animation:none !important; transition:none !important }
 }
 
@@ -100,14 +99,22 @@ a:hover{text-decoration:underline}
 .ico{vertical-align:-3px;flex:none}
 .logo-b27{display:block}
 
+/* Entrée des éléments d'une grille, légèrement décalée d'un élément à
+   l'autre : le regard suit la construction au lieu de recevoir tout d'un
+   bloc. Le remplissage est "backwards" et non "both" : la valeur de
+   remplissage ne vaut alors que pendant le délai, et pas après la fin de
+   l'animation, faute de quoi le transform final bloquerait celui du survol. */
+@keyframes entree{
+  from{opacity:0;transform:translateY(9px)}
+  to{opacity:1;transform:none}
+}
+
 /* ---------------------------------------------------------------- en-tête */
 header{
   display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;
   padding:12px 22px;background:var(--papier);border-bottom:1px solid var(--ligne);
   position:sticky;top:0;z-index:6;box-shadow:0 1px 3px rgba(0,0,0,.05);
 }
-/* Le logo se pose directement sur le fond, sans plaque : le monogramme est
-   déjà une marque, l'enfermer dans un carré vert ferait doublon. */
 header .logo{color:var(--marque);flex:none;display:inline-flex;align-items:center}
 header .titre{display:flex;flex-direction:column;gap:1px;min-width:0;flex:0 1 auto}
 header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.3px;color:var(--encre);line-height:1.2}
@@ -121,15 +128,15 @@ header .espace{flex:1}
 .bouton-icone:hover{background:var(--papier-3);transform:rotate(15deg)}
 
 /* ------------------------------------------------------ bandeau d'accueil
-   Le hall proprement dit. Bandeau pleine largeur plutôt que carte : c'est
-   ce qui lui donne son rôle de seuil, avant les portes. Le lavis vert est
-   posé au radial-gradient en haut à gauche, très dilué : il réchauffe le
-   blanc sans devenir un fond décoratif ni un dégradé de bandeau marketing. */
+   Le seuil du hall. Il ne se montre qu'au premier niveau : une fois dans un
+   dossier, l'en-tête suffit à porter l'identité et la place revient au
+   contenu. Le lavis vert est posé au radial-gradient, très dilué. */
 .hall{
   background-color:var(--papier);
   background-image:radial-gradient(56rem 22rem at 5% -45%, var(--marque-lavis), transparent 68%);
   border-bottom:1px solid var(--ligne);
 }
+body.dedans .hall{display:none}
 .hall-dedans{
   max-width:1200px;margin:0 auto;padding:34px 22px 28px;
   display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;
@@ -141,9 +148,6 @@ header .espace{flex:1}
   line-height:1.15;color:var(--encre);
 }
 .hall-chapeau{margin:0;font-size:14px;color:var(--encre-2);line-height:1.6;max-width:62ch}
-
-/* Les chiffres sont calculés à l'affichage : ils disent l'état réel du hall,
-   pas une promesse. Sur leur propre ligne, ils font socle sous l'accroche. */
 .hall-chiffres{
   list-style:none;margin:20px 0 0;padding:0;flex-basis:100%;
   display:flex;gap:8px;flex-wrap:wrap;
@@ -157,14 +161,9 @@ header .espace{flex:1}
 .hall-chiffres li.fort b{color:var(--primaire-encre)}
 
 .wrap{padding:24px 22px 20px;max-width:1200px;margin:0 auto}
+body.dedans .wrap{padding-top:20px}
 
-/* Sur un téléphone, les marges latérales de 22 px prennent une part sensible
-   de la largeur utile : la carte y gagne à être plus large que la marge. */
 @media (max-width:560px){
-  /* flex-wrap:nowrap : par défaut, un conteneur qui déborde préfère renvoyer à
-     la ligne plutôt que rétrécir ses éléments. Les deux boutons partaient donc
-     sur une troisième ligne. En interdisant le renvoi, le bloc de titre rétrécit
-     et le sous-titre passe sur deux lignes, boutons à droite. */
   header{padding:10px 16px;gap:6px 12px;flex-wrap:nowrap}
   header h1{font-size:17px}
   .hall-dedans{padding:24px 16px 22px;gap:16px}
@@ -173,11 +172,11 @@ header .espace{flex:1}
   footer.pied{padding:6px 16px 30px}
 }
 
-/* ------------------------------------------ barre de recherche et de filtres
-   Cette barre n'est rendue qu'à partir de REGLAGES.seuilFiltres portes, voir
-   hub.js. Le style est donc écrit pour un hall déjà fourni. */
+/* ------------------------------------------------------------- recherche
+   Elle traverse tous les niveaux d'un coup : chercher "INIES" depuis le
+   hall doit trouver, sans avoir à deviner dans quel dossier c'est rangé. */
 .barre{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 20px}
-.recherche{position:relative;flex:1 1 260px;max-width:380px}
+.recherche{position:relative;flex:1 1 260px;max-width:420px}
 .recherche .ico{
   position:absolute;left:10px;top:50%;transform:translateY(-50%);
   color:var(--discret);pointer-events:none;
@@ -189,9 +188,8 @@ header .espace{flex:1}
   transition:border-color var(--vitesse),box-shadow var(--vitesse);
 }
 .recherche input::placeholder{color:var(--discret)}
-/* type="search" apporte gratuitement la touche Échap pour vider le champ, mais
-   aussi une croix déjà dessinée par le navigateur. Elle ferait doublon avec la
-   nôtre, qui elle suit la palette et reste identique d'un navigateur à l'autre. */
+/* type="search" apporte la touche Échap pour vider le champ, mais aussi une
+   croix déjà dessinée par le navigateur, qui ferait doublon avec la nôtre. */
 .recherche input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
 .recherche input:focus{outline:none;border-color:var(--primaire);box-shadow:0 0 0 3px var(--anneau)}
 .recherche .vider{
@@ -203,51 +201,112 @@ header .espace{flex:1}
 .recherche .vider:hover{background:var(--papier-3);color:var(--encre)}
 .recherche.remplie .vider{display:inline-flex}
 
-.filtres{display:flex;gap:6px;flex-wrap:wrap}
-.filtres button{
-  display:inline-flex;align-items:center;gap:6px;
-  background:transparent;border:1px solid var(--ligne);color:var(--encre-2);
-  padding:6px 12px;font:inherit;font-size:12.5px;font-weight:600;
-  border-radius:999px;cursor:pointer;
-  transition:background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
-}
-.filtres button:hover{background:var(--papier-3);color:var(--encre)}
-.filtres button[aria-pressed="true"]{
-  background:var(--primaire-fond);color:var(--primaire-encre);border-color:var(--primaire-bord);
-}
-
-/* -------------------------------------------------------- titres de section
-   Une catégorie est un groupe de portes : son titre mérite d'être un vrai
-   titre, avec son pavé d'icône et son compte, et non la micro-étiquette
-   grise en capitales qui servait quand il n'y avait que deux cartes. */
-.section{margin:0 0 30px}
-.section:last-child{margin-bottom:0}
-.section > h2, #annuaire > h2{
-  margin:0 0 13px;font-size:14.5px;font-weight:700;letter-spacing:-.2px;
-  color:var(--encre);display:flex;align-items:center;gap:10px;
-}
-.section > h2 .pave, #annuaire > h2 .pave{
-  width:27px;height:27px;border-radius:var(--rayon-s);flex:none;
-  background:var(--papier-3);color:var(--encre-2);
+/* ----------------------------------------------------------- fil d'Ariane */
+.fil{display:flex;align-items:center;gap:11px;margin:0 0 18px;flex-wrap:wrap}
+.fil-retour{
+  width:34px;height:34px;flex:none;border-radius:var(--rayon-s);
+  border:1px solid var(--ligne);background:var(--papier);color:var(--encre-2);
   display:inline-flex;align-items:center;justify-content:center;
+  transition:background-color var(--vitesse),color var(--vitesse),
+             border-color var(--vitesse),transform var(--vitesse);
 }
-.section > h2 .compte, #annuaire > h2 .compte{
-  font-size:11.5px;font-weight:600;color:var(--discret);
-  background:var(--papier-2);border:1px solid var(--ligne-2);
-  border-radius:999px;padding:1px 8px;
+.fil-retour:hover{
+  background:var(--primaire-fond);color:var(--primaire-encre);
+  border-color:var(--primaire-bord);text-decoration:none;transform:translateX(-2px);
+}
+.fil-suite{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;min-width:0}
+.fil-lien{color:var(--discret);display:inline-flex;align-items:center;gap:5px;font-weight:500}
+.fil-lien:hover{color:var(--primaire-encre);text-decoration:none}
+.fil-ici{color:var(--encre);font-weight:700;letter-spacing:-.1px}
+.fil-sep{color:var(--ligne);display:inline-flex;align-items:center}
+[data-theme="dark"] .fil-sep{color:var(--encre-2);opacity:.45}
+
+/* ------------------------------------------------------------- dossiers
+   Carrés, l'icône au centre, le nom en dessous qui se révèle au survol.
+
+   Le nom est visible PAR DÉFAUT, et c'est délibéré : c'est l'état sur
+   tablette et téléphone, où le survol n'existe pas et où des tuiles muettes
+   seraient indéchiffrables. C'est aussi le repli si la requête média n'est
+   pas comprise. Le masquage n'intervient qu'à l'intérieur du bloc
+   (hover:hover), c'est-à-dire uniquement là où il y a une souris pour le
+   révéler. Le focus clavier le révèle aussi, sans quoi la navigation au
+   clavier ferait défiler des dossiers anonymes. */
+.grille-dossiers{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:14px;
+}
+@media (min-width:760px){
+  .grille-dossiers{grid-template-columns:repeat(auto-fill,minmax(158px,186px))}
 }
 
-/* ------------------------------------------------------------------ grille
-   auto-fill et non auto-fit : auto-fit étirerait deux cartes isolées sur la
-   moitié de l'écran. auto-fill les garde à leur largeur de lecture et laisse
-   le vide à droite, ce qui reste juste quand la liste grandit. */
+.dossier{
+  position:relative;aspect-ratio:1;
+  display:grid;place-items:center;
+  background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon-g);
+  box-shadow:var(--ombre);color:var(--encre);text-decoration:none;overflow:hidden;
+  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
+  animation-delay:calc(var(--i, 0) * 26ms);
+  transition:transform var(--vitesse-dossier) var(--courbe),
+             box-shadow var(--vitesse-dossier) var(--courbe),
+             border-color var(--vitesse-dossier) var(--courbe);
+}
+.dossier:hover{text-decoration:none}
+
+.dossier .glyphe{
+  width:64px;height:64px;border-radius:18px;
+  display:grid;place-items:center;
+  background:var(--primaire-fond);color:var(--primaire-encre);
+  border:1px solid var(--primaire-bord);
+  transform:translateY(-13px);
+  transition:transform var(--vitesse-dossier) var(--courbe),
+             background-color var(--vitesse-dossier),color var(--vitesse-dossier),
+             border-color var(--vitesse-dossier);
+}
+.dossier .nom{
+  position:absolute;left:11px;right:11px;bottom:15px;
+  text-align:center;font-size:12.5px;font-weight:600;line-height:1.3;
+  color:var(--encre);letter-spacing:-.1px;
+  opacity:1;transform:none;
+  transition:opacity var(--vitesse-dossier) var(--courbe),
+             transform var(--vitesse-dossier) var(--courbe);
+}
+.dossier .compte{
+  position:absolute;top:10px;right:11px;
+  font-size:11px;font-weight:600;color:var(--discret);
+  background:var(--papier-2);border:1px solid var(--ligne-2);
+  border-radius:999px;padding:0 7px;line-height:17px;
+  font-variant-numeric:tabular-nums;
+  transition:background-color var(--vitesse-dossier),color var(--vitesse-dossier),
+             border-color var(--vitesse-dossier);
+}
+
+@media (hover:hover) and (pointer:fine){
+  /* Il y a une souris : le nom se retire et n'apparaît qu'au survol, comme
+     demandé. L'icône reprend alors sa place au centre. */
+  .dossier .nom{opacity:0;transform:translateY(7px)}
+  .dossier .glyphe{transform:none}
+  .dossier:hover,.dossier:focus-visible{
+    transform:translateY(-3px);box-shadow:var(--ombre-haute);border-color:var(--primaire-bord);
+  }
+  .dossier:hover .glyphe,.dossier:focus-visible .glyphe{
+    transform:translateY(-13px) scale(1.04);
+    background:var(--primaire);color:var(--sur-primaire);border-color:var(--primaire);
+  }
+  .dossier:hover .nom,.dossier:focus-visible .nom{opacity:1;transform:none}
+  .dossier:hover .compte,.dossier:focus-visible .compte{
+    background:var(--primaire-fond);color:var(--primaire-encre);border-color:var(--primaire-bord);
+  }
+  .dossier:active{transform:translateY(-1px)}
+}
+.dossier:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
+
+/* --------------------------------------------------------------- grilles */
 .grille{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(300px,340px));
   gap:14px;
 }
-/* Grille dense : pour les ressources extérieures et les fiches d'annuaire,
-   plus petites, dont il peut y en avoir beaucoup. */
 .grille-dense{grid-template-columns:repeat(auto-fill,minmax(228px,272px))}
 @media (max-width:700px){ .grille, .grille-dense{grid-template-columns:1fr} }
 
@@ -257,6 +316,8 @@ header .espace{flex:1}
   background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon);
   box-shadow:var(--ombre);padding:15px 16px 14px;
   color:var(--encre);text-decoration:none;
+  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
+  animation-delay:calc(var(--i, 0) * 26ms);
   transition:transform var(--vitesse),box-shadow var(--vitesse),border-color var(--vitesse);
 }
 a.carte:hover{
@@ -279,8 +340,6 @@ a.carte:hover .vignette{background:var(--primaire);color:var(--sur-primaire);bor
   margin:0;font-size:14.5px;font-weight:700;line-height:1.3;color:var(--encre);
   letter-spacing:-.2px;flex:1;min-width:0;
 }
-/* Flèche de sortie : elle dit que la carte quitte le hub pour un autre site.
-   Discrète au repos, elle part légèrement dans son sens au survol. */
 .carte .sortie{
   flex:none;color:var(--discret);margin-top:1px;
   transition:color var(--vitesse),transform var(--vitesse);
@@ -295,17 +354,12 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
   border:1px solid var(--ligne-2);border-radius:999px;padding:1px 8px;white-space:nowrap;
 }
 
-/* Carte compacte, pour une ressource extérieure que nous ne maintenons pas.
-   Vingt liens ne doivent pas prendre le pas sur deux outils : ils sont utiles,
-   ils ne sont pas la raison d'être du hall. */
 .carte-lien{padding:12px 14px 11px;gap:7px}
 .carte-lien .vignette{width:30px;height:30px}
 .carte-lien h3{font-size:13.5px}
 .carte-lien .pitch{font-size:12px;line-height:1.45}
 .carte-lien .bas{margin-top:0}
 
-/* Pastille de statut. Le statut "en-ligne" n'en porte pas : le cas normal n'a
-   pas besoin d'être annoncé, seules les exceptions méritent un signe. */
 .pastille{
   font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
   border-radius:999px;padding:2px 8px;white-space:nowrap;flex:none;
@@ -316,18 +370,12 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 .pastille.bureau{background:var(--papier-3);color:var(--encre-2);border-color:var(--ligne)}
 .pastille.obsolete{background:var(--haute-fond);color:var(--haute);border-color:var(--haute)}
 
-/* Cartes non cliquables : à venir, application de bureau, porte retirée. Elles
-   restent lisibles mais ne prétendent pas mener quelque part. */
 .carte.inerte{box-shadow:none;background:var(--papier-2);border-style:dashed}
 .carte.inerte .vignette{background:var(--papier-3);color:var(--discret);border-color:var(--ligne)}
 .carte.inerte h3{color:var(--encre-2)}
 .carte.obsolete h3{text-decoration:line-through;text-decoration-thickness:1px}
 
-/* ---------------------------------------------------------------- annuaire
-   Une fiche de contact n'est pas une porte : on n'y clique pas pour partir
-   ailleurs, on y prend une adresse. Elle ne se soulève donc pas au survol,
-   et ce sont ses liens mailto et tel qui portent l'interaction. */
-#annuaire{margin:32px 0 0;padding-top:26px;border-top:1px solid var(--ligne)}
+/* --------------------------------------------------------------- annuaire */
 .fiche{box-shadow:none;gap:10px}
 .fiche .tete{align-items:center}
 .fiche h3{font-size:14px}
@@ -339,16 +387,30 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
   color:var(--lien);overflow-wrap:anywhere;
 }
 
+/* ------------------------------------------------- résultats de recherche
+   Chaque résultat rappelle le dossier d'où il vient : sans cela, on trouve
+   la porte mais on ne sait pas où elle était rangée, ni comment y revenir. */
+.resultat{
+  display:flex;flex-direction:column;gap:6px;
+  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
+  animation-delay:calc(var(--i, 0) * 26ms);
+}
+.resultat .carte{animation:none}
+.resultat-ou{
+  font-size:11.5px;color:var(--discret);display:inline-flex;align-items:center;gap:5px;
+  padding-left:3px;
+}
+
 /* --------------------------------------------------- message aucun résultat */
 .vide{
   border:1px dashed var(--ligne);border-radius:var(--rayon);background:var(--papier-2);
-  padding:26px 20px;text-align:center;color:var(--discret);font-size:13px;
+  padding:30px 20px;text-align:center;color:var(--discret);font-size:13px;
 }
 .vide b{display:block;color:var(--encre-2);font-size:14px;margin-bottom:4px}
 
 /* -------------------------------------------------------------- pied de page */
 footer.pied{
-  padding:8px 22px 40px;max-width:1200px;margin:0 auto;
+  padding:26px 22px 40px;max-width:1200px;margin:0 auto;
   font-size:12px;color:var(--discret);line-height:1.7;
 }
 footer.pied .sep{margin:0 7px;opacity:.5}
@@ -400,9 +462,8 @@ footer.pied .sep{margin:0 7px;opacity:.5}
 .changelog .cl-txt{color:var(--encre-2);line-height:1.5}
 
 /* ---------------------------------------------------------------- impression
-   Le hall s'imprime rarement, mais s'il l'est il doit sortir en clair et
-   porter les adresses : une carte cliquable sans son URL ne sert à rien sur
-   papier. */
+   Sur papier, un dossier fermé ne sert à rien : le nom est donc toujours
+   visible, et chaque carte est suivie de son adresse complète. */
 @media print{
   :root,[data-theme="dark"]{
     color-scheme:light;
@@ -416,9 +477,12 @@ footer.pied .sep{margin:0 7px;opacity:.5}
   body{background:#fff}
   header{position:static;box-shadow:none}
   .hall{background-image:none}
-  .noprint,.barre{display:none !important}
+  .noprint,.barre,.fil-retour{display:none !important}
   .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
-  .carte,.fiche{break-inside:avoid;box-shadow:none}
+  .grille-dossiers{grid-template-columns:repeat(4,1fr)}
+  .dossier .nom{opacity:1;transform:none}
+  .dossier .glyphe{transform:translateY(-13px)}
+  .carte,.fiche,.dossier{break-inside:avoid;box-shadow:none}
   .carte .sortie{display:none}
   a.carte[href]::after{
     content:" " attr(href);display:block;margin-top:6px;

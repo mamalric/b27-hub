@@ -52,17 +52,16 @@
 </section>
 
 <div class="wrap">
-  <!-- Barre de recherche et filtres : construite par hub.js seulement au-delà
-       de REGLAGES.seuilFiltres portes, elle reste vide en dessous. -->
+  <!-- Barre de recherche : construite par hub.js seulement au-delà de
+       REGLAGES.seuilFiltres portes, elle reste vide en dessous. -->
   <div class="barre noprint" id="barre"></div>
 
-  <!-- Cartes construites à partir de catalogue.js. Rien à écrire ici. -->
-  <div id="catalogue"></div>
+  <!-- Fil d'Ariane, vide au niveau du hall. -->
+  <div id="filAriane"></div>
 
-  <div class="vide" id="aucunResultat" hidden></div>
-
-  <!-- Annuaire, masqué tant que CONTACTS est vide. -->
-  <section id="annuaire" hidden></section>
+  <!-- Dossiers ou portes, selon l'endroit où l'on est dans l'arborescence.
+       Tout est construit à partir de catalogue.js, rien à écrire ici. -->
+  <div id="contenu"></div>
 </div>
 
 <footer class="pied">

@@ -2,6 +2,24 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, navigation par dossiers
+
+Retour de l'utilisateur sur la présentation : il veut une navigation par dossiers, pas une liste à plat. Des cartes carrées avec une icône au centre, le nom en dessous qui n'apparaît qu'au survol, des micro-animations, et une descente par catégories puis sous-catégories jusqu'à l'élément final.
+
+**La réserve posée d'emblée.** Le nom qui n'apparaît qu'au survol ne marche pas sur tablette ni sur téléphone, où le survol n'existe pas : les tuiles y resteraient anonymes. Implémenté comme demandé sur écran avec souris, sous `@media (hover: hover) and (pointer: fine)`, et le nom reste visible en permanence partout ailleurs. L'ordre des règles compte : le nom visible est l'état par défaut, le masquage n'est ajouté qu'à l'intérieur de la requête média, ce qui fait que le repli en cas de non-prise en charge est le bon. Le focus clavier révèle le nom au même titre que la souris.
+
+**L'arborescence.** Nouveau tableau `SOUS_CATEGORIES` et champ `sousCategorie` facultatif sur les portes. Une catégorie sans sous-dossier peuplé s'ouvre directement sur ses portes : on ne traverse jamais un dossier qui n'aurait qu'un enfant à montrer. Les portes d'une catégorie à sous-dossiers qui n'en déclarent pas tombent dans un dossier "Divers", sans quoi elles seraient invisibles. Les six ressources ont été réparties en Réglementation, Données et bases, Documentation technique : c'est la branche qui montre les trois niveaux. L'annuaire devient un dossier du hall comme les autres, plutôt qu'une section en pied de page.
+
+**La position est dans l'adresse.** `#/`, `#/ressources`, `#/ressources/technique`. Ce n'est pas cosmétique : c'est ce qui rend le bouton Précédent fonctionnel, permet d'ouvrir un dossier dans un nouvel onglet, et permet d'envoyer à un collègue le lien d'un dossier précis. Un dossier est un `<a href>` et non un `div` avec un écouteur : le clavier, le clic du milieu et le menu contextuel viennent gratuitement. Une adresse inventée ramène au hall sans rien casser.
+
+**Un piège d'animation.** Les grilles entrent avec un décalage de 26 ms par élément. Le remplissage doit être `backwards` et non `both` : avec `both`, la valeur finale de l'animation reste appliquée après la fin et bloque le `transform` du survol, la carte ne se soulève plus jamais.
+
+**Deux décisions de forme.** Le dossier est carré, la porte reste rectangulaire : la forme dit la fonction, le carré contient, le rectangle mène ailleurs. Et le bandeau d'accueil disparaît dès qu'on entre dans un dossier, l'en-tête suffisant alors à porter l'identité.
+
+**La recherche traverse les niveaux.** Indispensable dans une navigation en profondeur : chercher "INIES" depuis n'importe où doit trouver, sans deviner le rangement. Chaque résultat rappelle son dossier d'origine. Les filtres par catégorie ont été retirés, les dossiers font désormais ce travail.
+
+**Vérifications.** Descente hall puis dossier puis sous-dossier, retour par le bouton du navigateur à chaque cran, retour par le bouton du fil d'Ariane, adresse inventée ramenant au hall. Survol montrant le nom, le pavé d'icône se remplissant, la pastille de compte virant au vert. Recherche depuis un sous-dossier trouvant une porte rangée ailleurs, avec son chemin. Mobile : noms visibles en permanence, deux tuiles par rangée. Thème sombre. Console propre.
+
 ## 2026-08-29, la dictée sans le navigateur
 
 L'utilisateur remonte un conseil trouvé sur Reddit : lancer Opera avec un `--user-agent` de Chrome pour débloquer le microphone. Vérification faite, cela ne s'applique pas ici, mais la question a mené à une bien meilleure réponse.

@@ -1,12 +1,12 @@
 # Outils B27
 
-Le hall d'entrée des outils du bureau d'études B27. Un seul lien à transmettre, une carte par porte : ce que nous fabriquons, les sites de l'entreprise, les ressources métier, et qui contacter.
+Le hall d'entrée des outils du bureau d'études B27. Un seul lien à transmettre. Le hall s'ouvre sur des dossiers : on en ouvre un, parfois un sous-dossier, et on arrive aux outils, aux sites de l'entreprise, aux ressources métier ou à l'annuaire.
 
 En ligne : https://mamalric.github.io/b27-hub/
 
 ## Ajouter une porte
 
-Un seul fichier à modifier, [`catalogue.js`](catalogue.js). Copier une fiche existante, remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis pousser sur `main`. La carte apparaît, les compteurs, les sections et les filtres suivent d'eux-mêmes. Le gabarit, les deux types de carte et les cinq statuts sont documentés en tête du fichier.
+Un seul fichier à modifier, [`catalogue.js`](catalogue.js). Copier une fiche existante, remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis pousser sur `main`. Le dossier apparaît, les compteurs suivent d'eux-mêmes. Le champ `sousCategorie` est facultatif : une catégorie sans sous-dossier peuplé s'ouvre directement sur ses portes. Le gabarit, les deux types de carte et les cinq statuts sont documentés en tête du fichier.
 
 Avant de publier, vérifier que le catalogue est cohérent :
 
@@ -19,8 +19,8 @@ python tests/verifier_catalogue.py
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Ossature de la page, presque vide : tout est construit à l'exécution. |
-| `catalogue.js` | Portes, annuaire, catégories, réglages. Le seul fichier à faire vivre. |
-| `hub.js` | Logo, icônes, thème, bandeau, cartes, annuaire, recherche, panneau À propos. |
+| `catalogue.js` | Portes, annuaire, catégories, sous-catégories, réglages. Le seul fichier à faire vivre. |
+| `hub.js` | Logo, icônes, thème, bandeau, navigation par dossiers, cartes, recherche, panneau À propos. |
 | `hub.css` | Charte graphique reprise des outils B27 existants. |
 | `signalement.js` | La pastille "Signaler un problème", autonome et réutilisable ailleurs. |
 | `logo-b27.svg` | Le logo, qui sert aussi de favicon. |
@@ -29,6 +29,8 @@ python tests/verifier_catalogue.py
 | `docs/signalement.md` | Fonctionnement du signalement et modes d'envoi. |
 
 HTML, CSS et JavaScript sans framework et sans étape de build. Aucune requête externe : la page s'ouvre aussi bien en ligne que par un double-clic sur `index.html`.
+
+La position dans l'arborescence tient dans l'adresse (`#/ressources/technique`) : le bouton Précédent du navigateur fonctionne, et le lien d'un dossier précis se transmet tel quel.
 
 ## Signaler un problème
 
