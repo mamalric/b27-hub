@@ -76,6 +76,24 @@ Le hub n'a pas de portail de connexion et n'en aura pas. La personnalisation ne 
 
 **La salutation suit l'heure du poste.** Bonjour, bonsoir, bonne nuit : c'est la seule chose que le hub sait de vous, et il la lit sur l'horloge. Accueillant sans rien demander.
 
+## Le bandeau de charpente
+
+Le hall s'ouvre sur une charpente métallique en axonométrie, qui passe du construit au dessiné de gauche à droite : membrures épaisses et pleines à gauche, trait fin seul à droite, sur une trame de calque. Un ouvrage qui se lèverait depuis son plan.
+
+**C'est un dessin original, pas une photo vectorisée.** La demande partait d'une image de charpente, vraisemblablement une photo de banque d'images : la tracer en aurait produit une oeuvre dérivée. Le dessin a donc été refait, dans le même esprit. Il y gagne aussi techniquement : neuf kilo-octets, net à toute taille, aucune requête, et il se recadre du grand écran au téléphone.
+
+**La géométrie est calculée, pas tracée à l'oeil.** `src/charpente.py` produit le SVG : deux files de poteaux, poutres longitudinales et transversales, fermes à treillis, contreventement une travée sur trois. C'est la seule façon d'obtenir des membrures réellement parallèles et une trame régulière. Une charpente mal d'aplomb se voit immédiatement, surtout chez un BET. Pour la modifier : éditer le script, relancer `python src/charpente.py bandeau-charpente.svg`, recoller le résultat dans `index.html`.
+
+**Axonométrie et non perspective**, volontairement : c'est le mode de représentation des plans d'exécution, et elle se répète proprement sur toute la largeur d'un bandeau.
+
+**Le rapport du viewBox suit celui du bandeau**, autour de 5,5 pour 1. Avec un recadrage en `slice`, tout écart entre les deux se paie en rognage : un premier essai en 1200 x 280 coupait les poteaux à mi-hauteur, et la charpente n'était plus qu'un enchevêtrement de poutres sans appui visible.
+
+**Le texte est protégé par un voile dégradé.** Le fond suffirait presque, mais une membrure blanche qui passe derrière une lettre blanche fait tomber le contraste localement, et cela ne se voit qu'à l'usage. Le voile reprend le vert le plus foncé du bandeau, où le blanc tient 8,1:1, et s'efface avant la moitié pour ne pas éteindre le dessin. Le dégradé de fond va de `#5f7f1f` à `#3f5714`, les deux extrémités tenant au moins 4,6:1 avec le texte blanc.
+
+**Sous 700 px, la charpente recule à l'état de texture.** Le bandeau y devient presque carré alors que le dessin est fait pour 5,5 pour 1 : le recadrage n'en montre plus qu'une tranche, qui ne se lit plus comme une charpente et se met à concurrencer le texte.
+
+**Elle ne s'imprime pas.** Elle mangerait de l'encre pour un décor, et le bandeau garde son sens sans elle.
+
 ## Les cartes chiffrées
 
 Quatre aplats colorés à l'arrivée, texte blanc, comme sur un tableau de bord. Chacune répond à une question qu'on se pose vraiment en arrivant : qu'est-ce qui marche, qu'est-ce que nous fabriquons nous-mêmes, qu'est-ce qui vient d'ailleurs, qu'est-ce qui arrive. Les chiffres sont calculés, jamais recopiés.

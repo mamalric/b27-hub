@@ -59,8 +59,236 @@
     <!-- Accueil : salutation, chiffres, raccourcis. Masqué dès qu'on entre
          dans un dossier ou qu'une recherche est en cours. -->
     <section class="accueil" id="accueil">
-      <p class="salut" id="salut"></p>
-      <p class="chapeau" id="chapeau"></p>
+
+      <!-- Bandeau d'accueil. La charpente est un dessin original, calculé par
+           src/charpente.py puis collé ici : axonométrie, deux files de
+           poteaux, fermes à treillis, contreventement une travée sur trois.
+           Elle passe du construit au dessiné de gauche à droite, comme un
+           ouvrage qui se lèverait depuis son plan. Purement décorative, donc
+           aria-hidden : un lecteur d'écran n'a rien à en tirer.
+           Pour la modifier : éditer le script, relancer
+           python src/charpente.py bandeau-charpente.svg, recoller. -->
+      <div class="banniere">
+      <svg class="bandeau-charpente" viewBox="0 0 1200 216" preserveAspectRatio="xMidYMid slice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bcPlein" x1="0" x2="1">
+            <stop offset="0.24" stop-color="#000"/>
+            <stop offset="0.52" stop-color="#fff"/>
+            <stop offset="0.74" stop-color="#fff"/>
+            <stop offset="0.96" stop-color="#000"/>
+          </linearGradient>
+          <linearGradient id="bcTrait" x1="0" x2="1">
+            <stop offset="0.16" stop-color="#000"/>
+            <stop offset="0.46" stop-color="#fff"/>
+            <stop offset="1" stop-color="#fff"/>
+          </linearGradient>
+          <linearGradient id="bcTrame" x1="0" x2="1">
+            <stop offset="0.45" stop-color="#000"/>
+            <stop offset="0.85" stop-color="#fff"/>
+            <stop offset="1" stop-color="#fff"/>
+          </linearGradient>
+          <mask id="bcMasquePlein"><rect width="1200" height="216" fill="url(#bcPlein)"/></mask>
+          <mask id="bcMasqueTrait"><rect width="1200" height="216" fill="url(#bcTrait)"/></mask>
+          <mask id="bcMasqueTrame"><rect width="1200" height="216" fill="url(#bcTrame)"/></mask>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.30" mask="url(#bcMasqueTrame)">
+          <path d="M0.0 0.0 L0.0 216.0"/>
+          <path d="M27.0 0.0 L27.0 216.0"/>
+          <path d="M54.0 0.0 L54.0 216.0"/>
+          <path d="M81.0 0.0 L81.0 216.0"/>
+          <path d="M108.0 0.0 L108.0 216.0"/>
+          <path d="M135.0 0.0 L135.0 216.0"/>
+          <path d="M162.0 0.0 L162.0 216.0"/>
+          <path d="M189.0 0.0 L189.0 216.0"/>
+          <path d="M216.0 0.0 L216.0 216.0"/>
+          <path d="M243.0 0.0 L243.0 216.0"/>
+          <path d="M270.0 0.0 L270.0 216.0"/>
+          <path d="M297.0 0.0 L297.0 216.0"/>
+          <path d="M324.0 0.0 L324.0 216.0"/>
+          <path d="M351.0 0.0 L351.0 216.0"/>
+          <path d="M378.0 0.0 L378.0 216.0"/>
+          <path d="M405.0 0.0 L405.0 216.0"/>
+          <path d="M432.0 0.0 L432.0 216.0"/>
+          <path d="M459.0 0.0 L459.0 216.0"/>
+          <path d="M486.0 0.0 L486.0 216.0"/>
+          <path d="M513.0 0.0 L513.0 216.0"/>
+          <path d="M540.0 0.0 L540.0 216.0"/>
+          <path d="M567.0 0.0 L567.0 216.0"/>
+          <path d="M594.0 0.0 L594.0 216.0"/>
+          <path d="M621.0 0.0 L621.0 216.0"/>
+          <path d="M648.0 0.0 L648.0 216.0"/>
+          <path d="M675.0 0.0 L675.0 216.0"/>
+          <path d="M702.0 0.0 L702.0 216.0"/>
+          <path d="M729.0 0.0 L729.0 216.0"/>
+          <path d="M756.0 0.0 L756.0 216.0"/>
+          <path d="M783.0 0.0 L783.0 216.0"/>
+          <path d="M810.0 0.0 L810.0 216.0"/>
+          <path d="M837.0 0.0 L837.0 216.0"/>
+          <path d="M864.0 0.0 L864.0 216.0"/>
+          <path d="M891.0 0.0 L891.0 216.0"/>
+          <path d="M918.0 0.0 L918.0 216.0"/>
+          <path d="M945.0 0.0 L945.0 216.0"/>
+          <path d="M972.0 0.0 L972.0 216.0"/>
+          <path d="M999.0 0.0 L999.0 216.0"/>
+          <path d="M1026.0 0.0 L1026.0 216.0"/>
+          <path d="M1053.0 0.0 L1053.0 216.0"/>
+          <path d="M1080.0 0.0 L1080.0 216.0"/>
+          <path d="M1107.0 0.0 L1107.0 216.0"/>
+          <path d="M1134.0 0.0 L1134.0 216.0"/>
+          <path d="M1161.0 0.0 L1161.0 216.0"/>
+          <path d="M1188.0 0.0 L1188.0 216.0"/>
+          <path d="M1215.0 0.0 L1215.0 216.0"/>
+          <path d="M0.0 0.0 L1200.0 0.0"/>
+          <path d="M0.0 27.0 L1200.0 27.0"/>
+          <path d="M0.0 54.0 L1200.0 54.0"/>
+          <path d="M0.0 81.0 L1200.0 81.0"/>
+          <path d="M0.0 108.0 L1200.0 108.0"/>
+          <path d="M0.0 135.0 L1200.0 135.0"/>
+          <path d="M0.0 162.0 L1200.0 162.0"/>
+          <path d="M0.0 189.0 L1200.0 189.0"/>
+          <path d="M0.0 216.0 L1200.0 216.0"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity="0.26" mask="url(#bcMasquePlein)">
+          <path d="M-40.0 198.0 L-40.0 94.0"/>
+          <path d="M200.0 198.0 L200.0 94.0"/>
+          <path d="M440.0 198.0 L440.0 94.0"/>
+          <path d="M680.0 198.0 L680.0 94.0"/>
+          <path d="M920.0 198.0 L920.0 94.0"/>
+          <path d="M1160.0 198.0 L1160.0 94.0"/>
+          <path d="M100.0 152.0 L100.0 48.0"/>
+          <path d="M340.0 152.0 L340.0 48.0"/>
+          <path d="M580.0 152.0 L580.0 48.0"/>
+          <path d="M820.0 152.0 L820.0 48.0"/>
+          <path d="M1060.0 152.0 L1060.0 48.0"/>
+          <path d="M1300.0 152.0 L1300.0 48.0"/>
+          <path d="M-40.0 94.0 L1160.0 94.0"/>
+          <path d="M-40.0 143.9 L1160.0 143.9"/>
+          <path d="M100.0 48.0 L1300.0 48.0"/>
+          <path d="M100.0 97.9 L1300.0 97.9"/>
+          <path d="M-40.0 94.0 L100.0 48.0"/>
+          <path d="M200.0 94.0 L340.0 48.0"/>
+          <path d="M440.0 94.0 L580.0 48.0"/>
+          <path d="M680.0 94.0 L820.0 48.0"/>
+          <path d="M920.0 94.0 L1060.0 48.0"/>
+          <path d="M1160.0 94.0 L1300.0 48.0"/>
+          <path d="M200.0 198.0 L440.0 94.0"/>
+          <path d="M440.0 198.0 L200.0 94.0"/>
+          <path d="M920.0 198.0 L1160.0 94.0"/>
+          <path d="M1160.0 198.0 L920.0 94.0"/>
+          <path d="M-40.0 84.9 L200.0 68.0 L440.0 84.9 L680.0 68.0 L920.0 84.9 L1160.0 68.0"/>
+          <path d="M-40.0 94.0 L-40.0 84.9"/>
+          <path d="M200.0 94.0 L200.0 68.0"/>
+          <path d="M440.0 94.0 L440.0 84.9"/>
+          <path d="M680.0 94.0 L680.0 68.0"/>
+          <path d="M920.0 94.0 L920.0 84.9"/>
+          <path d="M1160.0 94.0 L1160.0 68.0"/>
+          <path d="M-40.0 94.0 L200.0 68.0"/>
+          <path d="M200.0 68.0 L440.0 94.0"/>
+          <path d="M440.0 94.0 L680.0 68.0"/>
+          <path d="M680.0 68.0 L920.0 94.0"/>
+          <path d="M920.0 94.0 L1160.0 68.0"/>
+          <path d="M100.0 38.9 L340.0 22.0 L580.0 38.9 L820.0 22.0 L1060.0 38.9 L1300.0 22.0"/>
+          <path d="M100.0 48.0 L100.0 38.9"/>
+          <path d="M340.0 48.0 L340.0 22.0"/>
+          <path d="M580.0 48.0 L580.0 38.9"/>
+          <path d="M820.0 48.0 L820.0 22.0"/>
+          <path d="M1060.0 48.0 L1060.0 38.9"/>
+          <path d="M1300.0 48.0 L1300.0 22.0"/>
+          <path d="M100.0 48.0 L340.0 22.0"/>
+          <path d="M340.0 22.0 L580.0 48.0"/>
+          <path d="M580.0 48.0 L820.0 22.0"/>
+          <path d="M820.0 22.0 L1060.0 48.0"/>
+          <path d="M1060.0 48.0 L1300.0 22.0"/>
+          <path d="M-40.0 84.9 L100.0 38.9"/>
+          <path d="M200.0 68.0 L340.0 22.0"/>
+          <path d="M440.0 84.9 L580.0 38.9"/>
+          <path d="M680.0 68.0 L820.0 22.0"/>
+          <path d="M920.0 84.9 L1060.0 38.9"/>
+          <path d="M1160.0 68.0 L1300.0 22.0"/>
+          <path d="M-40.0 198.0 L1160.0 198.0"/>
+          <path d="M100.0 152.0 L1300.0 152.0"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55" mask="url(#bcMasqueTrait)">
+          <path d="M-40.0 198.0 L-40.0 94.0"/>
+          <path d="M200.0 198.0 L200.0 94.0"/>
+          <path d="M440.0 198.0 L440.0 94.0"/>
+          <path d="M680.0 198.0 L680.0 94.0"/>
+          <path d="M920.0 198.0 L920.0 94.0"/>
+          <path d="M1160.0 198.0 L1160.0 94.0"/>
+          <path d="M100.0 152.0 L100.0 48.0"/>
+          <path d="M340.0 152.0 L340.0 48.0"/>
+          <path d="M580.0 152.0 L580.0 48.0"/>
+          <path d="M820.0 152.0 L820.0 48.0"/>
+          <path d="M1060.0 152.0 L1060.0 48.0"/>
+          <path d="M1300.0 152.0 L1300.0 48.0"/>
+          <path d="M-40.0 94.0 L1160.0 94.0"/>
+          <path d="M-40.0 143.9 L1160.0 143.9"/>
+          <path d="M100.0 48.0 L1300.0 48.0"/>
+          <path d="M100.0 97.9 L1300.0 97.9"/>
+          <path d="M-40.0 94.0 L100.0 48.0"/>
+          <path d="M200.0 94.0 L340.0 48.0"/>
+          <path d="M440.0 94.0 L580.0 48.0"/>
+          <path d="M680.0 94.0 L820.0 48.0"/>
+          <path d="M920.0 94.0 L1060.0 48.0"/>
+          <path d="M1160.0 94.0 L1300.0 48.0"/>
+          <path d="M200.0 198.0 L440.0 94.0"/>
+          <path d="M440.0 198.0 L200.0 94.0"/>
+          <path d="M920.0 198.0 L1160.0 94.0"/>
+          <path d="M1160.0 198.0 L920.0 94.0"/>
+          <path d="M-40.0 84.9 L200.0 68.0 L440.0 84.9 L680.0 68.0 L920.0 84.9 L1160.0 68.0"/>
+          <path d="M-40.0 94.0 L-40.0 84.9"/>
+          <path d="M200.0 94.0 L200.0 68.0"/>
+          <path d="M440.0 94.0 L440.0 84.9"/>
+          <path d="M680.0 94.0 L680.0 68.0"/>
+          <path d="M920.0 94.0 L920.0 84.9"/>
+          <path d="M1160.0 94.0 L1160.0 68.0"/>
+          <path d="M-40.0 94.0 L200.0 68.0"/>
+          <path d="M200.0 68.0 L440.0 94.0"/>
+          <path d="M440.0 94.0 L680.0 68.0"/>
+          <path d="M680.0 68.0 L920.0 94.0"/>
+          <path d="M920.0 94.0 L1160.0 68.0"/>
+          <path d="M100.0 38.9 L340.0 22.0 L580.0 38.9 L820.0 22.0 L1060.0 38.9 L1300.0 22.0"/>
+          <path d="M100.0 48.0 L100.0 38.9"/>
+          <path d="M340.0 48.0 L340.0 22.0"/>
+          <path d="M580.0 48.0 L580.0 38.9"/>
+          <path d="M820.0 48.0 L820.0 22.0"/>
+          <path d="M1060.0 48.0 L1060.0 38.9"/>
+          <path d="M1300.0 48.0 L1300.0 22.0"/>
+          <path d="M100.0 48.0 L340.0 22.0"/>
+          <path d="M340.0 22.0 L580.0 48.0"/>
+          <path d="M580.0 48.0 L820.0 22.0"/>
+          <path d="M820.0 22.0 L1060.0 48.0"/>
+          <path d="M1060.0 48.0 L1300.0 22.0"/>
+          <path d="M-40.0 84.9 L100.0 38.9"/>
+          <path d="M200.0 68.0 L340.0 22.0"/>
+          <path d="M440.0 84.9 L580.0 38.9"/>
+          <path d="M680.0 68.0 L820.0 22.0"/>
+          <path d="M920.0 84.9 L1060.0 38.9"/>
+          <path d="M1160.0 68.0 L1300.0 22.0"/>
+          <path d="M-40.0 198.0 L1160.0 198.0"/>
+          <path d="M100.0 152.0 L1300.0 152.0"/>
+        </g>
+        <g fill="currentColor" opacity="0.5" mask="url(#bcMasqueTrait)">
+          <circle cx="-40.0" cy="94.0" r="3.2"/>
+          <circle cx="200.0" cy="94.0" r="3.2"/>
+          <circle cx="440.0" cy="94.0" r="3.2"/>
+          <circle cx="680.0" cy="94.0" r="3.2"/>
+          <circle cx="920.0" cy="94.0" r="3.2"/>
+          <circle cx="1160.0" cy="94.0" r="3.2"/>
+          <circle cx="100.0" cy="48.0" r="3.2"/>
+          <circle cx="340.0" cy="48.0" r="3.2"/>
+          <circle cx="580.0" cy="48.0" r="3.2"/>
+          <circle cx="820.0" cy="48.0" r="3.2"/>
+          <circle cx="1060.0" cy="48.0" r="3.2"/>
+          <circle cx="1300.0" cy="48.0" r="3.2"/>
+        </g>
+      </svg>
+        <div class="banniere-txt">
+          <p class="salut" id="salut"></p>
+          <p class="chapeau" id="chapeau"></p>
+        </div>
+      </div>
+
       <div class="chiffres" id="chiffres"></div>
       <div id="raccourcis"></div>
     </section>

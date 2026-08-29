@@ -20,6 +20,8 @@ Donner un point d'entrée unique, en ligne, vers les outils, les sites et les re
 ## État actuel
 Version v4 en ligne sur GitHub Pages, publiée depuis `main`. La page est construite à l'exécution à partir de `catalogue.js`, seul fichier à faire vivre : ajouter une porte, c'est y ajouter une fiche, sans toucher au reste du code.
 
+Le hall s'ouvre sur un bandeau portant une charpente métallique dessinée en axonométrie, qui passe du construit au dessiné de gauche à droite. C'est un dessin original en SVG, calculé par `src/charpente.py` et non tracé à la main : neuf kilo-octets, net à toute taille, aucune requête.
+
 Disposition de tableau de bord : barre latérale permanente donnant accès à toutes les catégories depuis n'importe où, recherche au centre de la barre du haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Sous 960 px la barre latérale devient un tiroir.
 
 Le hall est personnel sans le moindre compte, et il n'y en aura jamais : épingler une porte la remonte en tête des visites suivantes, les six dernières portes ouvertes s'y ajoutent d'elles-mêmes. Thème, épingles et récentes vivent en `localStorage`, dans le navigateur de chacun, et n'en sortent jamais.

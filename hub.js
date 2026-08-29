@@ -21,6 +21,8 @@
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v5", date: "2026-08-29", titre: "Bandeau de charpente",
+    texte: "Un bandeau d'accueil portant une charpente métallique dessinée en axonométrie, qui passe du construit au dessiné de gauche à droite. Dessin original en SVG, calculé et non tracé à la main, quelques kilo-octets et net à toute taille." },
   { v: "v4", date: "2026-08-29", titre: "Tableau de bord, et ce qui vous appartient",
     texte: "Barre latérale permanente : toutes les catégories à un clic depuis n'importe où. Recherche en haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Surtout : le hall devient personnel sans le moindre compte. Épinglez une porte, elle remonte en tête à chacune de vos visites, et les dernières portes ouvertes s'y ajoutent. Tout vit dans votre navigateur et n'en sort jamais." },
   { v: "v3", date: "2026-08-29", titre: "Navigation par dossiers",

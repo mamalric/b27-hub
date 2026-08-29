@@ -2,6 +2,22 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, bandeau de charpente
+
+L'utilisateur envoie une image de charpente métallique, moitié photo moitié filaire, et demande de la vectoriser en simplifiant pour en faire un bandeau d'accueil. Il a raison sur le manque : il manquait quelque chose qui dise le métier.
+
+**Deux points posés d'emblée.** Je n'ai que le rendu de l'image, pas le fichier, et c'est visiblement une photo de banque d'images : la tracer en aurait produit une oeuvre dérivée. J'ai donc dessiné une charpente originale dans le même esprit. C'est aussi meilleur techniquement : neuf kilo-octets contre plusieurs centaines pour une photo, net à toute taille, aucune requête.
+
+**Géométrie calculée, pas tracée à l'oeil.** `src/charpente.py` produit le SVG : axonométrie, deux files de poteaux, poutres longitudinales et transversales, fermes à treillis, contreventement une travée sur trois. Une charpente mal d'aplomb se voit immédiatement, surtout chez un BET ; seul le calcul garantit des membrures parallèles et une trame régulière. Le script reste dans le dépôt, le dessin se régénère et se recolle.
+
+**Trois essais avant le bon cadrage.** Le premier était un fourré : trois files de poteaux et des croix de Saint-André partout, illisible. Le deuxième, allégé, se lisait comme un petit hangar vu de loin. Le troisième, zoomé en fragment, coupait les poteaux à mi-hauteur : le rapport du viewBox, 1200 x 280, s'écartait trop de celui du bandeau, et le recadrage en `slice` mangeait la différence. Le rapport a été aligné sur celui du bandeau, autour de 5,5 pour 1, et là seulement la charpente s'est tenue debout.
+
+**Contraste.** Le dégradé de fond va de `#5f7f1f` à `#3f5714`, les deux extrémités tenant au moins 4,6:1 avec le texte blanc, seuil du petit texte. Un voile dégradé a été ajouté entre le dessin et le texte : le fond suffisait presque, mais une membrure blanche passant derrière une lettre blanche fait tomber le contraste localement, et cela ne se voit qu'à l'usage.
+
+**Sous 700 px**, la charpente recule à l'état de texture : le bandeau y devient presque carré alors que le dessin est fait pour 5,5 pour 1, et la tranche visible ne se lit plus comme une charpente, elle concurrence le texte. Elle ne s'imprime pas non plus.
+
+**Vérifications.** Clair et sombre, écran large, écran moyen et mobile. Contrastes calculés avant d'écrire le style, pas constatés après. Console propre, aucun débordement horizontal.
+
 ## 2026-08-29, tableau de bord et personnalisation sans compte
 
 L'utilisateur veut quelque chose de plus accueillant, capture d'un tableau de bord à l'appui (portail Jobie) : barre latérale, recherche en haut, cartes chiffrées colorées, carte de profil. Contrainte posée par lui : pas de portail de connexion, et il pense qu'il n'y en aura jamais.
