@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, la meteo veille
+
+Question de l'utilisateur : la meteo ne se met pas a jour automatiquement ? Non, et c'etait un manque : elle ne se chargeait qu'a l'ouverture de la page, un onglet laisse ouvert toute la journee affichait le releve du matin, fige.
+
+Le portail veille desormais : toutes les dix minutes et au retour sur l'onglet, `chargerMeteo()` repasse. Le cache de vingt minutes decide si une requete part reellement, donc la veille coute au plus une requete par demi-heure. Au passage de minuit, le calendrier bascule sur le nouveau jour et revient au mois courant. Effet de bord bienvenu : si la premiere demande avait echoue, reseau coupe au chargement, la tuile apparait d'elle-meme des qu'une veille aboutit.
+
+Verifie en aperçu avec un cache artificiellement perime : la relance re-tire et reecrit le cache. Le chemin du retour d'onglet n'est pas testable dans le panneau, qui se declare hidden en permanence, mais il tient en deux lignes.
+
 ## 2026-08-29, le fond vit avec le ciel (v8)
 
 Idée de l'utilisateur : rendre le fond dynamique selon la météo affichée — orage, vent, soleil, nuageux, neige, grêle — et selon les saisons, avec une règle impérative : apaisant, relaxant, jamais épileptique ou stressant.

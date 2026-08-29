@@ -752,6 +752,36 @@ function chargerMeteo(force) {
   });
 }
 
+/* La veille. La météo ne se chargeait qu'à l'ouverture de la page : un
+   onglet laissé ouvert toute la journée affichait le relevé du matin,
+   figé. Le portail est fait pour rester ouvert, donc il veille : toutes
+   les dix minutes, et au retour sur l'onglet, chargerMeteo() repasse — le
+   cache de vingt minutes fait qu'au plus une requête sur deux part
+   réellement, le reste est gratuit. Au passage de minuit, le calendrier
+   bascule sur le nouveau jour. Et si la première demande avait échoué,
+   réseau coupé au chargement par exemple, la tuile apparaît dès qu'une
+   veille aboutit : le portail se répare tout seul. */
+const TIC_VEILLE = 10 * 60 * 1000;   // ms
+
+function initVeille() {
+  let jour = new Date().getDate();
+  function tic() {
+    chargerMeteo();
+    const d = new Date().getDate();
+    if (d !== jour) {
+      jour = d;
+      calDecalage = 0;   // au réveil un autre jour, on montre le mois courant
+      peindreCalendrier();
+    }
+  }
+  setInterval(tic, TIC_VEILLE);
+  // Le retour sur l'onglet est le moment qui compte : c'est là qu'un
+  // relevé de trois heures se verrait.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) tic();
+  });
+}
+
 function demanderPosition() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(p => {
@@ -1151,6 +1181,7 @@ function init() {
   initAncre();
   initApropos();
   chargerMeteo();
+  initVeille();
 
   if (typeof Signalement !== "undefined" && typeof SIGNALEMENT !== "undefined" && SIGNALEMENT.actif) {
     Signalement.init(SIGNALEMENT);
