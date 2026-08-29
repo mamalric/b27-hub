@@ -60,6 +60,12 @@ Au survol, une carte se soulève, sa bordure prend la couleur de sa catégorie, 
 
 Un seul champ, centré, qui filtre tout en direct : cartes, rangées, fiches. La touche `/` l'amène depuis n'importe où, Échap le vide — les conventions d'un outil qu'on utilise au clavier. Pendant une recherche, les tuiles vivantes s'effacent : on est venu chercher quelque chose, la météo attendra.
 
+## Les panneaux et les barres
+
+**Un panneau ne surgit pas, il se pose.** L'ouverture des modales — météo détaillée, À propos — est un glissement : le cadre monte de dix-huit pixels en s'opacifiant, le voile d'arrière-plan se floute progressivement, et le contenu suit en cascade, un souffle après le cadre. La fermeture est animée aussi, par `@starting-style` et `transition-behavior: allow-discrete` : un navigateur qui ignore ces règles ouvre d'un coup, comme avant, sans rien casser. `prefers-reduced-motion` coupe tout.
+
+**Les barres de défilement appartiennent à l'interface, pas au système.** Fines, gouttière invisible, poucier au vert discret qui se révèle un peu au survol — via la propriété standard `scrollbar-color`, qui hérite partout, panneau météo compris. Les navigateurs qui l'ignorent gardent leurs barres.
+
 ## Ce qui ne bouge pas
 
 - La pastille de signalement, en bas à droite, avec sa propre palette : elle doit avoir la même tête sur tous les outils B27.

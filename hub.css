@@ -31,6 +31,8 @@
   --courbe:cubic-bezier(.2,.7,.2,1);
   --lueur:0 0 44px rgba(149,192,61,.15);
   --ombre:0 10px 34px rgba(0,0,0,.42);
+  --barre:rgba(149,192,61,.16);
+  --barre-vive:rgba(149,192,61,.34);
 }
 [data-theme="light"]{
   --fond:#f3f5f0;
@@ -47,6 +49,8 @@
   --attention:#8a6200;
   --lueur:0 0 44px rgba(95,127,31,.14);
   --ombre:0 10px 30px rgba(30,40,15,.12);
+  --barre:rgba(95,127,31,.26);
+  --barre-vive:rgba(95,127,31,.5);
 }
 @media (prefers-reduced-motion: reduce){
   :root{--vitesse:0s}
@@ -54,7 +58,15 @@
 }
 
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;background:var(--fond)}
+/* Les barres de défilement appartiennent à l'interface, pas au système :
+   fines, gouttière invisible, poucier au vert discret. La propriété
+   standard scrollbar-color hérite partout, panneau météo compris, et les
+   navigateurs qui l'ignorent gardent leurs barres — rien ne casse. */
+html{
+  -webkit-text-size-adjust:100%;background:var(--fond);
+  scrollbar-width:thin;scrollbar-color:var(--barre) transparent;
+}
+*:hover{scrollbar-color:var(--barre-vive) transparent}
 body{
   font-family:Inter,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   margin:0;color:var(--encre);background:transparent;
@@ -375,7 +387,38 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   width:min(560px,calc(100vw - 32px));max-height:min(78vh,720px);
   box-shadow:var(--ombre);
 }
-.modale::backdrop{background:rgba(4,6,3,.6);backdrop-filter:blur(4px)}
+/* L'ouverture ne doit pas surgir : le panneau se pose, le voile se
+   floute, le contenu suit en cascade. @starting-style donne l'état de
+   départ de la transition d'entrée, allow-discrete anime aussi la
+   fermeture ; un navigateur qui ne connaît pas ces règles ouvre d'un
+   coup, comme avant, sans rien casser. */
+.modale{
+  opacity:0;transform:translateY(18px) scale(.97);
+  transition:opacity .3s var(--courbe),transform .38s var(--courbe),
+    overlay .38s var(--courbe) allow-discrete,display .38s var(--courbe) allow-discrete;
+}
+.modale[open]{opacity:1;transform:none}
+@starting-style{
+  .modale[open]{opacity:0;transform:translateY(18px) scale(.97)}
+}
+.modale::backdrop{
+  background:rgba(4,6,3,0);backdrop-filter:blur(0px);
+  transition:background .38s var(--courbe),backdrop-filter .38s var(--courbe),
+    overlay .38s var(--courbe) allow-discrete,display .38s var(--courbe) allow-discrete;
+}
+.modale[open]::backdrop{background:rgba(4,6,3,.6);backdrop-filter:blur(4px)}
+@starting-style{
+  .modale[open]::backdrop{background:rgba(4,6,3,0);backdrop-filter:blur(0px)}
+}
+/* Le contenu se pose en cascade, un souffle après le cadre. */
+.modale-corps > *{animation:lever .45s var(--courbe) backwards}
+.modale-corps > :nth-child(2){animation-delay:50ms}
+.modale-corps > :nth-child(3){animation-delay:100ms}
+.modale-corps > :nth-child(4){animation-delay:150ms}
+.modale-corps > :nth-child(5){animation-delay:200ms}
+.modale-corps > :nth-child(6){animation-delay:250ms}
+.modale-corps > :nth-child(7){animation-delay:300ms}
+.modale-corps > :nth-child(n+8){animation-delay:340ms}
 .modale-tete{
   display:flex;align-items:center;gap:10px;padding:16px 20px;
   border-bottom:1px solid var(--ligne);position:sticky;top:0;background:inherit;

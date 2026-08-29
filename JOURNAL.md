@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, le rendu : panneaux qui se posent, barres immergees
+
+Deux finitions demandees. L'ouverture du panneau meteo surgissait d'un coup : les modales se posent desormais — glissement de dix-huit pixels, voile qui se floute, contenu en cascade un souffle apres le cadre — et se referment de la meme maniere, par `@starting-style` et `allow-discrete`. Un navigateur qui ignore ces regles recentes abandonne la declaration entiere et ouvre d'un coup comme avant : la degradation est propre.
+
+Les barres de defilement passent en version immergee : fines, gouttiere invisible, poucier au vert discret qui se revele au survol. Propriete standard `scrollbar-color`, posee a la racine, heritee partout.
+
 ## 2026-08-29, la meteo en grand (v9)
 
 L'utilisateur envoie le catalogue complet des API Open-Meteo et rappelle son fil rouge, la precision : la tuile doit s'ouvrir sur tout ce qui est disponible pour sa position, et chacun doit pouvoir composer les mesures qu'elle affiche par defaut.
