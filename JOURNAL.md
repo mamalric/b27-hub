@@ -2,6 +2,24 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, refonte en portail (v7)
+
+Rien de ce qui précède ne convient à l'utilisateur : il se dit perdu, trouve le résultat plat, et pose enfin le concept qui manquait depuis le début. Un portail public de visibilité, à la Thermexcel mais en version 2026, ouvert à tous — collègues, clients, n'importe qui — sans portail de connexion. Une démonstration de maîtrise technologique, moderne et sérieuse sans faire geek. Consigne : tout balayer sauf la pastille de signalement.
+
+**Ce qui a été gardé du balayage** : la pastille de signalement telle quelle, `catalogue.js` comme source de données (seul son habillage change, le tableau garde son nom PORTES pour l'histoire), les couleurs de lot B27 sur les pastilles, le validateur, les icônes, le logo.
+
+**Le nouveau visage.** Tout centré sous le logo : emblème sur plaque de verre avec aura animée, titre en dégradé vers le vert, accroche, recherche (raccourci `/`, Échap), compteurs. Sombre par défaut — c'est l'identité du portail, le clair reste à un clic. En fond, un champ d'écoulement animé calculé en local : des lignes de flux, le métier des fluides en mouvement. Première version trop dense, virée à la paille ; l'équilibre tracé/estompage a été réglé en trois essais, et le vert clair rendu rare.
+
+**Les tuiles vivantes**, demandées en cours de route. La météo en données réelles : Open-Meteo, le fournisseur sans clé et sans compte — la leçon Unsplash a servi. Pression au dixième d'hectopascal et ressenti au dixième de degré, la précision suggérée que demandait l'utilisateur, sauf que ce sont de vraies mesures. Lieu par défaut Dijon, bouton « ma position », cache vingt minutes, tuile absente sans réseau. Le calendrier : semaines ISO sur l'axe vertical — la monnaie du BET — week-ends teintés, jour courant en aplat vert, semaine courante surlignée, navigation de mois en mois, entièrement local.
+
+**Les rayons.** Nos outils (fabriqués ici) en cartes avec reflet qui suit la souris et lueur de catégorie au survol ; Ressources en rangées compactes groupées par domaine ; Contact en fiche. La métaphore des portes disparaît de l'écran, avec les dossiers, le fil d'Ariane, les épingles et les récents. Le seul commentaire toléré est le sous-titre grisé du rayon, celui que l'utilisateur avait cité en exemple.
+
+**Les couleurs sont vérifiées au calcul**, pas à l'oeil : tous les jetons de texte des deux thèmes tiennent 4,5:1 (le gris discret du thème clair a dû être assombri d'un cran), le vert de marque ne porte du texte que sur fond sombre, le thème clair a son vert d'encre #4e6b1c.
+
+**Sur les photos du bandeau**, réponse due : elles nécessitaient une clé Unsplash, donc un compte que je ne peux pas créer à la place de l'utilisateur, et le bandeau vert n'était que l'état de repli — mauvais choix de l'avoir laissé comme visage de la page. Le fond animé règle le problème sans compte. `docs/bandeau.md` et `src/bandeau_teinte.py` sont supprimés, la doc réécrite (charte, README, FICHE).
+
+Reste à faire regarder cette v7 et à itérer. Question posée à l'utilisateur : le portail se veut ouvert à tous, faut-il lever le `noindex` ?
+
 ## 2026-08-29, retrait de la barre laterale
 
 Suite et fin de l'epuration : la barre laterale disparait. Avec elle partent le bouton hamburger, le voile du tiroir, les fonctions `construireRail`, `majRailActif` et `ouvrirRail`, leurs quatre ecouteurs, tout le bloc CSS correspondant, la variable `--rail` et l'icone `menu`.

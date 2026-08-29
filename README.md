@@ -1,16 +1,14 @@
 # Outils B27
 
-Le hall d'entrée des outils du bureau d'études B27. Un seul lien à transmettre.
+Le portail des outils et ressources du bureau d'études B27. Un seul lien à transmettre — à un collègue, à un client, à n'importe qui.
 
-Le hall s'ouvre sur des dossiers : on en ouvre un, parfois un sous-dossier, et on arrive aux outils, aux sites de l'entreprise, aux ressources métier ou à l'annuaire. Le fil d'Ariane et la marque, en haut à gauche, ramènent au hall.
-
-**Le hall est personnel sans le moindre compte.** Épinglez une porte, elle remonte en tête à chacune de vos visites ; les dernières portes ouvertes s'y ajoutent. Tout vit dans votre navigateur et n'en sort jamais.
+Tout est centré sous le logo : la recherche, une tuile météo en données réelles, un calendrier en semaines ISO, puis deux rayons, nos outils et les ressources, et la fiche de contact. Un champ d'écoulement animé, calculé en local, occupe le fond : des lignes de flux, comme l'air et l'eau qui sont le métier de la maison. Pas de compte, pas de portail de connexion.
 
 En ligne : https://mamalric.github.io/b27-hub/
 
-## Ajouter une porte
+## Ajouter une entrée
 
-Un seul fichier à modifier, [`catalogue.js`](catalogue.js). Copier une fiche existante, remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis pousser sur `main`. Le dossier apparaît, les compteurs suivent d'eux-mêmes. Le champ `sousCategorie` est facultatif : une catégorie sans sous-dossier peuplé s'ouvre directement sur ses portes. Le gabarit, les deux types de carte et les cinq statuts sont documentés en tête du fichier.
+Un seul fichier à modifier, [`catalogue.js`](catalogue.js). Copier une fiche existante, remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis pousser sur `main`. La carte apparaît dans son rayon, les compteurs suivent d'eux-mêmes. Le gabarit, les deux types et les cinq statuts sont documentés en tête du fichier.
 
 Avant de publier, vérifier que le catalogue est cohérent :
 
@@ -23,20 +21,16 @@ python tests/verifier_catalogue.py
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Ossature de la page, presque vide : tout est construit à l'exécution. |
-| `catalogue.js` | Portes, annuaire, catégories, sous-catégories, réglages. Le seul fichier à faire vivre. |
-| `hub.js` | Logo, icônes, thème, bandeau, navigation par dossiers, cartes, recherche, panneau À propos. |
-| `hub.css` | Charte graphique reprise des outils B27 existants. |
+| `catalogue.js` | Outils, ressources, contact, catégories, réglages. Le seul fichier à faire vivre. |
+| `hub.js` | Logo, icônes, thème, champ d'écoulement, météo, calendrier, rayons, recherche, panneau À propos. |
+| `hub.css` | La peau du portail : sombre par défaut, thème clair à un clic. |
 | `signalement.js` | La pastille "Signaler un problème", autonome et réutilisable ailleurs. |
 | `logo-b27.svg` | Le logo, qui sert aussi de favicon. |
-| `src/bandeau_teinte.py` | Calcule et vérifie la chaîne de filtres qui met la photo du bandeau au vert B27. |
 | `tests/verifier_catalogue.py` | Contrôle du catalogue, bibliothèque standard uniquement. |
 | `docs/charte.md` | Palette, logo, types de carte, conventions visuelles. |
 | `docs/signalement.md` | Fonctionnement du signalement et modes d'envoi. |
-| `docs/bandeau.md` | Photo du bandeau : clé Unsplash, quota, traitement des couleurs. |
 
-HTML, CSS et JavaScript sans framework et sans étape de build. Tout est dans le dépôt, à une exception près : la photo du bandeau d'accueil, facultative et décorative. Sans elle la page s'ouvre aussi bien en ligne que par un double-clic sur `index.html`.
-
-La position dans l'arborescence tient dans l'adresse (`#/ressources/technique`) : le bouton Précédent du navigateur fonctionne, et le lien d'un dossier précis se transmet tel quel.
+HTML, CSS et JavaScript sans framework et sans étape de build. Tout est dans le dépôt, à une exception près : la météo, en données réelles Open-Meteo, sans clé et sans compte. Sans réseau la tuile disparaît et la page s'ouvre aussi bien par un double-clic sur `index.html`.
 
 ## Signaler un problème
 

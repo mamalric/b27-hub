@@ -1,13 +1,17 @@
 /* =====================================================================
-   catalogue.js : le seul fichier à modifier pour faire vivre le hub.
+   catalogue.js : le seul fichier à modifier pour faire vivre le portail.
    =====================================================================
 
-   Le hall se parcourt comme une armoire : on ouvre un dossier, parfois un
-   sous-dossier, et on tombe sur les portes. Ajouter quelque chose, c'est
-   ajouter un objet dans un des tableaux ci-dessous. Aucun autre fichier
-   n'est à toucher : ni index.html, ni hub.js, ni hub.css. Les dossiers,
-   les compteurs, le fil d'Ariane, la recherche et le panneau "À propos"
-   se recalculent seuls à partir de ces données.
+   Le portail se lit en deux rayons, nos outils et les ressources, plus la
+   fiche de contact. Ajouter quelque chose, c'est ajouter un objet dans un
+   des tableaux ci-dessous. Aucun autre fichier n'est à toucher : ni
+   index.html, ni hub.js, ni hub.css. Les rayons, les compteurs, la
+   recherche et le panneau "À propos" se recalculent seuls.
+
+   Le tableau principal s'appelle PORTES pour des raisons d'histoire, du
+   temps où le portail se présentait comme un hall à dossiers ; à l'écran
+   on parle d'outils et de ressources. Le renommer casserait plus de
+   choses qu'il n'en clarifierait.
 
    Pourquoi un .js et non un .json : chargé par <script src>, ce fichier
    fonctionne aussi quand on ouvre index.html directement depuis le disque
@@ -15,7 +19,7 @@
    file:// et le hub s'afficherait vide hors ligne.
 
    ---------------------------------------------------------------------
-   GABARIT D'UNE PORTE (copier-coller, puis remplir)
+   GABARIT D'UNE ENTRÉE (copier-coller, puis remplir)
 
      {
        id: "slug-unique",          // identifiant court, minuscules et tirets
@@ -39,9 +43,9 @@
    ---------------------------------------------------------------------
    LES DEUX TYPES
 
-     outil   ce que nous fabriquons : carte pleine, avec pitch et mots-clés.
-     lien    une ressource extérieure que nous ne maintenons pas : carte
-             compacte, sans mots-clés.
+     outil   ce que nous fabriquons : une carte dans le rayon "Nos outils".
+     lien    une ressource extérieure que nous ne maintenons pas : une
+             rangée compacte dans le rayon "Ressources".
 
    ---------------------------------------------------------------------
    LES CINQ STATUTS
@@ -302,51 +306,28 @@ const SOUS_CATEGORIES = [
 const REGLAGES = {
   // Nom affiché dans l'en-tête et dans l'onglet du navigateur.
   titre: "Outils B27",
-  sousTitre: "Le hall d'entrée des outils du bureau d'études",
+  sousTitre: "Le portail des outils et ressources du bureau d'études",
 
-  // Bandeau d'accueil. L'accroche est la grande phrase sous le logo, le
-  // chapeau la ligne d'explication qui la suit. Chaîne vide : l'élément
-  // disparaît. Le bandeau se resserre dès qu'on entre dans un dossier.
-  accroche: "Toutes les portes, au même endroit.",
-  chapeau: "Ouvrez un dossier pour trouver un outil, un site ou une ressource. Ce que nous fabriquons fonctionne dans le navigateur : rien à installer, aucun compte à créer.",
+  // L'accroche est la phrase sous le titre du portail. Chaîne vide : elle
+  // disparaît.
+  accroche: "Les outils et les ressources du bureau d'études, ouverts à tous. Rien à installer, aucun compte.",
 
-  // Photo du bandeau d'accueil. Le hub tire au sort une image de chantier
-  // chez Unsplash, la passe en noir et blanc puis en sépia puis au vert de
-  // B27, et en change régulièrement, à la manière des fonds d'écran Windows.
-  //
-  // La clé d'accès Unsplash est publique par conception : elle n'ouvre que
-  // des lectures et le fournisseur la destine explicitement au code d'un site.
-  // Elle peut donc rester dans le dépôt. Tant qu'elle est vide, le bandeau
-  // garde son dégradé vert et n'émet aucune requête : c'est un état de
-  // fonctionnement normal, pas une panne. La marche à suivre pour en obtenir
-  // une, en deux minutes et sans frais, est dans docs/bandeau.md.
-  bandeau: {
+  // Tuile météo du portail. Données réelles d'Open-Meteo (open-meteo.com),
+  // sans clé et sans compte : c'est un service de données météo ouvert,
+  // gratuit pour un usage non commercial, qui autorise l'appel direct depuis
+  // un navigateur. Le lieu ci-dessous sert tant que le visiteur n'a pas
+  // cliqué sur "ma position" ; ce choix reste alors dans son navigateur.
+  // actif: false : la tuile disparaît et plus aucune requête n'est émise.
+  meteo: {
     actif: true,
-    cle: "",
-
-    // Ce que l'on demande à Unsplash. Plusieurs recherches valent mieux
-    // qu'une seule, qui finirait par ramener toujours les mêmes photos.
-    recherches: [
-      "construction site",
-      "steel structure building",
-      "architecture facade concrete",
-      "building under construction crane",
-      "industrial building interior"
-    ],
-
-    // Nombre de photos ramenées en une seule requête, puis tirées au sort à
-    // chaque visite. Le quota d'un compte de démonstration est de cinquante
-    // requêtes par heure, tous visiteurs confondus : interroger l'API à
-    // chaque chargement de page l'épuiserait en un midi. Un lot gardé
-    // plusieurs jours ramène cela à une requête par poste et par semaine,
-    // et le tirage reste différent à chaque visite.
-    parLot: 12,
-    joursDeCache: 7
+    ville: "Dijon",
+    lat: 47.322,
+    lon: 5.041
   },
 
-  // La barre de recherche n'apparaît qu'à partir de ce nombre de portes.
-  // En dessous elle encombre plus qu'elle n'aide : le hall tient déjà tout
-  // entier sous les yeux.
+  // La recherche n'apparaît qu'à partir de ce nombre d'entrées, contacts
+  // compris. En dessous elle encombre plus qu'elle n'aide : le portail
+  // tient déjà tout entier sous les yeux.
   seuilFiltres: 6
 };
 

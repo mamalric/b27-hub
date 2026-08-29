@@ -1,689 +1,392 @@
 /* =====================================================================
-   hub.css : habillage du hall d'entrée des outils B27.
-   =====================================================================
+   hub.css : la peau du portail B27.
 
-   Disposition de tableau de bord : une barre latérale permanente à gauche,
-   une recherche en haut, le contenu au centre. C'est ce qui distingue un
-   hall d'une simple arborescence : toutes les catégories sont à un clic,
-   depuis n'importe où, on n'a jamais à remonter pour changer de branche.
+   Sombre par défaut : c'est l'identité du portail, le fond sur lequel le
+   champ d'écoulement et le vert B27 prennent leur relief. Le thème clair
+   reste à un clic, mémorisé par poste.
 
-   La palette, les rayons et la pile de polices restent celles du
-   Sélectionneur de radiateurs et de la Calculette ECS et Bouclage, pour
-   qu'un collègue qui passe du hall à un outil ne change pas d'univers.
-
-   Deux verts, et ils ne font pas le même travail :
-     --marque    #95c03d, le vert exact du logo B27. Il ne sert qu'au logo.
-     --primaire  #7da32f, sa variante assombrie, pour tout ce qui porte du
-                 texte ou doit tenir un contraste.
-
-   Aucune requête externe : pas de Google Fonts, pas de CDN. Segoe UI prend
-   le relais d'Inter sur Windows, où travaillent les postes B27.
+   Le vert d'accent est le #95C03D du logo, exactement. Sur fond sombre il
+   tient 10:1 avec le texte qu'on pose dessus ; sur fond clair il ne tient
+   rien du tout face à du texte petit, le thème clair a donc son propre
+   vert d'encre, #4e6b1c, pour tout ce qui se lit.
    ===================================================================== */
 
 :root{
-  color-scheme: light;
-  --fond:#f3f5f2;
-  --papier:#ffffff;
-  --papier-2:#f4f6f3;
-  --papier-3:#e8ebe6;
-  --encre:#1e2220;
-  --encre-2:#525754;
-  --discret:#676e69;
-  --ligne:#dde0dc;
-  --ligne-2:#ebeee9;
-  --marque:#95c03d;
-  --marque-lavis:rgba(149,192,61,.13);
-  --primaire:#7da32f;
-  --primaire-fond:#eaf3d8;
-  --primaire-bord:#c3daa0;
-  --primaire-encre:#4c6a19;
-  --lien:#4c6a19;
-  --haute:#bc3f38;
-  --haute-fond:#fbeae8;
-  --moyenne:#b87a15;
-  --moyenne-fond:#fdf3e2;
-  --note-fond:#fdf6e6;
-  --note-bord:#e2b45f;
-  --sur-primaire:#ffffff;
-  --anneau:rgba(125,163,47,.20);
-  --rayon:10px;
-  --rayon-s:7px;
-  --rayon-g:14px;
-  --ombre:0 1px 2px rgba(30,34,32,.05), 0 6px 20px rgba(30,34,32,.06);
-  --ombre-haute:0 2px 4px rgba(30,34,32,.06), 0 12px 28px rgba(30,34,32,.10);
-  /* Tuile d'icône d'application : la teinte vient de la catégorie, le bas du
-     dégradé est calculé. --app-haut sert de repli quand aucune n'est déclarée. */
-  --app-haut:#779c2b;
-  --ombre-app:0 3px 8px rgba(30,34,32,.16), 0 8px 20px rgba(30,34,32,.10);
-  --ombre-app-haute:0 6px 14px rgba(30,34,32,.20), 0 16px 34px rgba(30,34,32,.16);
-  --vitesse:.12s;
-  --vitesse-dossier:.22s;
-  --courbe:cubic-bezier(.2,.7,.3,1);
+  --fond:#0a0d08;
+  --carte:rgba(22,28,16,.72);
+  --carte-pleine:#141a0e;
+  --ligne:rgba(149,192,61,.15);
+  --ligne-forte:rgba(149,192,61,.34);
+  --encre:#e9ede2;
+  --encre-2:#b9c3ab;
+  --discret:#8d9880;
+  --accent:#95c03d;
+  --accent-encre:#0a0d08;      /* ce qui s'écrit sur un aplat d'accent */
+  --lien:#b7dc78;
+  --attention:#e8c468;
+  --rayon-g:20px;
+  --rayon-m:14px;
+  --rayon-s:9px;
+  --vitesse:.25s;
+  --courbe:cubic-bezier(.2,.7,.2,1);
+  --lueur:0 0 44px rgba(149,192,61,.15);
+  --ombre:0 10px 34px rgba(0,0,0,.42);
 }
-[data-theme="dark"]{
-  color-scheme: dark;
-  --fond:#0e100f;
-  --papier:#1a1d1b;
-  --papier-2:#232725;
-  --papier-3:#2c312e;
-  --encre:#e9ebe8;
-  --encre-2:#b2b7b3;
-  --discret:#929991;
-  --ligne:#343a36;
-  --ligne-2:#272c29;
-  --marque:#95c03d;
-  --marque-lavis:rgba(149,192,61,.10);
-  --primaire:#a5cc52;
-  --primaire-fond:#2b3a17;
-  --primaire-bord:#4a6626;
-  --primaire-encre:#c9e58f;
-  --lien:#b8d67c;
-  --haute:#e5837c;
-  --haute-fond:#3b2321;
-  --moyenne:#e3ad63;
-  --moyenne-fond:#382c15;
-  --note-fond:#332a14;
-  --note-bord:#8a6520;
-  --sur-primaire:#12180a;
-  --anneau:rgba(165,204,82,.22);
-  --ombre:0 1px 2px rgba(0,0,0,.35), 0 6px 20px rgba(0,0,0,.30);
-  --ombre-haute:0 2px 4px rgba(0,0,0,.45), 0 12px 28px rgba(0,0,0,.45);
-  --ombre-app:0 3px 8px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.4);
-  --ombre-app-haute:0 6px 14px rgba(0,0,0,.55), 0 16px 34px rgba(0,0,0,.45);
+[data-theme="light"]{
+  --fond:#f3f5f0;
+  --carte:rgba(255,255,255,.82);
+  --carte-pleine:#ffffff;
+  --ligne:#dde3d2;
+  --ligne-forte:#b9c79c;
+  --encre:#171b10;
+  --encre-2:#414c33;
+  --discret:#68725a;
+  --accent:#95c03d;
+  --accent-encre:#131709;
+  --lien:#4e6b1c;
+  --attention:#8a6200;
+  --lueur:0 0 44px rgba(95,127,31,.14);
+  --ombre:0 10px 30px rgba(30,40,15,.12);
 }
 @media (prefers-reduced-motion: reduce){
-  :root{ --vitesse:0s; --vitesse-dossier:0s }
-  *{ animation:none !important; transition:none !important }
+  :root{--vitesse:0s}
+  *{animation:none !important;transition:none !important}
 }
 
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--fond)}
 body{
   font-family:Inter,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  margin:0;color:var(--encre);background:var(--fond);font-size:14px;line-height:1.5;
-  min-height:100vh;
-  transition:background-color var(--vitesse),color var(--vitesse);
+  margin:0;color:var(--encre);background:transparent;
+  font-size:14px;line-height:1.5;min-height:100vh;
+  transition:color var(--vitesse);
 }
 a{color:var(--lien);text-decoration:none}
 a:hover{text-decoration:underline}
-:focus-visible{outline:2px solid var(--primaire);outline-offset:2px;border-radius:4px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .ico{vertical-align:-3px;flex:none}
 .logo-b27{display:block}
 
-@keyframes entree{
-  from{opacity:0;transform:translateY(9px)}
+/* Le canvas du champ d'écoulement, derrière tout. Le fond du body est
+   transparent et c'est html qui porte la couleur : sans cela le fond du
+   body se peindrait par-dessus le canvas en z négatif. */
+#fond{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1}
+
+@keyframes lever{
+  from{opacity:0;transform:translateY(16px)}
   to{opacity:1;transform:none}
 }
+@keyframes halo{
+  from{opacity:.55;transform:scale(.92)}
+  to{opacity:1;transform:scale(1.06)}
+}
+.apparait{animation:lever .55s var(--courbe) backwards;animation-delay:calc(var(--i,0)*60ms)}
 
-
-/* ============================================================= PAGE == */
-.page{min-width:0;display:flex;flex-direction:column;min-height:100vh}
-
-.barre-haute{
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  padding:14px 26px;background:var(--papier);border-bottom:1px solid var(--ligne);
-  position:sticky;top:0;z-index:15;
-}
-.barre-haute h1{
-  margin:0;font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--encre);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:34%;
-  padding-left:13px;border-left:1px solid var(--ligne);
-}
-.barre-haute .espace{flex:1}
-/* La marque, à gauche de la barre du haut. Depuis le retrait de la barre
-   latérale, c'est le seul lien de navigation permanent : elle ramène au hall
-   depuis n'importe quelle profondeur. */
-.marque{
-  display:flex;align-items:center;gap:9px;flex:none;min-width:0;
-  color:var(--encre);text-decoration:none;
-}
-.marque:hover{text-decoration:none}
-.marque:hover .marque-nom b{color:var(--primaire)}
-.marque-logo{color:var(--marque);flex:none;line-height:0}
-.marque-nom{display:flex;flex-direction:column;min-width:0;gap:1px}
-.marque-nom b{
-  font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1.2;
-  transition:color var(--vitesse);
-}
-.marque-nom small{
-  font-size:11.5px;color:var(--discret);line-height:1.3;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-/* Au hall, le titre répéterait la marque qu'il touche : « Outils B27 » puis
-   « Hall », deux fois la même information à trois centimètres d'intervalle.
-   Il n'apparaît qu'une fois qu'on est entré quelque part, où il dit alors
-   quelque chose que la marque ne dit pas. */
-.barre-haute h1{display:none}
-body.dedans .barre-haute h1{display:block}
+/* ================================================== BOUTONS DU HAUT == */
+.haut{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:30}
 .bouton-icone{
-  background:transparent;border:1px solid var(--ligne);color:var(--encre-2);border-radius:var(--rayon-s);
-  width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:background-color var(--vitesse),color var(--vitesse);flex:none;
-}
-.bouton-icone:hover{background:var(--papier-2);color:var(--encre)}
-
-.wrap{padding:26px 26px 44px;flex:1;max-width:1360px;width:100%}
-
-/* ------------------------------------------------------------ recherche
-   Au centre de la barre du haut, comme sur un tableau de bord : c'est le
-   geste le plus rapide quand on sait déjà ce qu'on cherche. Elle traverse
-   tous les niveaux d'un coup. */
-.barre-recherche{flex:1 1 240px;min-width:0;max-width:440px}
-.recherche{position:relative}
-.recherche .ico{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  color:var(--discret);pointer-events:none;
-}
-.recherche input{
-  width:100%;font:inherit;font-size:13.5px;color:var(--encre);
-  background:var(--papier-2);border:1px solid transparent;border-radius:999px;
-  padding:9px 32px 9px 36px;
-  transition:border-color var(--vitesse),box-shadow var(--vitesse),background-color var(--vitesse);
-}
-.recherche input::placeholder{color:var(--discret)}
-.recherche input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
-.recherche input:focus{
-  outline:none;background:var(--papier);
-  border-color:var(--primaire);box-shadow:0 0 0 3px var(--anneau);
-}
-.recherche .vider{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);
-  width:22px;height:22px;padding:0;border:none;border-radius:50%;
-  background:transparent;color:var(--discret);cursor:pointer;
-  display:none;align-items:center;justify-content:center;
-}
-.recherche .vider:hover{background:var(--papier-3);color:var(--encre)}
-.recherche.remplie .vider{display:inline-flex}
-
-/* =========================================================== ACCUEIL ==
-   Ce bloc n'appartient qu'au hall. Il disparaît dès qu'on entre dans un
-   dossier ou qu'une recherche est en cours. */
-/* ---- bandeau d'accueil
-   Une photo de chantier tiree au sort, ramenee au vert de B27. Le bandeau
-   sort de .wrap et occupe toute la largeur de la page : c'est la seule
-   surface du hub qui a interet a le faire, une photo bornee a 1360 px sur un
-   ecran large se lit comme une vignette agrandie. Le texte, lui, reste aligne
-   sur la grille du reste de la page.
-   Il garde sa couleur dans les deux themes, comme les tuiles : c'est un objet
-   colore, pas une surface de l'interface. Le degrade sous la photo n'est pas
-   un pis-aller mais l'etat normal du bandeau tant que la photo n'est pas la,
-   ou definitivement si aucune cle d'acces n'est renseignee. */
-.banniere{
-  position:relative;overflow:hidden;isolation:isolate;
-  background:linear-gradient(150deg,#557020,#26310d);
-  color:#fff;min-height:250px;display:flex;align-items:center;
-}
-/* Noir et blanc, puis sepia, puis vert B27. Les six etapes ne sont pas
-   reglees a l'oeil : elles sortent de src/bandeau_teinte.py, qui balaie les
-   parametres des matrices feColorMatrix correspondantes. Le premier
-   brightness() n'est pas cosmetique, il est indispensable : les lignes de la
-   matrice sepia somment a 1,35, donc sepia(1) brule le canal rouge de tout
-   gris superieur a 0,74 et tord la teinte des hautes lumieres. En comprimant
-   la plage avant, la chaine reste lineaire de bout en bout et la teinte se
-   tient a 79,4 degres du noir au blanc, avec 52 % de saturation constante,
-   exactement celles du #95c03d du logo. Le gris 0,85 de la photo ressort en
-   #94be3c, a deux niveaux du vert de marque. */
-.banniere-fond{
-  position:absolute;inset:0;z-index:0;
-  background-position:center;background-size:cover;
-  filter:grayscale(1) brightness(.74) sepia(1) hue-rotate(38deg) saturate(2.6) brightness(.88);
-  opacity:0;transform:scale(1.05);
-  transition:opacity 1.1s ease,transform 12s ease-out;
-}
-/* La photo arrive apres le reste de la page : elle se pose en fondu plutot
-   que d'apparaitre d'un coup sous un texte deja lu. */
-.banniere-fond.posee{opacity:1;transform:scale(1)}
-/* Voile sous le texte. Une photo peut porter un ciel blanc juste derriere la
-   salutation : le cas defavorable n'est pas rare, il est probable, et le voile
-   se dimensionne sur lui. Au pixel le plus clair que la chaine puisse
-   produire, #aedf47, il faut 51 % d'opacite pour que le blanc tienne ses
-   4,5:1. Sa couleur est prise sur la rampe de la photo elle-meme, au gris
-   0,15 : voile et image partagent donc exactement la meme teinte, et le voile
-   ne se lit pas comme un rectangle rapporte.
-   Ces 51 % doivent tenir partout ou il y a du texte, et pas seulement au bord
-   gauche : un degrade qui commence a la bonne opacite mais faiblit des le
-   tiers laisse la fin du chapeau sous les 4,5:1, ce qui ne se voit pas a
-   l'oeil mais se mesure. Le voile garde donc son plateau jusqu'a la moitie du
-   bandeau, ou le texte s'arrete, et ne s'efface qu'ensuite. */
-.banniere::after{
-  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(100deg,
-    rgba(26,33,11,.60) 0%, rgba(26,33,11,.52) 50%, rgba(26,33,11,0) 85%);
-}
-/* Le texte reprend la largeur et le retrait de .wrap pour rester dans l'axe
-   du contenu, alors que la photo, elle, va d'un bord a l'autre. */
-.banniere-txt{
-  position:relative;z-index:2;width:100%;max-width:1360px;
-  padding:34px 26px;box-sizing:border-box;
-}
-/* Credit photo. C'est une obligation de la licence Unsplash, pas une
-   politesse : le photographe et Unsplash doivent etre nommes et lies. Il se
-   pose la ou le voile est deja nul, donc il porte son propre fond, calcule
-   sur le meme pire cas. */
-.banniere-credit{
-  position:absolute;z-index:2;right:14px;bottom:12px;margin:0;
-  font-size:11px;line-height:1.4;letter-spacing:.2px;color:#fff;
-  background:rgba(26,33,11,.58);padding:4px 10px;border-radius:99px;
-  max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.banniere-credit a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.38)}
-.banniere-credit a:hover,.banniere-credit a:focus-visible{border-bottom-color:#fff}
-.salut{
-  margin:0 0 7px;max-width:62ch;font-size:27px;font-weight:800;letter-spacing:-.7px;
-  line-height:1.15;color:#fff;
-}
-.chapeau{margin:0;font-size:14px;color:#fff;opacity:.93;line-height:1.6;max-width:56ch}
-
-/* ---- cartes chiffrées
-   Aplat coloré, texte blanc. Les teintes sont plus foncées que celles des
-   tuiles, et ce n'est pas une inadvertance : une tuile ne porte qu'un
-   glyphe, seuil de contraste 3:1, une carte chiffrée porte du texte de
-   petite taille, seuil 4,5:1. */
-.chiffres{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));
-  gap:14px;margin:0 0 28px;
-}
-.chiffre{
-  background:var(--c);color:#fff;border-radius:var(--rayon-g);
-  padding:16px 18px;
-  display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px 14px;
-  align-items:center;
-  box-shadow:var(--ombre-app);
-  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
-  animation-delay:calc(var(--i, 0) * 40ms);
-}
-.chiffre-ico{
-  grid-area:1 / 1 / 4 / 2;align-self:center;
-  width:46px;height:46px;border-radius:13px;
-  background:rgba(255,255,255,.17);
-  display:grid;place-items:center;
-}
-.chiffre-titre{grid-area:1 / 2;font-size:12.5px;font-weight:700;opacity:.92}
-.chiffre-n{grid-area:2 / 2;font-size:30px;font-weight:800;line-height:1.08;font-variant-numeric:tabular-nums}
-.chiffre-detail{grid-area:3 / 2;font-size:11.5px;opacity:.86}
-
-/* ---- blocs du hall (raccourcis, récemment ouvert) */
-.bloc{margin:0 0 26px}
-.bloc > h2, .section > h2{
-  margin:0 0 13px;font-size:14.5px;font-weight:700;letter-spacing:-.2px;
-  color:var(--encre);display:flex;align-items:center;gap:10px;
-}
-.bloc > h2 .pave, .section > h2 .pave{
-  width:27px;height:27px;border-radius:var(--rayon-s);flex:none;
-  background:var(--c,var(--papier-3));color:#fff;
   display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;padding:0;cursor:pointer;
+  background:var(--carte);border:1px solid var(--ligne);color:var(--encre-2);
+  border-radius:var(--rayon-s);backdrop-filter:blur(10px);
+  transition:border-color var(--vitesse),color var(--vitesse),transform var(--vitesse);
 }
-.bloc > h2 .compte, .section > h2 .compte{
-  font-size:11.5px;font-weight:600;color:var(--discret);
-  background:var(--papier-2);border:1px solid var(--ligne-2);
-  border-radius:999px;padding:1px 8px;
+.bouton-icone:hover{border-color:var(--ligne-forte);color:var(--encre);transform:translateY(-1px)}
+
+/* ============================================================ ENTRÉE == */
+.portail{max-width:1080px;margin:0 auto;padding:0 22px 96px}
+.entree{
+  text-align:center;
+  padding:clamp(56px,9vh,104px) 0 34px;
+  display:flex;flex-direction:column;align-items:center;
 }
 
-/* Invite d'épinglage, tant que rien n'est épinglé. Elle explique une
-   fonction que rien d'autre n'annonce, plutôt que de laisser un vide. */
-.invite{
-  display:flex;align-items:flex-start;gap:12px;
-  background:var(--papier);border:1px dashed var(--ligne);border-radius:var(--rayon-g);
-  padding:16px 18px;font-size:13px;color:var(--encre-2);line-height:1.6;max-width:74ch;
+/* L'emblème : le monogramme B27 sur une plaque de verre, une aura verte
+   qui respire derrière. Le logo lui-même n'est pas redessiné : c'est la
+   marque, elle appartient à l'entreprise. C'est sa mise en scène qui
+   change. */
+.embleme{
+  position:relative;display:grid;place-items:center;
+  width:118px;height:118px;border-radius:30px;
+  color:var(--accent);
+  background:linear-gradient(160deg,rgba(149,192,61,.17),rgba(149,192,61,.03));
+  border:1px solid var(--ligne-forte);
+  box-shadow:var(--lueur);
+  animation:lever .55s var(--courbe) backwards;
 }
-.invite .ico{color:var(--moyenne);margin-top:2px}
-.invite b{color:var(--encre)}
+.embleme::before{
+  content:"";position:absolute;inset:-34px;z-index:-1;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(149,192,61,.28),transparent 72%);
+  filter:blur(14px);
+  animation:halo 7s ease-in-out infinite alternate;
+}
+[data-theme="light"] .embleme{color:#5f7f1f;background:linear-gradient(160deg,rgba(149,192,61,.22),rgba(149,192,61,.05))}
 
-/* ----------------------------------------------------------- fil d'Ariane */
-.fil{display:flex;align-items:flex-start;gap:11px;margin:0 0 18px;flex-wrap:nowrap}
-.fil-retour{
-  width:34px;height:34px;flex:none;border-radius:var(--rayon-s);
-  border:1px solid var(--ligne);background:var(--papier);color:var(--encre-2);
-  display:inline-flex;align-items:center;justify-content:center;
-  transition:background-color var(--vitesse),color var(--vitesse),
-             border-color var(--vitesse),transform var(--vitesse);
+.titre-portail{
+  margin:22px 0 0;font-size:clamp(30px,4.6vw,44px);font-weight:800;
+  letter-spacing:-1.2px;line-height:1.1;
+  background:linear-gradient(115deg,var(--encre) 46%,var(--accent));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:lever .55s var(--courbe) .06s backwards;
 }
-.fil-retour:hover{
-  background:var(--papier-2);color:var(--encre);
-  text-decoration:none;transform:translateX(-2px);
-}
-.fil-suite{
-  display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;
-  flex:1 1 auto;min-width:0;padding-top:4px;
-}
-.fil-lien{color:var(--discret);display:inline-flex;align-items:center;gap:5px;font-weight:500}
-.fil-lien:hover{color:var(--primaire-encre);text-decoration:none}
-.fil-ici{
-  color:var(--encre);font-weight:700;letter-spacing:-.1px;font-size:14.5px;
-  display:inline-flex;align-items:center;gap:7px;min-width:0;
-}
-.fil-ici .ico{color:var(--c,var(--primaire-encre))}
-.fil-compte{
-  font-size:11.5px;font-weight:600;color:var(--discret);letter-spacing:0;
-  background:var(--papier-2);border:1px solid var(--ligne-2);
-  border-radius:999px;padding:1px 9px;white-space:nowrap;
-}
-.fil-sep{color:var(--ligne);display:inline-flex;align-items:center}
-[data-theme="dark"] .fil-sep{color:var(--encre-2);opacity:.45}
-
-/* ========================================================== DOSSIERS ==
-   Des icônes d'application. Le carré plein coloré EST le dossier, le nom se
-   pose dessous, hors de la tuile, comme sur un écran d'accueil.
-
-   Le nom est visible PAR DÉFAUT : c'est l'état sur tablette et téléphone, où
-   le survol n'existe pas et où des tuiles muettes seraient indéchiffrables,
-   et c'est le repli si la requête média n'est pas comprise. Le masquage
-   n'intervient qu'à l'intérieur du bloc (hover:hover), là où il y a une
-   souris pour le révéler. Le focus clavier le révèle aussi. */
-.grille-dossiers{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:22px 16px;
-}
-@media (min-width:760px){
-  .grille-dossiers{grid-template-columns:repeat(auto-fill,minmax(112px,138px))}
+[data-theme="light"] .titre-portail{background:linear-gradient(115deg,var(--encre) 46%,#5f7f1f);-webkit-background-clip:text;background-clip:text}
+.devise{
+  margin:10px 0 0;font-size:15.5px;color:var(--encre-2);max-width:52ch;
+  animation:lever .55s var(--courbe) .12s backwards;
 }
 
-.dossier{
-  position:relative;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  background:none;border:none;box-shadow:none;padding:0;
-  color:var(--encre);text-decoration:none;
-  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
-  animation-delay:calc(var(--i, 0) * 26ms);
+/* La recherche, au centre, seule porte d'entrée textuelle. La touche /
+   la rejoint depuis n'importe où : c'est une convention d'outil, pas de
+   site vitrine, et c'est voulu. */
+.quete{
+  position:relative;display:flex;align-items:center;gap:10px;
+  width:min(620px,100%);margin-top:26px;padding:0 16px;height:52px;
+  background:var(--carte);border:1px solid var(--ligne);border-radius:var(--rayon-m);
+  backdrop-filter:blur(12px);
+  transition:border-color var(--vitesse),box-shadow var(--vitesse);
+  animation:lever .55s var(--courbe) .18s backwards;
 }
-.dossier:hover{text-decoration:none}
-
-/* La tuile. Rayon de 23 pour cent du côté, proportion des icônes
-   d'application des systèmes courants : en pourcentage et non en pixels, il
-   reste juste quelle que soit la taille. Le bas du dégradé est calculé, une
-   seule valeur à saisir par catégorie ; l'aplat sert de repli aux
-   navigateurs sans color-mix. */
-.dossier .glyphe{
-  width:100%;aspect-ratio:1;border-radius:23%;
-  background:var(--c,var(--app-haut));
-  background:linear-gradient(160deg,
-    var(--c,var(--app-haut)),
-    color-mix(in srgb, var(--c,var(--app-haut)) 82%, #000));
-  color:#fff;
-  display:grid;place-items:center;
-  box-shadow:var(--ombre-app);
-  transition:transform var(--vitesse-dossier) var(--courbe),
-             box-shadow var(--vitesse-dossier) var(--courbe);
+.quete:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(149,192,61,.14),var(--lueur)}
+.quete-loupe{display:inline-flex;color:var(--discret)}
+.quete input{
+  flex:1;min-width:0;height:100%;border:0;background:transparent;outline:0;
+  color:var(--encre);font:inherit;font-size:15px;
 }
-/* Le glyphe est demandé à 1,4 d'épaisseur dans hub.js, au lieu de 2 : à
-   cette taille le trait d'origine serait épais, et le blanc sur fond coloré
-   supporte mal la surcharge. */
-.dossier .glyphe .ico{width:54%;height:auto;display:block;vertical-align:baseline}
-
-.dossier .nom{
-  text-align:center;font-size:12.5px;font-weight:600;line-height:1.3;
-  color:var(--encre);letter-spacing:-.1px;
-  opacity:1;transform:none;
-  transition:opacity var(--vitesse-dossier) var(--courbe),
-             transform var(--vitesse-dossier) var(--courbe);
+.quete input::placeholder{color:var(--discret)}
+.quete input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.quete-touche{
+  font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--discret);border:1px solid var(--ligne);border-radius:5px;
+  padding:5px 7px;background:transparent;
 }
-/* Le compte se pose sur le coin, comme la pastille de notification d'une
-   application. Fond papier et non rouge : ce n'est pas une alerte. */
-.dossier .compte{
-  position:absolute;top:-6px;right:-6px;
-  min-width:22px;height:22px;padding:0 6px;border-radius:11px;
-  background:var(--papier);color:var(--c,var(--primaire-encre));
-  border:1px solid var(--ligne);
-  display:grid;place-items:center;
-  font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
-  box-shadow:0 1px 3px rgba(0,0,0,.18);
-  transition:border-color var(--vitesse-dossier);
+.compte{
+  margin:16px 0 0;font-size:12.5px;letter-spacing:.4px;color:var(--discret);
+  animation:lever .55s var(--courbe) .24s backwards;
 }
 
-@media (hover:hover) and (pointer:fine){
-  .dossier .nom{opacity:0;transform:translateY(4px)}
-  /* C'est la tuile entière qui se soulève, pas un contenu à l'intérieur d'un
-     cadre : le geste est celui d'une icône que l'on vise. */
-  .dossier:hover .glyphe,.dossier:focus-visible .glyphe{
-    transform:translateY(-4px) scale(1.05);
-    box-shadow:var(--ombre-app-haute);
-  }
-  .dossier:hover .nom,.dossier:focus-visible .nom{opacity:1;transform:none}
-  .dossier:hover .compte,.dossier:focus-visible .compte{border-color:var(--c,var(--primaire-bord))}
-  .dossier:active .glyphe{transform:translateY(-1px) scale(1.01)}
+/* ====================================================== TUILES VIVES == */
+.tuiles-vives{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+  gap:14px;max-width:880px;margin:14px auto 0;
 }
-.dossier:focus-visible{outline:none}
-.dossier:focus-visible .glyphe{outline:2px solid var(--primaire);outline-offset:4px}
-
-/* =========================================================== GRILLES == */
-.section{margin:0 0 30px}
-.section:last-child{margin-bottom:0}
-.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,340px));gap:14px}
-.grille-dense{grid-template-columns:repeat(auto-fill,minmax(228px,272px))}
-@media (max-width:700px){ .grille, .grille-dense{grid-template-columns:1fr} }
-
-/* ====================================================== PORTE, CARTE ==
-   La porte enveloppe la carte et son épingle. La carte reste un lien pur :
-   un bouton à l'intérieur d'un lien serait invalide, et cliquer sur
-   l'épingle suivrait le lien. */
-.porte{
-  position:relative;display:flex;
-  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
-  animation-delay:calc(var(--i, 0) * 26ms);
+.tuile-vive{
+  background:var(--carte);border:1px solid var(--ligne);border-radius:var(--rayon-g);
+  backdrop-filter:blur(12px);padding:18px 20px;box-shadow:var(--ombre);
+  animation:lever .55s var(--courbe) .3s backwards;
 }
-.porte > .carte{flex:1;animation:none}
+.tv-tete{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.tv-tete h3{
+  margin:0;font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--discret);
+}
+.tv-tete .espace{flex:1}
 
-.carte, .fiche{
-  position:relative;display:flex;flex-direction:column;gap:9px;
-  background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon);
-  box-shadow:var(--ombre);padding:15px 16px 14px;
-  color:var(--encre);text-decoration:none;
-  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
-  animation-delay:calc(var(--i, 0) * 26ms);
-  transition:transform var(--vitesse),box-shadow var(--vitesse),border-color var(--vitesse);
+/* ---- météo. Les mesures secondaires sont là pour la précision qu'elles
+   suggèrent : pression au dixième d'hectopascal, ressenti au dixième de
+   degré. Ce sont de vraies données, Open-Meteo les fournit à ce pas. */
+.meteo-corps{display:flex;align-items:center;gap:16px}
+.meteo-icone{color:var(--accent);flex:none;display:flex}
+[data-theme="light"] .meteo-icone{color:#5f7f1f}
+.meteo-temp{font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1;font-variant-numeric:tabular-nums}
+.meteo-temp small{font-size:19px;font-weight:600;color:var(--encre-2);vertical-align:14px;letter-spacing:0}
+.meteo-quoi{display:flex;flex-direction:column;gap:2px;min-width:0}
+.meteo-libelle{font-size:14.5px;font-weight:600}
+.meteo-lieu{font-size:12px;color:var(--discret)}
+.meteo-mesures{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;
+  margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--ligne);
+}
+.meteo-mesures div{display:flex;justify-content:space-between;gap:10px}
+.meteo-mesures dt{font-size:12px;color:var(--discret)}
+.meteo-mesures dd{margin:0;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meteo-pied{
+  margin:12px 0 0;font-size:10.5px;color:var(--discret);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.meteo-pied a{color:inherit;text-decoration:underline;text-decoration-color:var(--ligne-forte)}
+.btn-position{
+  display:inline-flex;align-items:center;gap:5px;cursor:pointer;
+  background:transparent;border:1px solid var(--ligne);border-radius:99px;
+  color:var(--discret);font:inherit;font-size:11px;padding:3px 10px;
+  transition:color var(--vitesse),border-color var(--vitesse);
+}
+.btn-position:hover{color:var(--encre);border-color:var(--ligne-forte)}
+
+/* ---- calendrier. Les semaines ISO sur l'axe vertical : c'est la monnaie
+   du bureau d'études, on se donne rendez-vous en semaine 38, pas le 14. */
+.cal-nav{display:flex;gap:4px}
+.cal-nav button{
+  width:26px;height:26px;display:grid;place-items:center;cursor:pointer;
+  background:transparent;border:1px solid var(--ligne);border-radius:7px;
+  color:var(--discret);font:inherit;line-height:1;
+  transition:color var(--vitesse),border-color var(--vitesse);
+}
+.cal-nav button:hover{color:var(--encre);border-color:var(--ligne-forte)}
+.cal-mois{font-size:14.5px;font-weight:700;text-transform:capitalize}
+.cal-semaine{
+  font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--accent-encre);
+  background:var(--accent);border-radius:99px;padding:3px 10px;white-space:nowrap;
+}
+.cal-grille{
+  display:grid;grid-template-columns:34px repeat(7,1fr);
+  gap:2px;margin-top:10px;font-variant-numeric:tabular-nums;
+}
+.cal-grille span{
+  display:grid;place-items:center;height:30px;font-size:12.5px;border-radius:8px;
+}
+.cal-ent{font-size:10.5px;font-weight:700;letter-spacing:.8px;color:var(--discret);text-transform:uppercase}
+.cal-num{font-size:10.5px;font-weight:700;color:var(--discret)}
+.cal-num.sem-act{color:var(--accent)}
+[data-theme="light"] .cal-num.sem-act{color:#4e6b1c}
+.cal-we{background:rgba(255,255,255,.035)}
+[data-theme="light"] .cal-we{background:rgba(30,40,15,.05)}
+.cal-hors{color:var(--discret);opacity:.45}
+.cal-lig-act{background:rgba(149,192,61,.08)}
+.cal-auj{background:var(--accent);color:var(--accent-encre);font-weight:800}
+
+/* ============================================================ RAYONS == */
+.rayon{max-width:1080px;margin:44px auto 0}
+.rayon h2{
+  margin:0 0 16px;font-size:19px;font-weight:800;letter-spacing:-.4px;
+  display:flex;align-items:baseline;gap:10px;
+}
+.rayon h2 span{font-size:12.5px;font-weight:500;color:var(--discret);letter-spacing:.2px}
+
+/* ---- cartes d'outil. La couleur de la pastille d'icône vient des
+   conventions de lot B27 : un ingénieur y reconnaît le code couleur de
+   ses plans. Le reflet qui suit la souris est peint en --mx/--my par
+   hub.js : le genre de détail qui se sent plus qu'il ne se voit. */
+.grille-outils{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+.carte{
+  position:relative;display:flex;flex-direction:column;gap:10px;overflow:hidden;
+  padding:18px;border-radius:var(--rayon-g);
+  background:var(--carte);border:1px solid var(--ligne);
+  backdrop-filter:blur(10px);color:var(--encre);
+  transition:transform var(--vitesse) var(--courbe),border-color var(--vitesse),box-shadow var(--vitesse);
 }
 a.carte:hover{
-  text-decoration:none;transform:translateY(-2px);
-  box-shadow:var(--ombre-haute);border-color:var(--primaire-bord);
+  text-decoration:none;transform:translateY(-4px);
+  border-color:color-mix(in srgb,var(--c,#95c03d) 55%,transparent);
+  box-shadow:0 14px 34px rgba(0,0,0,.35),0 0 30px color-mix(in srgb,var(--c,#95c03d) 22%,transparent);
 }
-a.carte:active{transform:translateY(0)}
-a.carte:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
-
-/* L'épingle ne se montre qu'au survol de la carte, ou si elle est déjà
-   posée : une rangée d'épingles grises sur toutes les cartes ferait un bruit
-   permanent pour une action occasionnelle. Au clavier elle reste atteignable
-   en toutes circonstances, et sur tactile elle est toujours visible faute de
-   survol pour la révéler. */
-.epingle{
-  position:absolute;top:9px;right:9px;z-index:2;
-  width:26px;height:26px;padding:0;border-radius:50%;
-  border:1px solid var(--ligne);background:var(--papier);color:var(--discret);
-  display:grid;place-items:center;cursor:pointer;
-  opacity:0;transform:scale(.9);
-  transition:opacity var(--vitesse),transform var(--vitesse),
-             background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
+[data-theme="light"] a.carte:hover{box-shadow:0 14px 30px rgba(30,40,15,.14),0 0 26px color-mix(in srgb,var(--c,#5f7f1f) 18%,transparent)}
+.carte::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:radial-gradient(170px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.09),transparent 70%);
+  transition:opacity var(--vitesse);
 }
-.porte:hover .epingle,.epingle:focus-visible,.epingle.posee{opacity:1;transform:none}
-.epingle:hover{background:var(--note-fond);color:var(--moyenne);border-color:var(--note-bord)}
-.epingle.posee{background:var(--moyenne);color:#fff;border-color:var(--moyenne)}
-.epingle.posee:hover{filter:brightness(1.08)}
-@media (hover:none){ .epingle{opacity:1;transform:none} }
-
-.carte .tete, .fiche .tete{display:flex;align-items:flex-start;gap:11px}
-.carte .vignette, .fiche .vignette{
-  width:36px;height:36px;flex:none;border-radius:var(--rayon-s);
-  background:var(--primaire-fond);color:var(--primaire-encre);
-  border:1px solid var(--primaire-bord);
-  display:inline-flex;align-items:center;justify-content:center;
-  transition:background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
+a.carte:hover::after{opacity:1}
+.carte-tete{display:flex;align-items:center;gap:10px}
+.carte-puce{
+  display:grid;place-items:center;width:42px;height:42px;flex:none;
+  border-radius:13px;background:var(--c,#5f7f1f);color:#fff;
 }
-a.carte:hover .vignette{background:var(--primaire);color:var(--sur-primaire);border-color:var(--primaire)}
-.carte h3, .fiche h3{
-  margin:0;font-size:14.5px;font-weight:700;line-height:1.3;color:var(--encre);
-  letter-spacing:-.2px;flex:1;min-width:0;
+.carte-sortie{
+  margin-left:auto;color:var(--discret);opacity:0;transform:translate(-4px,4px);
+  transition:opacity var(--vitesse),transform var(--vitesse);
 }
-/* La flèche de sortie laisse la place à l'épingle, qui occupe le même coin. */
-.carte .sortie{
-  flex:none;color:var(--discret);margin-top:1px;margin-right:28px;
-  transition:color var(--vitesse),transform var(--vitesse);
+a.carte:hover .carte-sortie{opacity:1;transform:none}
+.carte-nom{font-size:15.5px;font-weight:700;letter-spacing:-.2px;line-height:1.25}
+.carte-pitch{margin:0;font-size:13px;color:var(--encre-2);line-height:1.5}
+.carte.attente{opacity:.62}
+.badge{
+  position:absolute;top:14px;right:14px;
+  font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;border:1px solid var(--ligne-forte);color:var(--encre-2);
 }
-a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
+.badge.beta{color:var(--attention);border-color:color-mix(in srgb,var(--attention) 45%,transparent)}
 
-.carte .pitch{margin:0;font-size:12.5px;color:var(--encre-2);line-height:1.5;flex:1}
-.carte .bas{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:1px}
-.tags{display:flex;gap:5px;flex-wrap:wrap;flex:1;min-width:0}
-.tag{
-  font-size:11px;color:var(--discret);background:var(--papier-2);
-  border:1px solid var(--ligne-2);border-radius:999px;padding:1px 8px;white-space:nowrap;
+/* ---- ressources : un annuaire de rangées compactes, groupées. */
+.groupe{margin:0 0 18px}
+.groupe h3{
+  margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--discret);
 }
-
-.carte-lien{padding:12px 14px 11px;gap:7px}
-.carte-lien .vignette{width:30px;height:30px}
-.carte-lien h3{font-size:13.5px}
-.carte-lien .pitch{font-size:12px;line-height:1.45}
-.carte-lien .bas{margin-top:0}
-
-.pastille{
-  font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
-  border-radius:999px;padding:2px 8px;white-space:nowrap;flex:none;
-  border:1px solid transparent;
+.rangs{display:flex;flex-direction:column;gap:7px}
+.rang{
+  display:flex;align-items:center;gap:13px;padding:12px 16px;
+  border-radius:var(--rayon-m);background:var(--carte);border:1px solid var(--ligne);
+  backdrop-filter:blur(10px);color:var(--encre);
+  transition:transform var(--vitesse) var(--courbe),border-color var(--vitesse);
 }
-.pastille.beta{background:var(--primaire-fond);color:var(--primaire-encre);border-color:var(--primaire-bord)}
-.pastille.a-venir{background:var(--note-fond);color:var(--moyenne);border-color:var(--note-bord)}
-.pastille.bureau{background:var(--papier-3);color:var(--encre-2);border-color:var(--ligne)}
-.pastille.obsolete{background:var(--haute-fond);color:var(--haute);border-color:var(--haute)}
+.rang:hover{text-decoration:none;transform:translateX(5px);border-color:var(--ligne-forte)}
+.rang-puce{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;background:var(--c,#6b5ba6);color:#fff}
+.rang-texte{min-width:0;display:flex;flex-direction:column;gap:1px}
+.rang-nom{font-size:14px;font-weight:650}
+.rang-pitch{font-size:12px;color:var(--discret);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rang-sortie{margin-left:auto;color:var(--discret);opacity:0;transition:opacity var(--vitesse)}
+.rang:hover .rang-sortie{opacity:1}
 
-.carte.inerte{box-shadow:none;background:var(--papier-2);border-style:dashed}
-.carte.inerte .vignette{background:var(--papier-3);color:var(--discret);border-color:var(--ligne)}
-.carte.inerte h3{color:var(--encre-2)}
-.carte.obsolete h3{text-decoration:line-through;text-decoration-thickness:1px}
-
-/* ========================================================== ANNUAIRE == */
-.fiche{box-shadow:none;gap:10px}
-.fiche .tete{align-items:center}
-.fiche h3{font-size:14px}
-.fiche .role{margin:1px 0 0;font-size:12px;color:var(--discret);line-height:1.35}
-.fiche .vignette{width:32px;height:32px}
-.joindre{display:flex;flex-direction:column;gap:5px;margin-top:1px}
-.joindre a{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--lien);overflow-wrap:anywhere}
-
-/* ============================================ RÉSULTATS DE RECHERCHE == */
-.resultat{
-  display:flex;flex-direction:column;gap:6px;
-  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
-  animation-delay:calc(var(--i, 0) * 26ms);
+/* ---- contact */
+.grille-contact{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
+.fiche{
+  display:flex;align-items:center;gap:14px;padding:16px 18px;
+  border-radius:var(--rayon-g);background:var(--carte);border:1px solid var(--ligne);
+  backdrop-filter:blur(10px);
 }
-.resultat .porte,.resultat .carte{animation:none}
-.resultat-ou{
-  font-size:11.5px;color:var(--discret);display:inline-flex;align-items:center;gap:5px;padding-left:3px;
+.fiche-puce{display:grid;place-items:center;width:44px;height:44px;flex:none;border-radius:50%;background:var(--carte-pleine);border:1px solid var(--ligne-forte);color:var(--accent)}
+[data-theme="light"] .fiche-puce{color:#5f7f1f}
+.fiche-texte{display:flex;flex-direction:column;gap:1px;min-width:0}
+.fiche-nom{font-size:14.5px;font-weight:700}
+.fiche-role{font-size:12px;color:var(--discret)}
+.fiche-mail{font-size:12.5px}
+
+.rien{
+  max-width:1080px;margin:48px auto 0;text-align:center;
+  color:var(--discret);font-size:14px;
 }
 
-.vide{
-  border:1px dashed var(--ligne);border-radius:var(--rayon);background:var(--papier-2);
-  padding:30px 20px;text-align:center;color:var(--discret);font-size:13px;
-}
-.vide b{display:block;color:var(--encre-2);font-size:14px;margin-bottom:4px}
-
-/* ================================================= PANNEAU À PROPOS == */
+/* ============================================================ MODALE == */
 .modale{
-  border:none;padding:0;border-radius:var(--rayon);background:var(--papier);color:var(--encre);
-  box-shadow:0 8px 32px rgba(35,31,32,.22);width:min(680px,94vw);max-height:88vh;overflow:hidden;
+  border:1px solid var(--ligne-forte);border-radius:var(--rayon-g);
+  background:var(--carte-pleine);color:var(--encre);padding:0;
+  width:min(560px,calc(100vw - 32px));max-height:min(78vh,720px);
+  box-shadow:var(--ombre);
 }
-[data-theme="dark"] .modale{box-shadow:0 8px 32px rgba(0,0,0,.6);border:1px solid var(--ligne)}
-.modale::backdrop{background:rgba(0,0,0,.45)}
+.modale::backdrop{background:rgba(4,6,3,.6);backdrop-filter:blur(4px)}
 .modale-tete{
-  display:flex;align-items:center;gap:10px;padding:13px 18px;
-  border-bottom:1px solid var(--ligne);background:var(--papier-2);
+  display:flex;align-items:center;gap:10px;padding:16px 20px;
+  border-bottom:1px solid var(--ligne);position:sticky;top:0;background:inherit;
 }
-.modale-tete h2{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+.modale-tete h2{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .modale-tete .espace{flex:1}
-.modale-corps{padding:16px 18px;overflow:auto;max-height:calc(88vh - 56px);font-size:13px}
+.modale-corps{padding:18px 20px 22px;overflow-y:auto}
 .stats-groupe{margin:0 0 18px}
-.stats-groupe:last-child{margin-bottom:0}
 .stats-groupe h3{
-  margin:0 0 8px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  color:var(--discret);display:flex;align-items:center;gap:6px;
+  margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--discret);display:flex;align-items:center;gap:7px;
 }
-.stats-liste{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:0}
-.stats-liste dt{color:var(--encre-2)}
-.stats-liste dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.note{
-  background:var(--note-fond);border:1px solid var(--note-bord);border-radius:var(--rayon-s);
-  padding:10px 12px;font-size:12.5px;color:var(--encre-2);line-height:1.55;
-}
-.note code{
-  font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12px;
-  background:var(--papier);border:1px solid var(--ligne);border-radius:4px;padding:1px 5px;
-}
-.changelog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.changelog li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
-.changelog .cl-ver{
-  grid-row:1 / span 2;align-self:start;
-  display:inline-block;min-width:34px;text-align:center;
-  padding:2px 8px;border-radius:11px;font-size:11.5px;font-weight:700;
-  background:var(--primaire-fond);color:var(--primaire-encre);border:1px solid var(--primaire-bord);
-}
-.changelog li.actuelle .cl-ver{background:var(--primaire);color:var(--sur-primaire);border-color:var(--primaire)}
-.changelog .cl-titre{font-weight:600;color:var(--encre)}
-.changelog .cl-date{font-weight:400;color:var(--discret);font-size:11.5px}
-.changelog .cl-txt{color:var(--encre-2);line-height:1.5}
+.stats-liste{margin:0;display:grid;gap:5px}
+.stats-liste div{display:flex;justify-content:space-between;gap:14px}
+.stats-liste dt{color:var(--encre-2);font-size:13px}
+.stats-liste dd{margin:0;font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+.changelog{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.changelog li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:13px}
+.changelog .cl-ver{font-weight:800;color:var(--accent);font-size:12px;align-self:start;padding-top:1px}
+[data-theme="light"] .changelog .cl-ver{color:#4e6b1c}
+.changelog .cl-titre{font-weight:700}
+.changelog .cl-date{color:var(--discret);font-size:11.5px}
+.changelog .cl-txt{grid-column:2;color:var(--encre-2);line-height:1.5}
+.note{font-size:13px;color:var(--encre-2);line-height:1.55}
 
-/* ============================================================ ÉTROIT ==
-   La barre du haut se resserre et le sous-titre de la marque s'efface : à
-   cette largeur il pousserait la recherche hors de la ligne pour une phrase
-   que le bandeau d'accueil redit deux centimètres plus bas. */
-@media (max-width:960px){
-  .barre-haute{padding:12px 16px;gap:10px}
-  .barre-haute h1{max-width:none;flex:1;padding-left:11px}
-  .marque-nom small{display:none}
-  /* La recherche passe sous le titre : à cette largeur, la garder sur la
-     même ligne la réduirait à un champ où l'on ne lit plus ce qu'on tape. */
-  .barre-recherche{order:9;flex-basis:100%;max-width:none}
-  .wrap{padding:20px 16px 34px}
-  .salut{font-size:22px}
-  .banniere{min-height:190px}
-  .banniere-txt{padding:26px 16px}
-}
-/* En dessous de cette largeur, le chapeau déborde la moitié du bandeau : à
-   62 caractères il mesure environ 480 px, et il dépasse les 50 % du plateau
-   dès que le bandeau descend sous 960 px. Le bandeau occupant désormais toute
-   la fenêtre, la barre latérale n'étant plus là pour lui en prendre 250 px,
-   le seuil se lit directement sur la fenêtre. Le voile couvre alors toute la
-   largeur, aux mêmes opacités : la photo se voit moins, mais le texte reste
-   lisible, et c'est dans cet ordre que ça se décide. */
-@media (max-width:1024px){
-  .banniere::after{
-    background:linear-gradient(100deg,
-      rgba(26,33,11,.62) 0%, rgba(26,33,11,.55) 60%, rgba(26,33,11,.52) 100%);
-  }
-}
-@media (max-width:560px){
-  .chiffres{grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px}
-  .chiffre{padding:13px 14px;gap:1px 11px}
-  .chiffre-ico{width:38px;height:38px;border-radius:11px}
-  .chiffre-n{font-size:25px}
+/* ============================================================ ÉTROIT == */
+@media (max-width:720px){
+  .portail{padding:0 14px 84px}
+  .entree{padding-top:44px}
+  .embleme{width:96px;height:96px;border-radius:24px}
+  .quete{height:48px}
+  .quete-touche{display:none}
+  .tuiles-vives{grid-template-columns:1fr}
+  .rayon{margin-top:36px}
+  .grille-outils{grid-template-columns:1fr}
+  .rang-pitch{white-space:normal}
 }
 
-/* ======================================================== IMPRESSION ==
-   La barre latérale et les commandes disparaissent, la tuile garde son
-   aplat : son glyphe est blanc, sans fond il disparaîtrait. */
+/* ============================================================ PAPIER == */
 @media print{
-  :root,[data-theme="dark"]{
-    color-scheme:light;
-    --fond:#fff;--papier:#fff;--papier-2:#f7f8f6;--papier-3:#eef0ec;
-    --encre:#1e2220;--encre-2:#4a4f4c;--discret:#636965;
-    --ligne:#c7cbc6;--ligne-2:#dcdfda;
-    --marque:#7da32f;--marque-lavis:transparent;
-    --primaire:#7da32f;--primaire-fond:#eaf3d8;--primaire-bord:#a9c67d;--primaire-encre:#3f5a12;
-    --ombre:none;--ombre-haute:none;--ombre-app:none;
-  }
-  body{display:block;background:#fff}
-  .noprint,.barre-recherche,.fil-retour,.epingle{display:none !important}
-  .barre-haute{position:static;border-bottom:1px solid var(--ligne)}
-  .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
-  .grille-dossiers{grid-template-columns:repeat(4,1fr)}
-  .dossier .nom{opacity:1;transform:none}
-  .dossier .glyphe{
-    transform:none;box-shadow:none;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
-  .chiffre,.banniere{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none}
-  /* La photo ne s'imprime pas : elle mangerait de l'encre pour un décor, et
-     le bandeau garde son sens sans elle. */
-  .banniere-fond,.banniere-credit{display:none}
-  .carte,.fiche,.dossier,.porte{break-inside:avoid;box-shadow:none}
-  .carte .sortie{display:none;margin-right:0}
-  a.carte[href]::after{
-    content:" " attr(href);display:block;margin-top:6px;
-    font-size:10px;color:#636965;overflow-wrap:anywhere;
-  }
+  #fond,.haut,.noprint{display:none !important}
+  html{background:#fff}
+  body{color:#000}
+  .carte,.rang,.fiche{border:1px solid #bbb;background:#fff;box-shadow:none}
+  .titre-portail{-webkit-background-clip:initial;background:none;color:#000}
 }

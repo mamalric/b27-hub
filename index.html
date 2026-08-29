@@ -5,91 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Outils B27</title>
 
-<!-- Le hub n'a pas vocation à être trouvé par un moteur de recherche : il se
-     transmet par son lien, entre collègues. Un site statique ne peut pas être
-     réellement protégé par mot de passe, mais il peut au moins ne pas être
-     référencé. robots.txt porte la même consigne côté serveur. -->
+<!-- Le portail se transmet par son lien. Il n'a pas vocation à être trouvé
+     par un moteur de recherche tant que la décision de l'ouvrir au monde
+     n'est pas prise : robots.txt porte la même consigne côté serveur. -->
 <meta name="robots" content="noindex, nofollow">
 
-<meta name="description" content="Le hall d'entrée des outils et applications du bureau d'études B27.">
+<meta name="description" content="Le portail des outils et ressources du bureau d'études B27.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Outils B27">
-<meta property="og:description" content="Le hall d'entrée des outils et applications du bureau d'études B27.">
+<meta property="og:description" content="Le portail des outils et ressources du bureau d'études B27.">
 
 <link rel="icon" href="logo-b27.svg">
 <link rel="stylesheet" href="hub.css">
 
-<!-- Thème posé avant le premier rendu : sans cette ligne, un poste réglé en
-     sombre verrait la page blanche un instant avant de basculer. -->
-<script>try{var t=localStorage.getItem('hub_b27_theme');document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch(e){}</script>
+<!-- Thème posé avant le premier rendu, sombre par défaut : c'est l'identité
+     du portail, pas un réglage du poste. La préférence enregistrée gagne. -->
+<script>try{var t=localStorage.getItem('hub_b27_theme');document.documentElement.dataset.theme=t||'dark';}catch(e){document.documentElement.dataset.theme='dark';}</script>
 </head>
 
 <body>
 
-<div class="page">
+<!-- Fond animé : un champ d'écoulement calculé en local, des lignes de flux
+     comme de l'air ou de l'eau en mouvement. C'est le métier du bureau
+     d'études, en fond de page. Dessiné par hub.js, immobile si le poste
+     demande moins d'animations. -->
+<canvas id="fond" aria-hidden="true"></canvas>
 
-  <header class="barre-haute">
-    <!-- La marque tient lieu de retour au hall : c'est le seul lien de
-         navigation permanent depuis que la barre latérale a été retirée. -->
-    <a class="marque" href="#/" aria-label="Revenir au hall">
-      <span class="marque-logo" id="marqueLogo"></span>
-      <span class="marque-nom">
-        <b id="marqueTitre">Outils B27</b>
-        <small id="marqueSousTitre"></small>
-      </span>
-    </a>
-    <h1 id="titrePage">Hall</h1>
-    <div class="barre-recherche noprint" id="barre"></div>
-    <span class="espace"></span>
-    <button type="button" class="bouton-icone noprint" id="btnTheme" aria-label="Changer de thème"></button>
-    <button type="button" class="bouton-icone noprint" id="btnApropos" data-ico="engrenage" aria-label="À propos du hub" title="À propos du hub"></button>
+<div class="haut noprint">
+  <button type="button" class="bouton-icone" id="btnTheme" aria-label="Changer de thème"></button>
+  <button type="button" class="bouton-icone" id="btnApropos" data-ico="engrenage" aria-label="À propos du portail" title="À propos du portail"></button>
+</div>
+
+<main class="portail">
+
+  <!-- L'entrée : tout est centré sous le logo. -->
+  <header class="entree">
+    <div class="embleme" id="embleme"></div>
+    <h1 class="titre-portail" id="titrePortail">Outils B27</h1>
+    <p class="devise" id="devise"></p>
+    <div class="quete noprint" id="quete" hidden>
+      <span class="quete-loupe" data-ico="recherche" data-ico-taille="18" aria-hidden="true"></span>
+      <input id="champRecherche" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Rechercher un outil, une ressource…" aria-label="Rechercher dans le portail">
+      <kbd class="quete-touche" aria-hidden="true">/</kbd>
+    </div>
+    <p class="compte" id="compte"></p>
   </header>
 
-  <!-- Bandeau d'accueil. Il est volontairement hors de .wrap : le reste de la
-       page est borne a 1360 px pour que les lignes restent lisibles, alors
-       qu'une photo, elle, doit aller d'un bord a l'autre. Le voile et le
-       cadrage du texte se chargent de recoller les deux largeurs.
-       La couche .banniere-fond recoit sa photo de hub.js, tiree au sort dans
-       un lot Unsplash mis en cache. Tout le traitement noir et blanc, puis
-       sepia, puis vert B27 tient dans une declaration filter calculee par
-       src/bandeau_teinte.py. Sans cle d'acces, sans reseau ou en cas d'echec,
-       la couche reste vide et le degrade vert suffit : le bandeau ne depend
-       jamais du reseau pour etre correct. -->
-  <div class="banniere" id="banniere">
-    <div class="banniere-fond" id="banniereFond" aria-hidden="true"></div>
-    <div class="banniere-txt">
-      <p class="salut" id="salut"></p>
-      <p class="chapeau" id="chapeau"></p>
-    </div>
-    <p class="banniere-credit" id="banniereCredit" hidden></p>
-  </div>
+  <!-- Les tuiles vivantes : météo en données réelles, calendrier en
+       semaines ISO. Construites par hub.js. -->
+  <section class="tuiles-vives noprint" id="tuilesVives" aria-label="Météo et calendrier">
+    <article class="tuile-vive" id="tuileMeteo" hidden></article>
+    <article class="tuile-vive" id="tuileCalendrier"></article>
+  </section>
 
-  <main class="wrap">
-    <!-- Accueil : salutation, chiffres, raccourcis. Masqué dès qu'on entre
-         dans un dossier ou qu'une recherche est en cours. -->
-    <section class="accueil" id="accueil">
-      <div class="chiffres" id="chiffres"></div>
-      <div id="raccourcis"></div>
-    </section>
+  <!-- Les rayons du portail, construits depuis catalogue.js. -->
+  <section class="rayon" id="rayonOutils" hidden>
+    <h2>Nos outils <span>fabriqués ici</span></h2>
+    <div class="grille-outils" id="grilleOutils"></div>
+  </section>
 
-    <!-- Fil d'Ariane, puis dossiers ou portes selon l'endroit. -->
-    <div id="filAriane"></div>
-    <div id="contenu"></div>
-  </main>
+  <section class="rayon" id="rayonRessources" hidden>
+    <h2>Ressources <span>sites de référence</span></h2>
+    <div id="groupesRessources"></div>
+  </section>
 
-</div>
+  <section class="rayon" id="rayonContact" hidden>
+    <h2>Contact</h2>
+    <div class="grille-contact" id="grilleContact"></div>
+  </section>
+
+  <p class="rien" id="rienTrouve" hidden></p>
+
+</main>
 
 <dialog id="dlgApropos" class="modale noprint" aria-labelledby="dlgAproposTitre">
   <div class="modale-tete">
-    <h2 id="dlgAproposTitre" data-ico="engrenage" data-ico-taille="15">À propos du hub</h2>
+    <h2 id="dlgAproposTitre" data-ico="engrenage" data-ico-taille="15">À propos du portail</h2>
     <span class="espace"></span>
     <button type="button" class="bouton-icone" id="btnAproposFermer" data-ico="fermer" aria-label="Fermer"></button>
   </div>
   <div class="modale-corps" id="aproposCorps"></div>
 </dialog>
 
-<!-- catalogue.js d'abord : hub.js le lit au chargement.
-     signalement.js est autonome et pose la pastille en bas à droite. -->
 <script src="catalogue.js"></script>
 <script src="signalement.js"></script>
 <script src="hub.js"></script>

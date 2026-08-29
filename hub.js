@@ -1,38 +1,39 @@
 /* =====================================================================
-   hub.js : rendu du hall d'entrée à partir de catalogue.js.
-   =====================================================================
+   hub.js : le moteur du portail B27.
 
-   Ce fichier n'a pas besoin d'être modifié pour ajouter une porte. Tout ce
-   qui varie est dans catalogue.js. Ce qui se trouve ici, ce sont le logo,
-   les tracés d'icônes, la mécanique de thème, la navigation par dossiers,
-   la recherche et le panneau "À propos".
+   Un portail public de visibilité : on entre, on voit les outils et les
+   ressources du bureau d'études, on clique, c'est tout. Pas de compte,
+   pas de portail de connexion, et il n'y en aura pas.
 
-   Le hall se parcourt comme une armoire : le premier niveau montre des
-   dossiers, on en ouvre un, parfois un sous-dossier, et on arrive aux
-   portes. La position est portée par l'adresse (#/ressources/technique),
-   ce qui rend le bouton Précédent du navigateur fonctionnel et permet
-   d'envoyer le lien d'un dossier précis à un collègue.
+   La page est une démonstration autant qu'un annuaire : un champ
+   d'écoulement animé en fond, calculé en local, la météo en données
+   réelles, un calendrier en semaines ISO. Tout se construit à
+   l'exécution depuis catalogue.js, seul fichier à faire vivre.
 
-   Aucune dépendance, et une seule requête réseau, facultative : la photo
-   décorative du bandeau d'accueil. Sans elle, tout fonctionne à l'identique.
-   Le hub s'ouvre aussi bien depuis GitHub Pages que par un double-clic sur
-   index.html.
+   Deux requêtes externes, toutes deux facultatives : la météo
+   (Open-Meteo, sans clé ni compte) et la géolocalisation si le visiteur
+   la demande. Sans réseau, la tuile météo disparaît et tout le reste
+   fonctionne à l'identique, double-clic sur index.html compris.
    ===================================================================== */
 
 /* ---------------------------------------------------------------------
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v7", date: "2026-08-29", titre: "Le portail",
+    texte: "Refonte complète : tout est centré sous le logo, un champ d'écoulement animé calculé en local occupe le fond, la météo affiche des données réelles Open-Meteo, un calendrier donne les semaines ISO. Le catalogue se lit en deux rayons, nos outils et les ressources, et la métaphore des portes disparaît. Sombre par défaut. La pastille de signalement est conservée telle quelle." },
   { v: "v6", date: "2026-08-29", titre: "Bandeau photo, épuré",
-    texte: "Le bandeau d'accueil va désormais d'un bord à l'autre de l'écran et porte une photo de chantier tirée au sort, qui change d'une visite à l'autre. Elle passe en noir et blanc, puis en sépia, puis prend le vert de B27 : teinte et saturation calculées pour tomber sur le #95C03D du logo. Le pied de page et le lien de contact latéral disparaissent. Sans réseau, le bandeau garde son dégradé vert et le hub fonctionne à l'identique." },
-  { v: "v4", date: "2026-08-29", titre: "Tableau de bord, et ce qui vous appartient",
-    texte: "Barre latérale permanente : toutes les catégories à un clic depuis n'importe où. Recherche en haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Surtout : le hall devient personnel sans le moindre compte. Épinglez une porte, elle remonte en tête à chacune de vos visites, et les dernières portes ouvertes s'y ajoutent. Tout vit dans votre navigateur et n'en sort jamais." },
+    texte: "Bandeau d'accueil pleine largeur à photo de chantier teintée au vert B27. Retiré dès la v7 au profit du fond animé." },
+  { v: "v5", date: "2026-08-29", titre: "Bandeau de charpente",
+    texte: "Une charpente métallique dessinée en axonométrie dans le bandeau d'accueil. Retirée dès la v6." },
+  { v: "v4", date: "2026-08-29", titre: "Tableau de bord",
+    texte: "Barre latérale permanente, recherche en haut, cartes chiffrées, épingles et portes récentes en localStorage. L'essentiel a été retiré depuis, au fil de l'épuration." },
   { v: "v3", date: "2026-08-29", titre: "Navigation par dossiers",
-    texte: "Le hall s'ouvre sur des dossiers carrés, une icône au centre et le nom qui se révèle au survol. On ouvre un dossier, parfois un sous-dossier, et on arrive aux portes. Fil d'Ariane, adresse qui suit la position, bouton Précédent du navigateur fonctionnel. La recherche, elle, traverse tous les niveaux d'un coup." },
+    texte: "Dossiers carrés, sous-dossiers, fil d'Ariane, adresse qui suit la position. Remplacée en v7 par un portail à plat." },
   { v: "v2", date: "2026-08-29", titre: "Hall d'entrée, logo B27 et signalement",
-    texte: "Bandeau d'accueil portant le logo B27 et le compte des portes ouvertes. Le catalogue s'élargit au-delà des outils : site de l'entreprise, B27 Mobility à venir, six ressources métier, et un annuaire de contacts. Une pastille en bas à droite ouvre un formulaire de signalement avec capture d'écran et dictée vocale." },
+    texte: "Le catalogue s'élargit au-delà des outils, et une pastille en bas à droite ouvre un formulaire de signalement avec capture d'écran et dictée vocale." },
   { v: "v1", date: "2026-08-29", titre: "Première mise en ligne",
-    texte: "Hub d'accueil des outils B27 : cartes cliquables construites à partir du catalogue, thème clair et sombre, panneau À propos. Deux outils référencés, la Calculette ECS et Bouclage et le Dimensionnement émetteurs Finimetal." }
+    texte: "Cartes cliquables construites à partir du catalogue, thème clair et sombre, panneau À propos." }
 ];
 
 /* ---------------------------------------------------------------------
@@ -60,10 +61,9 @@ function logoB27(hauteur) {
 /* ---------------------------------------------------------------------
    ICÔNES
 
-   Tracés Lucide inlinés, comme dans les autres outils B27 : aucune requête
-   externe. Ajouter une icône, c'est ajouter une ligne ici, puis citer son
-   nom dans le champ "icone" d'une porte, d'une catégorie ou d'une
-   sous-catégorie.
+   Tracés Lucide inlinés, comme dans les autres outils B27. Ajouter une
+   icône, c'est ajouter une ligne ici, puis citer son nom dans le champ
+   "icone" d'une entrée du catalogue.
    --------------------------------------------------------------------- */
 const TRACES_ICONES = {
   grille: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
@@ -85,11 +85,19 @@ const TRACES_ICONES = {
   dossier: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
   voiture: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
   regle: '<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/>',
-  palette: '<path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>',
-  ordinateur: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
   recherche: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
   sortie: '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
   soleil: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  nuage_soleil: '<path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',
+  pluie: '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>',
+  neige: '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/>',
+  orage: '<path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/>',
+  brouillard: '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 17H7"/><path d="M17 21H9"/>',
+  jauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  position: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  calendrier: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  chevron_g: '<path d="m15 18-6-6 6-6"/>',
+  chevron_d: '<path d="m9 18 6-6-6-6"/>',
   lune: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   engrenage: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
   fermer: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
@@ -100,19 +108,13 @@ const TRACES_ICONES = {
   horloge: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
   valider: '<path d="M20 6 9 17l-5-5"/>',
   attention: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
-  porte: '<path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5.442 20.1a1 1 0 0 1-.442-.83V5.562a1 1 0 0 1 .58-.908l6-2.769a1 1 0 0 1 1.42.908z"/>',
-  maison: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
-  chevron: '<path d="m9 18 6-6-6-6"/>',
-  retour: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
-  epingle: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
   etincelle: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>'
 };
 
 // L'épaisseur de trait est réglable, et il faut s'en servir dès qu'on agrandit
-// une icône. Les tracés Lucide sont dessinés à 2 sur une grille de 24 : à
-// 16 px le trait fait 1,3 px à l'écran, mais à 110 px il en ferait 9, et
-// l'icône vire au pictogramme épais. Un grand glyphe demande un trait
-// proportionnellement plus fin pour garder la même densité apparente.
+// une icône : les tracés Lucide sont dessinés à 2 sur une grille de 24, un
+// grand glyphe demande un trait proportionnellement plus fin pour garder la
+// même densité apparente.
 function ico(nom, taille, epaisseur) {
   const traces = TRACES_ICONES[nom] || TRACES_ICONES.info;
   return '<svg class="ico" width="' + (taille || 16) + '" height="' + (taille || 16) + '" viewBox="0 0 24 24"'
@@ -143,8 +145,6 @@ function ech(txt) {
 
 // Comparaison insensible à la casse et aux accents : chercher "electricite"
 // doit trouver "Électricité", personne ne tape les accents dans un filtre.
-// NFD sépare la lettre de son accent, la plage U+0300 à U+036F retire les
-// accents ainsi détachés.
 function normaliser(txt) {
   return String(txt || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -155,45 +155,27 @@ function dateFr(iso) {
   return j + "/" + m + "/" + a;
 }
 
+// Décimale à la française : 18,4 et non 18.4.
+function virgule(n, dec) {
+  return Number(n).toFixed(dec == null ? 1 : dec).replace(".", ",");
+}
+
 const STATUTS = {
-  "en-ligne": { libelle: "En ligne",   cliquable: true,  pastille: false },
-  "beta":     { libelle: "Bêta",       cliquable: true,  pastille: true  },
-  "a-venir":  { libelle: "À venir",    cliquable: false, pastille: true  },
-  "bureau":   { libelle: "Bureau",     cliquable: false, pastille: true  },
-  "obsolete": { libelle: "Obsolète",   cliquable: false, pastille: true  }
+  "en-ligne": { libelle: "En ligne",  cliquable: true,  pastille: false },
+  "beta":     { libelle: "Bêta",      cliquable: true,  pastille: true  },
+  "a-venir":  { libelle: "Bientôt",   cliquable: false, pastille: true  },
+  "bureau":   { libelle: "Au bureau", cliquable: false, pastille: true  },
+  "obsolete": { libelle: "Obsolète",  cliquable: false, pastille: true  }
 };
 
 const TYPES = { outil: true, lien: true };
 
-// Clé du dossier qui recueille les portes d'une catégorie à sous-dossiers
-// qui n'ont pas déclaré de sous-catégorie. Sans lui, elles seraient
-// invisibles : rangées dans une catégorie qui n'affiche que des dossiers,
-// elles n'apparaîtraient dans aucun d'eux.
-const DIVERS = "__divers";
-const CLE_ANNUAIRE = "annuaire";
+const COULEUR_REPLI = "#5f7f1f";
 
-// Teinte du dossier de l'annuaire, et repli de toute catégorie qui n'en
-// déclare pas. Un gris chaud, neutre : des personnes ne sont pas un lot, elles
-// n'ont donc pas de couleur de lot. Le gris de la structure de B27, #4a4a4a,
-// a été écarté après mesure : il ne tenait que 2,12:1 face au fond du thème
-// sombre, la tuile s'y confondait avec la page.
-const COULEUR_ANNUAIRE = "#6e6a63";
-const COULEUR_REPLI = "#779c2b";
-
-// La couleur part du fichier de données et finit dans un attribut style :
-// on ne laisse passer qu'une notation hexadécimale, faute de quoi une faute
-// de frappe dans catalogue.js pourrait injecter de la déclaration CSS.
+// Une couleur venue du catalogue finit dans un attribut style : on ne laisse
+// passer que de l'hexadécimal.
 function couleurSure(c) {
   return /^#[0-9a-fA-F]{3,8}$/.test(String(c || "")) ? c : COULEUR_REPLI;
-}
-
-/* ---------------------------------------------------------------------
-   ARBORESCENCE
-   --------------------------------------------------------------------- */
-
-function estCliquable(o) {
-  const st = STATUTS[o.statut];
-  return !!(st && st.cliquable && o.url);
 }
 
 function categorie(cle) { return CATEGORIES.find(c => c.cle === cle) || null; }
@@ -201,61 +183,6 @@ function sousCategorie(cle) {
   return (typeof SOUS_CATEGORIES === "undefined" ? [] : SOUS_CATEGORIES).find(s => s.cle === cle) || null;
 }
 function contacts() { return typeof CONTACTS === "undefined" ? [] : CONTACTS; }
-
-function portesDe(cle) { return PORTES.filter(o => o.categorie === cle); }
-
-// Sous-dossiers réellement peuplés d'une catégorie, plus le dossier Divers
-// si des portes de cette catégorie n'ont pas de sous-catégorie.
-function sousDossiersDe(cle) {
-  const dedans = portesDe(cle);
-  const toutes = typeof SOUS_CATEGORIES === "undefined" ? [] : SOUS_CATEGORIES;
-  // La couleur de la catégorie descend dans ses sous-dossiers, sauf si l'un
-  // d'eux en déclare une. C'est ce qui fait qu'en entrant dans Ressources,
-  // les trois sous-dossiers restent violets : on voit qu'on est toujours
-  // dans la même branche.
-  const parente = categorie(cle);
-  const teinte = parente ? parente.couleur : null;
-  const liste = toutes
-    .filter(s => s.categorie === cle)
-    .map(s => ({ ...s, couleur: s.couleur || teinte,
-                 portes: dedans.filter(o => o.sousCategorie === s.cle) }))
-    .filter(s => s.portes.length);
-  if (!liste.length) return [];
-  const clesConnues = new Set(liste.map(s => s.cle));
-  const orphelines = dedans.filter(o => !o.sousCategorie || !clesConnues.has(o.sousCategorie));
-  if (orphelines.length) {
-    liste.push({ cle: DIVERS, categorie: cle, nom: "Divers", icone: "dossier",
-                 couleur: teinte, portes: orphelines });
-  }
-  return liste;
-}
-
-function categoriesPeuplees() {
-  return CATEGORIES
-    .map(c => ({ ...c, portes: portesDe(c.cle) }))
-    .filter(c => c.portes.length);
-}
-
-// Portes rangées dans une catégorie qui n'existe pas : elles seraient
-// perdues sans ce filet, on les regroupe dans un dossier de fin de liste.
-function categoriesOrphelines() {
-  const connues = new Set(CATEGORIES.map(c => c.cle));
-  const perdues = PORTES.filter(o => !connues.has(o.categorie));
-  return perdues.length
-    ? [{ cle: "__autres", nom: "Autres", icone: "dossier", portes: perdues }]
-    : [];
-}
-
-// Les dossiers du premier niveau, annuaire compris.
-function dossiersRacine() {
-  const liste = categoriesPeuplees().concat(categoriesOrphelines());
-  if (contacts().length) {
-    liste.push({ cle: CLE_ANNUAIRE, nom: "Qui contacter", icone: "personne",
-                 couleur: COULEUR_ANNUAIRE,
-                 portes: [], compte: contacts().length, annuaire: true });
-  }
-  return liste;
-}
 
 /* ---------------------------------------------------------------------
    CONTRÔLE DU CATALOGUE
@@ -278,7 +205,7 @@ function controlerCatalogue() {
   });
 
   PORTES.forEach((o, i) => {
-    const ou = "porte " + (i + 1) + " (" + (o.nom || o.id || "sans nom") + ")";
+    const ou = "entrée " + (i + 1) + " (" + (o.nom || o.id || "sans nom") + ")";
     if (!o.id) anomalies.push(ou + " : champ id manquant.");
     else if (vus.has(o.id)) anomalies.push(ou + ' : id "' + o.id + '" déjà utilisé.');
     else vus.add(o.id);
@@ -293,12 +220,12 @@ function controlerCatalogue() {
         const s = sousCategorie(o.sousCategorie);
         if (s && s.categorie !== o.categorie) {
           anomalies.push(ou + ' : sous-catégorie "' + o.sousCategorie + '" rattachée à "' + s.categorie
-            + '" et non à "' + o.categorie + "\", la porte n'apparaîtrait dans aucun dossier.");
+            + '" et non à "' + o.categorie + '".');
         }
       }
     }
     if (!STATUTS[o.statut]) anomalies.push(ou + ' : statut "' + o.statut + '" inconnu.');
-    if (o.type && !TYPES[o.type]) anomalies.push(ou + ' : type "' + o.type + "\" inconnu, la carte sera rendue en type outil.");
+    if (o.type && !TYPES[o.type]) anomalies.push(ou + ' : type "' + o.type + "\" inconnu, l'entrée sera rendue en type outil.");
     if (o.icone && !TRACES_ICONES[o.icone]) anomalies.push(ou + ' : icône "' + o.icone + "\" absente de TRACES_ICONES, remplacée par l'icône info.");
     if (STATUTS[o.statut] && STATUTS[o.statut].cliquable && !o.url) {
       anomalies.push(ou + " : statut cliquable mais url vide, la carte sera affichée non cliquable.");
@@ -312,607 +239,607 @@ function controlerCatalogue() {
   });
 
   if (anomalies.length) {
-    console.warn("Hub B27 : " + anomalies.length + " anomalie(s) dans catalogue.js\n"
+    console.warn("Portail B27 : " + anomalies.length + " anomalie(s) dans catalogue.js\n"
       + anomalies.map(a => "  - " + a).join("\n"));
   }
   return anomalies;
 }
 
 /* ---------------------------------------------------------------------
-   CE QUI VOUS APPARTIENT
+   THÈME
 
-   Le hub n'a pas de portail de connexion et n'en aura pas. La
-   personnalisation ne passe donc par aucun compte : elle vit dans le
-   navigateur de chacun, en localStorage. C'est personnel sans être
-   identifiant, et cela ne quitte jamais le poste.
-
-   Deux listes seulement : ce que l'on épingle, et ce que l'on a ouvert
-   récemment. Les deux sont filtrées contre le catalogue à la lecture, sans
-   quoi une porte retirée y laisserait un fantôme.
-   --------------------------------------------------------------------- */
-const CLE_EPINGLES = "hub_b27_epingles";
-const CLE_RECENTS = "hub_b27_recents";
-const RECENTS_MAX = 6;
-
-function lireListe(cle) {
-  try {
-    const v = JSON.parse(localStorage.getItem(cle) || "[]");
-    return Array.isArray(v) ? v.filter(x => typeof x === "string") : [];
-  } catch (e) { return []; }
-}
-function ecrireListe(cle, valeurs) {
-  try { localStorage.setItem(cle, JSON.stringify(valeurs)); } catch (e) { /* mode privé */ }
-}
-function porteParId(id) { return PORTES.find(o => o.id === id) || null; }
-
-function epingles() { return lireListe(CLE_EPINGLES).filter(porteParId); }
-function estEpingle(id) { return epingles().indexOf(id) !== -1; }
-function basculerEpingle(id) {
-  const liste = epingles();
-  const i = liste.indexOf(id);
-  if (i === -1) liste.unshift(id); else liste.splice(i, 1);
-  ecrireListe(CLE_EPINGLES, liste);
-}
-
-function recents() { return lireListe(CLE_RECENTS).filter(porteParId).slice(0, RECENTS_MAX); }
-function noterOuverture(id) {
-  if (!porteParId(id)) return;
-  const liste = lireListe(CLE_RECENTS).filter(x => x !== id);
-  liste.unshift(id);
-  ecrireListe(CLE_RECENTS, liste.slice(0, RECENTS_MAX * 2));
-}
-
-// Salutation selon l'heure. C'est la seule chose que le hub sait de vous, et
-// il la lit sur l'horloge du poste : accueillant sans rien demander.
-function salutation() {
-  const h = new Date().getHours();
-  if (h < 6) return "Bonne nuit";
-  if (h < 18) return "Bonjour";
-  return "Bonsoir";
-}
-
-/* ---------------------------------------------------------------------
-   THÈME CLAIR ET SOMBRE
+   Sombre par défaut : c'est l'identité du portail, pas un réglage du
+   poste. La préférence enregistrée, elle, gagne toujours.
    --------------------------------------------------------------------- */
 const CLE_THEME = "hub_b27_theme";
 
 function appliquerTheme(t) {
   document.documentElement.dataset.theme = t;
-  const b = $("btnTheme");
-  b.innerHTML = ico(t === "dark" ? "soleil" : "lune", 16);
-  b.title = t === "dark" ? "Passer en thème clair" : "Passer en thème sombre";
+  const btn = $("btnTheme");
+  if (btn) btn.innerHTML = ico(t === "dark" ? "soleil" : "lune", 17);
+  fondTheme();
 }
-function themeMemorise() {
-  try { return localStorage.getItem(CLE_THEME); } catch (e) { return null; }
-}
+
 function initTheme() {
-  const systeme = () => matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  appliquerTheme(themeMemorise() || systeme());
-  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ev => {
-    if (!themeMemorise()) appliquerTheme(ev.matches ? "dark" : "light");
-  });
+  let memorise = null;
+  try { memorise = localStorage.getItem(CLE_THEME); } catch (e) { /* stockage refusé */ }
+  appliquerTheme(memorise === "light" || memorise === "dark" ? memorise : "dark");
   $("btnTheme").addEventListener("click", () => {
     const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    try { localStorage.setItem(CLE_THEME, t); } catch (e) { /* mode privé : tant pis */ }
+    try { localStorage.setItem(CLE_THEME, t); } catch (e) { /* tant pis, non mémorisé */ }
     appliquerTheme(t);
   });
 }
 
 /* ---------------------------------------------------------------------
-   NAVIGATION
+   LE CHAMP D'ÉCOULEMENT
 
-   La position tient dans l'adresse : #/, #/ressources, #/ressources/technique.
-   C'est ce qui rend le bouton Précédent du navigateur fonctionnel et permet
-   d'envoyer à un collègue le lien d'un dossier précis, pas seulement celui
-   du hall.
+   Des particules qui suivent un champ de vecteurs, tracé par tracé, avec
+   une traînée qui s'estompe : des lignes de flux, comme de l'air ou de
+   l'eau en mouvement. C'est le métier du bureau d'études, en fond de
+   page, et c'est calculé en local : pas une image, pas une vidéo, pas une
+   bibliothèque.
+
+   Le champ est une somme de sinus déphasés dans le temps : ce n'est pas
+   du bruit de Perlin, mais à l'écran la différence ne se voit pas et le
+   calcul tient en une ligne. Si le poste demande moins d'animations, le
+   champ est dessiné une fois, immobile, et rien ne bouge.
    --------------------------------------------------------------------- */
+const FOND = { ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0 };
 
-function cheminDepuisAdresse() {
-  const h = (location.hash || "").replace(/^#\/?/, "");
-  if (!h) return [];
-  return h.split("/").filter(Boolean).map(m => {
-    try { return decodeURIComponent(m); } catch (e) { return m; }
+function fondCouleurs() {
+  const sombre = document.documentElement.dataset.theme !== "light";
+  return sombre
+    ? { fond: "#0a0d08", voile: "rgba(10,13,8,.06)",
+        traits: ["rgba(149,192,61,", "rgba(95,127,31,", "rgba(201,232,138,"] }
+    : { fond: "#f3f5f0", voile: "rgba(243,245,240,.07)",
+        traits: ["rgba(95,127,31,", "rgba(85,122,58,", "rgba(149,192,61,"] };
+}
+
+function fondAngle(x, y, t) {
+  return (Math.sin(x * 0.0016 + t * 0.0009)
+        + Math.cos(y * 0.0021 - t * 0.0007)
+        + Math.sin((x + y) * 0.0008 + t * 0.0004)) * Math.PI * 0.75;
+}
+
+function fondGraine(p, L, H) {
+  p.x = Math.random() * L;
+  p.y = Math.random() * H;
+  p.vie = 100 + Math.random() * 220;
+  p.v = 0.45 + Math.random() * 0.75;
+  // Le vert clair reste rare : équiprobable, l'ensemble vire à la paille.
+  const r = Math.random();
+  p.c = r < 0.14 ? 2 : (r < 0.6 ? 0 : 1);
+  p.a = 0.04 + Math.random() * 0.05;
+  p.e = 0.6 + Math.random() * 0.7;
+  return p;
+}
+
+function fondPas() {
+  const { ctx, parts, L, H } = FOND;
+  FOND.t += 0.5;
+  const c = fondCouleurs();
+  ctx.fillStyle = c.voile;
+  ctx.fillRect(0, 0, L, H);
+  for (const p of parts) {
+    const a = fondAngle(p.x, p.y, FOND.t);
+    const nx = p.x + Math.cos(a) * p.v;
+    const ny = p.y + Math.sin(a) * p.v * 0.72;   // aplati : le flux file à l'horizontale
+    ctx.strokeStyle = c.traits[p.c] + p.a + ")";
+    ctx.lineWidth = p.e;
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(nx, ny); ctx.stroke();
+    p.x = nx; p.y = ny; p.vie--;
+    if (p.vie < 0 || nx < -9 || ny < -9 || nx > L + 9 || ny > H + 9) fondGraine(p, L, H);
+  }
+  FOND.anime = requestAnimationFrame(fondPas);
+}
+
+function fondTheme() {
+  // Au changement de thème, tout repartir de zéro : les traînées de
+  // l'ancien fond resteraient visibles en négatif sous le nouveau.
+  if (!FOND.ctx) return;
+  FOND.ctx.fillStyle = fondCouleurs().fond;
+  FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
+  if (FOND.statique) fondStatique();
+}
+
+// La version immobile : les mêmes lignes de flux, dessinées une fois. Le
+// poste a demandé moins d'animations, pas moins de dessin.
+function fondStatique() {
+  const { ctx, L, H } = FOND;
+  const c = fondCouleurs();
+  for (let i = 0; i < 60; i++) {
+    const p = fondGraine({}, L, H);
+    ctx.strokeStyle = c.traits[p.c] + (p.a * 0.9) + ")";
+    ctx.lineWidth = p.e;
+    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    for (let k = 0; k < 160; k++) {
+      const a = fondAngle(p.x, p.y, 0);
+      p.x += Math.cos(a) * 1.4; p.y += Math.sin(a) * 1.0;
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+  }
+}
+
+function initFond() {
+  const cv = $("fond");
+  if (!cv || !cv.getContext) return;
+  const ctx = cv.getContext("2d", { alpha: false });
+  FOND.ctx = ctx;
+  FOND.statique = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function taille() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+    FOND.L = window.innerWidth; FOND.H = window.innerHeight;
+    cv.width = FOND.L * dpr; cv.height = FOND.H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = fondCouleurs().fond;
+    ctx.fillRect(0, 0, FOND.L, FOND.H);
+    if (FOND.statique) fondStatique();
+  }
+  taille();
+  window.addEventListener("resize", taille);
+
+  if (FOND.statique) return;
+
+  FOND.parts = Array.from({ length: 80 }, () => fondGraine({}, FOND.L, FOND.H));
+  FOND.anime = requestAnimationFrame(fondPas);
+
+  // Un onglet caché n'a pas besoin de brûler la carte graphique.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { cancelAnimationFrame(FOND.anime); FOND.anime = null; }
+    else if (!FOND.anime) FOND.anime = requestAnimationFrame(fondPas);
   });
 }
 
-function adresseDe(chemin) {
-  return chemin.length ? "#/" + chemin.map(encodeURIComponent).join("/") : "#/";
+/* ---------------------------------------------------------------------
+   MÉTÉO
+
+   Données réelles, Open-Meteo : un service public de données météo, sans
+   clé et sans compte, qui autorise l'appel direct depuis un navigateur.
+   Les mesures secondaires, pression au dixième d'hectopascal en tête,
+   sont là pour la précision qu'elles suggèrent, et ce sont pourtant de
+   vraies mesures : le service les fournit à ce pas.
+
+   Le relevé est gardé vingt minutes en localStorage : la météo ne change
+   pas entre deux allers-retours au portail, inutile de redemander. Sans
+   réseau ou si le service ne répond pas, la tuile n'apparaît pas : rien
+   ne clignote, rien ne s'excuse.
+   --------------------------------------------------------------------- */
+const CLE_METEO = "hub_b27_meteo";
+const CLE_LIEU = "hub_b27_lieu";
+const FRAICHEUR_METEO = 20 * 60 * 1000;   // ms
+
+// Codes temps de l'OMM, tels qu'Open-Meteo les renvoie.
+const TEMPS = [
+  [0, 0,  "Ciel dégagé",        "soleil"],
+  [1, 2,  "Peu nuageux",        "nuage_soleil"],
+  [3, 3,  "Couvert",            "nuage"],
+  [45, 48, "Brouillard",        "brouillard"],
+  [51, 57, "Bruine",            "pluie"],
+  [61, 67, "Pluie",             "pluie"],
+  [71, 77, "Neige",             "neige"],
+  [80, 82, "Averses",           "pluie"],
+  [85, 86, "Averses de neige",  "neige"],
+  [95, 99, "Orage",             "orage"]
+];
+
+function tempsDe(code) {
+  const t = TEMPS.find(([a, b]) => code >= a && code <= b);
+  return t ? { libelle: t[2], icone: t[3] } : { libelle: "Temps mêlé", icone: "nuage" };
 }
 
-// Un chemin qui ne correspond à rien (adresse tapée à la main, dossier
-// vidé depuis) ramène au hall plutôt que d'afficher une page morte.
-function cheminValide(chemin) {
-  if (!chemin.length) return [];
-  if (chemin[0] === CLE_ANNUAIRE) return contacts().length ? [CLE_ANNUAIRE] : [];
-  const dossiers = dossiersRacine();
-  const racine = dossiers.find(d => d.cle === chemin[0]);
-  if (!racine) return [];
-  if (chemin.length === 1) return [chemin[0]];
-  const sous = sousDossiersDe(chemin[0]).find(s => s.cle === chemin[1]);
-  return sous ? [chemin[0], sous.cle] : [chemin[0]];
+function cardinal(deg) {
+  return ["N", "NE", "E", "SE", "S", "SO", "O", "NO"][Math.round(deg / 45) % 8];
+}
+
+function reglagesMeteo() {
+  const r = (typeof REGLAGES === "object" && REGLAGES.meteo) || null;
+  return r && r.actif && isFinite(r.lat) && isFinite(r.lon) ? r : null;
+}
+
+// Le lieu : celui du catalogue, ou celui que le visiteur a choisi en
+// cliquant sur « ma position ». Le choix reste dans ce navigateur.
+function lieuCourant(r) {
+  try {
+    const l = JSON.parse(localStorage.getItem(CLE_LIEU) || "null");
+    if (l && isFinite(l.lat) && isFinite(l.lon)) return l;
+  } catch (e) { /* stockage illisible */ }
+  return { nom: r.ville || "", lat: r.lat, lon: r.lon };
+}
+
+function tirerMeteo(lieu) {
+  const url = "https://api.open-meteo.com/v1/forecast"
+    + "?latitude=" + encodeURIComponent(lieu.lat)
+    + "&longitude=" + encodeURIComponent(lieu.lon)
+    + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,"
+    + "surface_pressure,weather_code,wind_speed_10m,wind_direction_10m"
+    + "&wind_speed_unit=kmh&timezone=auto";
+  const options = {};
+  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
+    options.signal = AbortSignal.timeout(6000);
+  }
+  return fetch(url, options)
+    .then(rep => rep.ok ? rep.json() : Promise.reject(new Error("HTTP " + rep.status)))
+    .then(d => {
+      const c = d && d.current;
+      if (!c || !isFinite(c.temperature_2m)) throw new Error("réponse sans mesure");
+      return c;
+    });
+}
+
+function peindreMeteo(mesure, lieu, quand) {
+  const t = tempsDe(mesure.weather_code);
+  const heure = new Date(quand);
+  const hhmm = String(heure.getHours()).padStart(2, "0") + ":" + String(heure.getMinutes()).padStart(2, "0");
+  $("tuileMeteo").innerHTML =
+      '<div class="tv-tete"><h3>Météo</h3><span class="espace"></span>'
+    +   '<button type="button" class="btn-position" id="btnPosition" title="Utiliser ma position">'
+    +     ico("position", 12) + " ma position</button></div>"
+    + '<div class="meteo-corps">'
+    +   '<span class="meteo-icone">' + ico(t.icone, 46, 1.5) + "</span>"
+    +   '<span class="meteo-temp">' + ech(virgule(mesure.temperature_2m)) + "<small>°C</small></span>"
+    +   '<span class="meteo-quoi">'
+    +     '<span class="meteo-libelle">' + ech(t.libelle) + "</span>"
+    +     '<span class="meteo-lieu">' + ech(lieu.nom || "Position choisie") + "</span>"
+    +   "</span>"
+    + "</div>"
+    + '<dl class="meteo-mesures">'
+    +   "<div><dt>Ressenti</dt><dd>" + ech(virgule(mesure.apparent_temperature)) + "&nbsp;°C</dd></div>"
+    +   "<div><dt>Vent</dt><dd>" + Math.round(mesure.wind_speed_10m) + "&nbsp;km/h "
+    +     ech(cardinal(mesure.wind_direction_10m)) + "</dd></div>"
+    +   "<div><dt>Humidité</dt><dd>" + Math.round(mesure.relative_humidity_2m) + "&nbsp;%</dd></div>"
+    +   "<div><dt>Pression</dt><dd>" + ech(virgule(mesure.surface_pressure)) + "&nbsp;hPa</dd></div>"
+    + "</dl>"
+    + '<p class="meteo-pied"><span>Relevé ' + hhmm + "</span>"
+    +   '<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">données Open-Meteo</a></p>';
+  $("tuileMeteo").hidden = false;
+  $("btnPosition").addEventListener("click", demanderPosition);
+}
+
+function chargerMeteo(force) {
+  const r = reglagesMeteo();
+  if (!r) return;
+  const lieu = lieuCourant(r);
+
+  if (!force) {
+    try {
+      const cache = JSON.parse(localStorage.getItem(CLE_METEO) || "null");
+      if (cache && cache.mesure
+          && Date.now() - cache.quand < FRAICHEUR_METEO
+          && cache.lat === lieu.lat && cache.lon === lieu.lon) {
+        peindreMeteo(cache.mesure, lieu, cache.quand);
+        return;
+      }
+    } catch (e) { /* cache illisible : on redemande */ }
+  }
+
+  tirerMeteo(lieu).then(mesure => {
+    const quand = Date.now();
+    try {
+      localStorage.setItem(CLE_METEO,
+        JSON.stringify({ quand, lat: lieu.lat, lon: lieu.lon, mesure }));
+    } catch (e) { /* stockage plein : le relevé vivra le temps de la visite */ }
+    peindreMeteo(mesure, lieu, quand);
+  }).catch(() => {
+    // Sans réseau, derrière un proxy, service en panne : la tuile
+    // n'apparaît pas, et le portail n'a pas l'air cassé pour autant.
+  });
+}
+
+function demanderPosition() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(p => {
+    const lieu = { nom: "Votre position",
+                   lat: Math.round(p.coords.latitude * 1000) / 1000,
+                   lon: Math.round(p.coords.longitude * 1000) / 1000 };
+    try { localStorage.setItem(CLE_LIEU, JSON.stringify(lieu)); } catch (e) { /* non mémorisé */ }
+    chargerMeteo(true);
+  }, () => { /* refusée ou impossible : on reste sur le lieu du catalogue */ },
+  { timeout: 8000 });
 }
 
 /* ---------------------------------------------------------------------
-   DOSSIERS
+   CALENDRIER
 
-   Carré, l'icône au centre, le nom en dessous qui se révèle au survol.
-   C'est un <a> et non un <div> avec un écouteur : on gagne le clavier, le
-   clic du milieu, le menu contextuel et le bouton Précédent sans écrire
-   une ligne de plus.
-
-   Le nom reste toujours présent dans le code, même invisible, pour les
-   lecteurs d'écran ; c'est la feuille de style qui le révèle au survol, et
-   seulement là où le survol existe (voir hub.css).
+   Les semaines ISO sur l'axe vertical, les jours en tête, les week-ends
+   teintés : c'est la monnaie du bureau d'études, où tout se planifie en
+   numéro de semaine. Entièrement calculé en local.
    --------------------------------------------------------------------- */
-function html_dossier(d, chemin, index) {
-  const compte = d.annuaire ? d.compte : d.portes.length;
-  const motCompte = d.annuaire
-    ? (compte > 1 ? "fiches" : "fiche")
-    : (compte > 1 ? "portes" : "porte");
-  const recherche = normaliser(d.nom + " " + (d.portes || []).map(o => o.nom + " " + o.pitch).join(" "));
-  return '<a class="dossier" href="' + adresseDe(chemin) + '"'
-    + ' style="--i:' + index + ';--c:' + couleurSure(d.couleur) + '"'
-    + ' data-recherche="' + ech(recherche) + '"'
-    + ' title="' + ech(d.nom) + " : " + compte + " " + motCompte + '">'
-    +   '<span class="glyphe">' + ico(d.icone, 110, 1.4) + "</span>"
-    +   '<span class="nom">' + ech(d.nom) + "</span>"
-    +   '<span class="compte" aria-hidden="true">' + compte + "</span>"
+const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin",
+              "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+let calDecalage = 0;   // mois affichés en avant ou en arrière d'aujourd'hui
+
+// Numéro de semaine ISO 8601 : la semaine 1 est celle qui contient le
+// premier jeudi de l'année. Calculé en UTC pour ignorer l'heure d'été.
+function semaineISO(d) {
+  const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const jour = x.getUTCDay() || 7;
+  x.setUTCDate(x.getUTCDate() + 4 - jour);
+  const debut = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+  return Math.ceil(((x - debut) / 86400000 + 1) / 7);
+}
+
+function peindreCalendrier() {
+  const auj = new Date();
+  const vue = new Date(auj.getFullYear(), auj.getMonth() + calDecalage, 1);
+
+  // Premier lundi de la grille : le lundi de la semaine du 1er du mois.
+  const premier = new Date(vue);
+  premier.setDate(1 - ((vue.getDay() + 6) % 7));
+
+  const semaineAuj = semaineISO(auj);
+
+  let h = '<div class="tv-tete"><h3>Calendrier</h3><span class="espace"></span>'
+    + '<span class="cal-semaine">Semaine ' + semaineISO(auj) + "</span>"
+    + '<span class="cal-nav">'
+    +   '<button type="button" id="calPrec" aria-label="Mois précédent">' + ico("chevron_g", 13) + "</button>"
+    +   '<button type="button" id="calSuiv" aria-label="Mois suivant">' + ico("chevron_d", 13) + "</button>"
+    + "</span></div>"
+    + '<div class="cal-mois">' + MOIS[vue.getMonth()] + " " + vue.getFullYear() + "</div>"
+    + '<div class="cal-grille" role="grid" aria-label="Calendrier du mois">';
+
+  h += '<span class="cal-ent" title="Semaine">S</span>';
+  ["L", "M", "M", "J", "V", "S", "D"].forEach((j, i) =>
+    h += '<span class="cal-ent' + (i >= 5 ? " cal-we" : "") + '">' + j + "</span>");
+
+  const d = new Date(premier);
+  for (let sem = 0; sem < 6; sem++) {
+    // Un mois tient sur 4 à 6 lignes de semaine : on s'arrête dès que la
+    // ligne entière appartient au mois suivant.
+    if (sem >= 4 && d.getMonth() !== vue.getMonth()) break;
+    const num = semaineISO(d);
+    const active = calDecalage === 0 && num === semaineAuj;
+    h += '<span class="cal-num' + (active ? " sem-act" : "") + '">' + num + "</span>";
+    for (let j = 0; j < 7; j++) {
+      const duMois = d.getMonth() === vue.getMonth();
+      const estAuj = d.getFullYear() === auj.getFullYear()
+        && d.getMonth() === auj.getMonth() && d.getDate() === auj.getDate();
+      const cls = ["cal-jour"];
+      if (j >= 5) cls.push("cal-we");
+      if (!duMois) cls.push("cal-hors");
+      if (active) cls.push("cal-lig-act");
+      if (estAuj) cls.push("cal-auj");
+      h += '<span class="' + cls.join(" ") + '">' + d.getDate() + "</span>";
+      d.setDate(d.getDate() + 1);
+    }
+  }
+  h += "</div>";
+
+  $("tuileCalendrier").innerHTML = h;
+  $("calPrec").addEventListener("click", () => { calDecalage--; peindreCalendrier(); });
+  $("calSuiv").addEventListener("click", () => { calDecalage++; peindreCalendrier(); });
+}
+
+/* ---------------------------------------------------------------------
+   LES RAYONS
+
+   Deux rayons et une fiche : nos outils, les ressources, le contact.
+   Tout vient de catalogue.js. Le tableau s'y appelle PORTES pour des
+   raisons historiques ; à l'écran, on parle d'outils et de ressources.
+   --------------------------------------------------------------------- */
+function estOutil(o) { return (o.type || "outil") === "outil"; }
+
+function clesRecherche(o) {
+  const cat = categorie(o.categorie);
+  const sous = o.sousCategorie ? sousCategorie(o.sousCategorie) : null;
+  return normaliser([o.nom, o.pitch, (o.tags || []).join(" "),
+                     cat && cat.nom, sous && sous.nom].filter(Boolean).join(" "));
+}
+
+function html_badge(o) {
+  const s = STATUTS[o.statut];
+  if (!s || !s.pastille) return "";
+  return '<span class="badge' + (o.statut === "beta" ? " beta" : "") + '">' + ech(s.libelle) + "</span>";
+}
+
+function html_outil(o, index) {
+  const s = STATUTS[o.statut] || STATUTS["a-venir"];
+  const cat = categorie(o.categorie);
+  const c = couleurSure(cat && cat.couleur);
+  const cliquable = s.cliquable && o.url;
+  const dedans =
+      '<div class="carte-tete">'
+    +   '<span class="carte-puce" style="--c:' + c + '">' + ico(o.icone || "grille", 21) + "</span>"
+    +   '<span class="carte-sortie">' + ico("sortie", 15) + "</span>"
+    + "</div>"
+    + '<span class="carte-nom">' + ech(o.nom) + "</span>"
+    + '<p class="carte-pitch">' + ech(o.pitch) + "</p>"
+    + html_badge(o);
+  const attrs = ' class="carte apparait' + (cliquable ? "" : " attente") + '"'
+    + ' style="--c:' + c + ';--i:' + index + '" data-cherche="' + ech(clesRecherche(o)) + '"';
+  return cliquable
+    ? "<a" + attrs + ' href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer">' + dedans + "</a>"
+    : "<div" + attrs + ">" + dedans + "</div>";
+}
+
+function html_ressource(o, index) {
+  const cat = categorie(o.categorie);
+  const c = couleurSure(cat && cat.couleur);
+  return '<a class="rang apparait" style="--c:' + c + ';--i:' + index + '"'
+    + ' data-cherche="' + ech(clesRecherche(o)) + '"'
+    + ' href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer">'
+    +   '<span class="rang-puce">' + ico(o.icone || "livre", 17) + "</span>"
+    +   '<span class="rang-texte">'
+    +     '<span class="rang-nom">' + ech(o.nom) + "</span>"
+    +     '<span class="rang-pitch">' + ech(o.pitch) + "</span>"
+    +   "</span>"
+    +   '<span class="rang-sortie">' + ico("sortie", 15) + "</span>"
     + "</a>";
 }
 
-function html_grilleDossiers(dossiers, prefixe) {
-  return '<div class="grille-dossiers">'
-    + dossiers.map((d, i) => html_dossier(d, (prefixe || []).concat([d.cle]), i)).join("")
-    + "</div>";
-}
+function construireRayons() {
+  const outils = PORTES.filter(estOutil);
+  const liens = PORTES.filter(o => !estOutil(o));
 
-/* ---------------------------------------------------------------------
-   PORTES
-   --------------------------------------------------------------------- */
-function html_carte(o, index) {
-  const st = STATUTS[o.statut] || STATUTS["a-venir"];
-  const type = TYPES[o.type] ? o.type : "outil";
-  const cliquable = estCliquable(o);
-
-  const classes = ["carte", "carte-" + type];
-  if (!cliquable) classes.push("inerte");
-  if (o.statut === "obsolete") classes.push("obsolete");
-
-  const pastille = st.pastille
-    ? '<span class="pastille ' + ech(o.statut) + '">' + ech(st.libelle) + "</span>"
-    : "";
-  const sortie = cliquable ? '<span class="sortie">' + ico("sortie", 15) + "</span>" : "";
-
-  let interieur;
-  if (type === "lien") {
-    interieur =
-        '<div class="tete">'
-      +   '<span class="vignette">' + ico(o.icone, 17) + "</span>"
-      +   "<h3>" + ech(o.nom) + "</h3>"
-      +   sortie
-      + "</div>"
-      + '<p class="pitch">' + ech(o.pitch) + "</p>"
-      + (pastille ? '<div class="bas">' + pastille + "</div>" : "");
-  } else {
-    const tags = (o.tags || []).slice(0, 4)
-      .map(t => '<span class="tag">' + ech(t) + "</span>").join("");
-    interieur =
-        '<div class="tete">'
-      +   '<span class="vignette">' + ico(o.icone, 19) + "</span>"
-      +   "<h3>" + ech(o.nom) + "</h3>"
-      +   sortie
-      + "</div>"
-      + '<p class="pitch">' + ech(o.pitch) + "</p>"
-      + '<div class="bas"><div class="tags">' + tags + "</div>" + pastille + "</div>";
+  if (outils.length) {
+    $("grilleOutils").innerHTML = outils.map(html_outil).join("");
+    $("rayonOutils").hidden = false;
   }
 
-  const attrs =
-      ' class="' + classes.join(" ") + '"'
-    + ' style="--i:' + (index || 0) + '"'
-    + ' data-id="' + ech(o.id) + '"';
-
-  if (!cliquable) {
-    return "<div" + attrs + ' aria-disabled="true" title="' + ech(st.libelle)
-      + " : cette porte n'est pas encore ouverte\">" + interieur + "</div>";
+  // Les ressources se groupent par sous-catégorie, dans l'ordre où elles
+  // sont déclarées ; ce qui n'en a pas se groupe par catégorie.
+  if (liens.length) {
+    const groupes = [];
+    const toutesSous = typeof SOUS_CATEGORIES === "undefined" ? [] : SOUS_CATEGORIES;
+    toutesSous.forEach(s => {
+      const dedans = liens.filter(o => o.sousCategorie === s.cle);
+      if (dedans.length) groupes.push({ nom: s.nom, portes: dedans });
+    });
+    CATEGORIES.forEach(cat => {
+      const dedans = liens.filter(o => o.categorie === cat.cle && !o.sousCategorie);
+      if (dedans.length) groupes.push({ nom: cat.nom, portes: dedans });
+    });
+    let i = 0;
+    $("groupesRessources").innerHTML = groupes.map(g =>
+        '<div class="groupe">'
+      +   "<h3>" + ech(g.nom) + "</h3>"
+      +   '<div class="rangs">' + g.portes.map(o => html_ressource(o, i++)).join("") + "</div>"
+      + "</div>").join("");
+    $("rayonRessources").hidden = false;
   }
-  return "<a" + attrs + ' href="' + ech(o.url) + '" target="_blank" rel="noopener">' + interieur + "</a>";
-}
 
-// Une porte est enveloppée : la carte reste un lien pur, et le bouton
-// d'épingle se pose par-dessus en frère et non en enfant. Un bouton à
-// l'intérieur d'un lien serait du HTML invalide, et cliquer sur l'épingle
-// suivrait le lien.
-function html_porte(o, index) {
-  const posee = estEpingle(o.id);
-  return '<div class="porte" style="--i:' + index + '">'
-    + html_carte(o, index)
-    + '<button type="button" class="epingle' + (posee ? " posee" : "") + '"'
-    +   ' data-epingler="' + ech(o.id) + '"'
-    +   ' aria-pressed="' + (posee ? "true" : "false") + '"'
-    +   ' title="' + (posee ? "Retirer des raccourcis" : "Ajouter à vos raccourcis") + '"'
-    +   ' aria-label="' + (posee ? "Retirer " : "Épingler ") + ech(o.nom) + '">'
-    +   ico("epingle", 14) + "</button>"
-    + "</div>";
-}
-
-function html_grillePortes(portes) {
-  const queDesLiens = portes.length && portes.every(o => o.type === "lien");
-  return '<div class="grille' + (queDesLiens ? " grille-dense" : "") + '">'
-    + portes.map((o, i) => html_porte(o, i)).join("")
-    + "</div>";
-}
-
-/* ---------------------------------------------------------------------
-   ANNUAIRE
-   --------------------------------------------------------------------- */
-function html_annuaire() {
-  return '<div class="grille grille-dense">'
-    + contacts().map((c, i) => {
-        const sousTitre = [c.role, c.agence].filter(Boolean).join(" - ");
-        const sujets = (c.sujets || []).length
-          ? '<div class="tags">' + c.sujets.slice(0, 4).map(s => '<span class="tag">' + ech(s) + "</span>").join("") + "</div>"
-          : "";
-        const liens = [];
-        if (c.mail) liens.push('<a href="mailto:' + ech(c.mail) + '">' + ico("courrier", 14) + ech(c.mail) + "</a>");
-        if (c.tel) liens.push('<a href="tel:' + ech(c.tel.replace(/\s+/g, "")) + '">' + ico("telephone", 14) + ech(c.tel) + "</a>");
-        return '<div class="fiche" style="--i:' + i + '">'
-          + '<div class="tete"><span class="vignette">' + ico("personne", 17) + "</span>"
-          +   "<div><h3>" + ech(c.nom) + "</h3>"
-          +   (sousTitre ? '<p class="role">' + ech(sousTitre) + "</p>" : "")
-          + "</div></div>"
-          + sujets
-          + (liens.length ? '<div class="joindre">' + liens.join("") + "</div>" : "")
-          + "</div>";
-      }).join("")
-    + "</div>";
-}
-
-/* ---------------------------------------------------------------------
-   FIL D'ARIANE
-   --------------------------------------------------------------------- */
-// Ce qu'un niveau contient, pour que le dernier maillon du fil puisse
-// l'annoncer. Le fil ne dit pas seulement où l'on est, il dit aussi ce qu'on
-// y trouve : c'est utile avant même de regarder la grille.
-function contenuDuNiveau(chemin) {
-  if (!chemin.length) {
-    const n = dossiersRacine().length;
-    return { icone: "maison", nom: "Hall", couleur: COULEUR_REPLI,
-             compte: n, mot: n > 1 ? "dossiers" : "dossier" };
+  if (contacts().length) {
+    $("grilleContact").innerHTML = contacts().map((c, i) =>
+        '<div class="fiche apparait" style="--i:' + i + '" data-cherche="'
+      +   ech(normaliser([c.nom, c.role, c.mail].filter(Boolean).join(" "))) + '">'
+      +   '<span class="fiche-puce">' + ico("personne", 20) + "</span>"
+      +   '<span class="fiche-texte">'
+      +     '<span class="fiche-nom">' + ech(c.nom) + "</span>"
+      +     (c.role ? '<span class="fiche-role">' + ech(c.role) + "</span>" : "")
+      +     (c.mail ? '<a class="fiche-mail" href="mailto:' + ech(c.mail) + '">' + ech(c.mail) + "</a>" : "")
+      +   "</span>"
+      + "</div>").join("");
+    $("rayonContact").hidden = false;
   }
-  if (chemin[0] === CLE_ANNUAIRE) {
-    const n = contacts().length;
-    return { icone: "personne", nom: "Qui contacter", couleur: COULEUR_ANNUAIRE,
-             compte: n, mot: n > 1 ? "fiches" : "fiche" };
-  }
-  const d = dossiersRacine().find(x => x.cle === chemin[0]) || { nom: chemin[0], icone: "dossier", portes: [] };
-  if (chemin.length === 1) {
-    const sous = sousDossiersDe(chemin[0]);
-    if (sous.length) return { icone: d.icone, nom: d.nom, couleur: d.couleur,
-      compte: sous.length, mot: sous.length > 1 ? "sous-dossiers" : "sous-dossier" };
-    const n = d.portes.length;
-    return { icone: d.icone, nom: d.nom, couleur: d.couleur,
-             compte: n, mot: n > 1 ? "portes" : "porte" };
-  }
-  const s = sousDossiersDe(chemin[0]).find(x => x.cle === chemin[1])
-    || { nom: chemin[1], icone: "dossier", portes: [] };
-  const n = s.portes.length;
-  return { icone: s.icone, nom: s.nom, couleur: s.couleur,
-           compte: n, mot: n > 1 ? "portes" : "porte" };
-}
 
-// Le fil est affiché à tous les niveaux, hall compris. Le masquer à la racine
-// le rendait invisible sur le premier écran, donc introuvable : on ne
-// découvrait son existence qu'après être entré quelque part, c'est-à-dire
-// trop tard pour qu'il serve de repère.
-function html_filAriane(chemin) {
   const morceaux = [];
-  const ici = contenuDuNiveau(chemin);
-  // La teinte du niveau descend sur le fil, dont l'icone la reprend.
-  const teinte = couleurSure(ici.couleur);
+  if (outils.length) morceaux.push(outils.length + " outil" + (outils.length > 1 ? "s" : ""));
+  if (liens.length) morceaux.push(liens.length + " ressource" + (liens.length > 1 ? "s" : ""));
+  if (contacts().length) morceaux.push(contacts().length + " contact" + (contacts().length > 1 ? "s" : ""));
+  $("compte").textContent = morceaux.join("  ·  ");
 
-  // Les maillons parents sont des liens, le maillon courant n'en est pas un :
-  // un lien vers la page où l'on se trouve déjà n'apprend rien et trompe.
-  if (chemin.length) {
-    morceaux.push('<a href="#/" class="fil-lien">' + ico("maison", 14) + "Hall</a>");
-  }
-  if (chemin.length > 1) {
-    const d = dossiersRacine().find(x => x.cle === chemin[0]) || { nom: chemin[0] };
-    morceaux.push('<a href="' + adresseDe([chemin[0]]) + '" class="fil-lien">' + ech(d.nom) + "</a>");
-  }
-  morceaux.push('<span class="fil-ici">' + ico(ici.icone, 15) + ech(ici.nom)
-    + '<span class="fil-compte">' + ici.compte + " " + ech(ici.mot) + "</span></span>");
-
-  // Le bouton Retour double le fil d'Ariane, volontairement : le fil dit où
-  // l'on est, le bouton donne une cible large et toujours au même endroit,
-  // qui est ce qu'on cherche quand on veut juste remonter d'un cran. Au hall,
-  // il n'y a nulle part où remonter : il ne s'affiche pas.
-  const retour = chemin.length
-    ? '<a class="fil-retour" href="' + adresseDe(chemin.slice(0, -1)) + '"'
-      + ' aria-label="Remonter d\'un niveau" title="Remonter d\'un niveau">' + ico("retour", 15) + "</a>"
-    : "";
-
-  return '<nav class="fil" aria-label="Fil d\'Ariane" style="--c:' + teinte + '">' + retour
-    + '<span class="fil-suite">'
-    +   morceaux.join('<span class="fil-sep" aria-hidden="true">' + ico("chevron", 12) + "</span>")
-    + "</span></nav>";
-}
-
-/* ---------------------------------------------------------------------
-   RENDU
-   --------------------------------------------------------------------- */
-
-// Toutes les portes, à plat, pour la recherche : elle traverse les niveaux.
-// Chercher "INIES" depuis le hall doit trouver, sans avoir à deviner dans
-// quel dossier c'est rangé.
-function toutesLesPortesAvecChemin() {
-  return PORTES.map(o => {
-    const c = categorie(o.categorie);
-    const s = o.sousCategorie ? sousCategorie(o.sousCategorie) : null;
-    const ou = [c ? c.nom : o.categorie, s ? s.nom : ""].filter(Boolean).join(" > ");
-    return {
-      porte: o,
-      ou: ou,
-      recherche: normaliser([o.nom, o.pitch, (o.tags || []).join(" "), ou].join(" "))
-    };
-  });
-}
-
-let requete = "";
-
-function rendre() {
-  const chemin = cheminValide(cheminDepuisAdresse());
-  const cible = $("contenu");
-  const ici = contenuDuNiveau(chemin);
-
-  // Le bloc d'accueil, salutation et raccourcis compris, n'appartient qu'au
-  // hall : dès qu'on entre dans un dossier ou qu'une recherche est en cours,
-  // la place revient à ce qu'on est venu chercher.
-  const auHall = chemin.length === 0 && !requete;
-  $("accueil").hidden = !auHall;
-  $("banniere").hidden = !auHall;
-  // Les raccourcis sont reconstruits à chaque retour au hall, et non une
-  // seule fois au chargement : une porte ouverte entre-temps doit apparaître
-  // dans les récentes sans qu'il faille recharger la page.
-  if (auHall) construireRaccourcis();
-  document.body.classList.toggle("dedans", !auHall);
-
-  // Le titre de la barre du haut suit le niveau, et l'onglet du navigateur
-  // aussi : un onglet parmi douze doit dire où il mène.
-  const titre = requete ? "Recherche" : ici.nom;
-  $("titrePage").textContent = titre;
-  document.title = auHall ? REGLAGES.titre : titre + " - " + REGLAGES.titre;
-
-  if (requete) { $("filAriane").innerHTML = ""; rendreRecherche(cible); return; }
-
-  // Au hall, le fil se réduirait à un maillon sans lien : le bloc d'accueil
-  // dit déjà où l'on est, et bien mieux que lui.
-  $("filAriane").innerHTML = auHall ? "" : html_filAriane(chemin);
-
-  if (!chemin.length) {
-    const dossiers = dossiersRacine();
-    cible.innerHTML = dossiers.length
-      ? html_grilleDossiers(dossiers, [])
-      : '<div class="vide"><b>Aucune porte pour le moment</b>'
-        + "Le hall se remplit en ajoutant une fiche dans catalogue.js.</div>";
-    return;
-  }
-
-  if (chemin[0] === CLE_ANNUAIRE) { cible.innerHTML = html_annuaire(); return; }
-
-  if (chemin.length === 1) {
-    const sous = sousDossiersDe(chemin[0]);
-    if (sous.length) { cible.innerHTML = html_grilleDossiers(sous, [chemin[0]]); return; }
-    const d = dossiersRacine().find(x => x.cle === chemin[0]);
-    cible.innerHTML = html_grillePortes(d ? d.portes : []);
-    return;
-  }
-
-  const s = sousDossiersDe(chemin[0]).find(x => x.cle === chemin[1]);
-  cible.innerHTML = html_grillePortes(s ? s.portes : []);
-}
-
-function rendreRecherche(cible) {
-  const q = normaliser(requete);
-  const trouves = toutesLesPortesAvecChemin().filter(e => e.recherche.includes(q));
-
-  $("filAriane").innerHTML = '<nav class="fil" aria-label="Fil d\'Ariane">'
-    + '<a class="fil-retour" href="' + adresseDe(cheminValide(cheminDepuisAdresse())) + '"'
-    + ' aria-label="Quitter la recherche" id="btnQuitterRecherche">' + ico("retour", 15) + "</a>"
-    + '<span class="fil-suite"><span class="fil-ici">'
-    + (trouves.length
-        ? trouves.length + (trouves.length > 1 ? " portes trouvées" : " porte trouvée") + " dans tout le hall"
-        : "Aucune porte ne correspond")
-    + "</span></span></nav>";
-
-  if (!trouves.length) {
-    cible.innerHTML = '<div class="vide"><b>Aucune porte ne correspond</b>'
-      + "Essayez un autre mot-clé, ou effacez la recherche pour revenir aux dossiers.</div>";
-    return;
-  }
-  // En recherche, chaque résultat rappelle son dossier : sans cela, on ne
-  // sait pas où il était rangé, et on ne peut pas y retourner.
-  cible.innerHTML = '<div class="grille">'
-    + trouves.map((e, i) =>
-        '<div class="resultat" style="--i:' + i + '">'
-      +   '<span class="resultat-ou">' + ico("dossier", 12) + ech(e.ou) + "</span>"
-      +   html_carte(e.porte, i)
-      + "</div>").join("")
-    + "</div>";
-}
-
-/* ---------------------------------------------------------------------
-   BANDEAU D'ACCUEIL
-   --------------------------------------------------------------------- */
-function construireAccueil() {
-  const ouvertes = PORTES.filter(estCliquable).length;
-  const maison = PORTES.filter(o => (o.type || "outil") === "outil").length;
-  const liens = PORTES.length - maison;
-  const preparation = PORTES.length - ouvertes;
-
-  $("salut").textContent = salutation() + ".";
-  $("chapeau").textContent = REGLAGES.chapeau || "";
-  $("chapeau").hidden = !REGLAGES.chapeau;
-
-  // Quatre chiffres, et chacun répond à une question qu'on se pose vraiment
-  // en arrivant : qu'est-ce qui marche, qu'est-ce que nous fabriquons
-  // nous-mêmes, qu'est-ce qui vient d'ailleurs, qu'est-ce qui arrive. Ils
-  // sont calculés, jamais recopiés : ils ne peuvent pas mentir après l'ajout
-  // d'une porte. Une case à zéro disparaît, sauf la première : annoncer
-  // "0 en préparation" attirerait l'oeil sur un vide.
-  const cases = [
-    // Ces teintes ne sont pas celles des tuiles, et l'écart est voulu : une
-    // tuile ne porte qu'un glyphe, seuil 3:1, tandis qu'une carte chiffrée
-    // porte du texte de petite taille, seuil 4,5:1. Le bleu et l'ocre ont donc
-    // été assombris, le #2f6f8f venant de la feuille de B27 Mobility où il est
-    // documenté à 5,54:1.
-    { n: ouvertes,    titre: "Portes ouvertes", detail: "prêtes à l'emploi",   c: "#5f7f1f", ico: "porte" },
-    { n: maison,      titre: "Nos outils",      detail: "fabriqués ici",       c: "#2f6f8f", ico: "calculatrice" },
-    { n: liens,       titre: "Ressources",      detail: "sites de référence",  c: "#6b5ba6", ico: "livre" },
-    { n: preparation, titre: "En préparation",  detail: "bientôt disponibles", c: "#8a6200", ico: "horloge" }
-  ].filter((x, i) => i === 0 || x.n > 0);
-
-  $("chiffres").innerHTML = cases.map((x, i) =>
-      '<div class="chiffre" style="--c:' + x.c + ';--i:' + i + '">'
-    +   '<span class="chiffre-ico">' + ico(x.ico, 22, 1.7) + "</span>"
-    +   '<span class="chiffre-n">' + x.n + "</span>"
-    +   '<span class="chiffre-titre">' + ech(x.titre) + "</span>"
-    +   '<span class="chiffre-detail">' + ech(x.detail) + "</span>"
-    + "</div>").join("");
-
-  construireRaccourcis();
-}
-
-/* ---------------------------------------------------------------------
-   VOS RACCOURCIS
-
-   La part personnelle du hall, sans compte ni identité : ce que vous avez
-   épinglé, puis ce que vous avez ouvert récemment. Tout vient du navigateur
-   et n'en sort jamais. Tant que rien n'est épinglé, un mot explique à quoi
-   sert l'épingle, plutôt que de laisser un vide sans raison.
-   --------------------------------------------------------------------- */
-function construireRaccourcis() {
-  const mesEpingles = epingles().map(porteParId);
-  // Une porte épinglée n'a pas à réapparaître dans les récentes : elle est
-  // déjà en haut, la répéter ferait du bruit.
-  const mesRecents = recents().map(porteParId).filter(o => !estEpingle(o.id));
-  let h = "";
-
-  if (mesEpingles.length) {
-    h += '<section class="bloc">'
-      +  '<h2><span class="pave" style="--c:#b17e00">' + ico("epingle", 14) + "</span>Vos raccourcis"
-      +    ' <span class="compte">' + mesEpingles.length + "</span></h2>"
-      +  html_grillePortes(mesEpingles)
-      + "</section>";
-  } else {
-    h += '<section class="bloc">'
-      +  '<div class="invite">' + ico("epingle", 16)
-      +    "<span><b>Faites-en votre hall.</b> L'épingle en haut d'une carte la remonte ici, "
-      +    "en tête du hall, à chacune de vos visites. Aucun compte n'est demandé et rien "
-      +    "n'est envoyé : l'épingle reste dans ce navigateur.</span></div>"
-      + "</section>";
-  }
-
-  if (mesRecents.length) {
-    h += '<section class="bloc">'
-      +  '<h2><span class="pave" style="--c:#6e6a63">' + ico("horloge", 14) + "</span>Ouvert récemment"
-      +    ' <span class="compte">' + mesRecents.length + "</span></h2>"
-      +  html_grillePortes(mesRecents)
-      + "</section>";
-  }
-
-  $("raccourcis").innerHTML = h;
-  poserIcones($("raccourcis"));
-}
-
-/* ---------------------------------------------------------------------
-   MARQUE
-
-   Depuis le retrait de la barre latérale, c'est le seul lien de navigation
-   permanent : le logo et le nom ramènent au hall depuis n'importe quelle
-   profondeur. Le reste du déplacement passe par le fil d'Ariane et par les
-   dossiers eux-mêmes.
-   --------------------------------------------------------------------- */
-function construireMarque() {
-  $("marqueLogo").innerHTML = logoB27(22);
-  $("marqueTitre").textContent = REGLAGES.titre;
-  $("marqueSousTitre").textContent = REGLAGES.sousTitre;
+  $("devise").textContent = REGLAGES.accroche || "";
+  $("devise").hidden = !REGLAGES.accroche;
+  document.title = REGLAGES.titre;
+  $("titrePortail").textContent = REGLAGES.titre;
+  $("embleme").innerHTML = logoB27(58);
 }
 
 /* ---------------------------------------------------------------------
    RECHERCHE
+
+   Un seul champ, qui filtre tout en direct : cartes, rangées, fiches.
+   Pendant une recherche, les tuiles vivantes s'effacent : on est venu
+   chercher quelque chose, la météo attendra.
    --------------------------------------------------------------------- */
-function construireBarre() {
-  if (PORTES.length < REGLAGES.seuilFiltres) return false;
+function filtrer(brut) {
+  const q = normaliser(brut.trim());
+  let visibles = 0;
 
-  $("barre").innerHTML =
-      '<div class="recherche" id="zoneRecherche">'
-    +   ico("recherche", 15)
-    +   '<input type="search" id="inpRecherche" placeholder="Rechercher dans tout le hall..." aria-label="Rechercher une porte">'
-    +   '<button type="button" class="vider" id="btnVider" aria-label="Effacer la recherche"></button>'
-    + "</div>";
-  $("btnVider").innerHTML = ico("fermer", 13);
+  document.querySelectorAll("[data-cherche]").forEach(el => {
+    const garde = !q || el.dataset.cherche.indexOf(q) !== -1;
+    el.hidden = !garde;
+    if (garde) visibles++;
+  });
 
-  $("inpRecherche").addEventListener("input", () => {
-    requete = $("inpRecherche").value.trim();
-    $("zoneRecherche").classList.toggle("remplie", requete.length > 0);
-    rendre();
+  // Un groupe de ressources dont toutes les rangées sont cachées disparaît,
+  // sinon il resterait des titres orphelins.
+  document.querySelectorAll(".groupe").forEach(g => {
+    g.hidden = !g.querySelector("[data-cherche]:not([hidden])");
   });
-  $("btnVider").addEventListener("click", () => {
-    $("inpRecherche").value = "";
-    requete = "";
-    $("zoneRecherche").classList.remove("remplie");
-    $("inpRecherche").focus();
-    rendre();
+  [["rayonOutils", "grilleOutils"], ["rayonRessources", "groupesRessources"],
+   ["rayonContact", "grilleContact"]].forEach(([rayon, dedans]) => {
+    const vide = !$(dedans).querySelector("[data-cherche]:not([hidden])");
+    $(rayon).hidden = vide || !$(dedans).innerHTML;
   });
-  return true;
+
+  $("tuilesVives").hidden = !!q;
+  $("rienTrouve").hidden = !(q && visibles === 0);
+  if (q && visibles === 0) {
+    $("rienTrouve").textContent = "Aucun résultat pour « " + brut.trim() + " ».";
+  }
+}
+
+function initRecherche() {
+  if (PORTES.length + contacts().length < (REGLAGES.seuilFiltres || 0)) return;
+  const champ = $("champRecherche");
+  $("quete").hidden = false;
+  champ.addEventListener("input", () => filtrer(champ.value));
+
+  // La touche / amène au champ depuis n'importe où, Échap le vide : les
+  // conventions d'un outil qu'on utilise au clavier.
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "/" && document.activeElement !== champ
+        && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
+      ev.preventDefault();
+      champ.focus();
+    }
+    if (ev.key === "Escape" && document.activeElement === champ && champ.value) {
+      champ.value = "";
+      filtrer("");
+    }
+  });
 }
 
 /* ---------------------------------------------------------------------
-   PANNEAU "À PROPOS"
+   LE REFLET DES CARTES
+
+   Chaque carte reçoit la position de la souris en variables CSS ; le
+   dégradé radial de ::after s'y accroche. Un seul écouteur délégué pour
+   toute la page.
+   --------------------------------------------------------------------- */
+function initReflets() {
+  if (!matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  document.addEventListener("pointermove", ev => {
+    const carte = ev.target.closest && ev.target.closest(".carte");
+    if (!carte) return;
+    const r = carte.getBoundingClientRect();
+    carte.style.setProperty("--mx", Math.round(ev.clientX - r.left) + "px");
+    carte.style.setProperty("--my", Math.round(ev.clientY - r.top) + "px");
+  }, { passive: true });
+}
+
+/* ---------------------------------------------------------------------
+   À PROPOS
    --------------------------------------------------------------------- */
 function ligneStat(dt, dd) {
-  return "<dt>" + ech(dt) + "</dt><dd>" + ech(dd) + "</dd>";
+  return "<div><dt>" + ech(dt) + "</dt><dd>" + ech(String(dd)) + "</dd></div>";
 }
 
 function remplirApropos() {
-  const parStatut = {};
-  PORTES.forEach(o => { parStatut[o.statut] = (parStatut[o.statut] || 0) + 1; });
+  const outils = PORTES.filter(estOutil).length;
+  const liens = PORTES.length - outils;
   const majs = PORTES.map(o => o.maj).filter(Boolean).sort();
-  const derniere = majs.length ? majs[majs.length - 1] : null;
   const anomalies = controlerCatalogue();
-  const nosOutils = PORTES.filter(o => (o.type || "outil") === "outil").length;
-  const nbSous = categoriesPeuplees().reduce((n, c) => n + sousDossiersDe(c.cle).length, 0);
 
-  let h = "";
-
-  h += '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">Le hall</h3><dl class="stats-liste">'
-     + ligneStat("Portes référencées", PORTES.length)
-     + ligneStat("dont ressources extérieures", PORTES.length - nosOutils)
-     + Object.keys(STATUTS).filter(s => parStatut[s]).map(s =>
-         ligneStat("dont " + STATUTS[s].libelle.toLowerCase(), parStatut[s])).join("")
-     + ligneStat("Dossiers au premier niveau", dossiersRacine().length)
-     + ligneStat("Sous-dossiers", nbSous)
-     + ligneStat("Fiches à l'annuaire", contacts().length)
-     + ligneStat("Porte mise à jour le plus récemment", derniere ? dateFr(derniere) : "non renseigné")
-     + ligneStat("Thème courant", document.documentElement.dataset.theme === "dark" ? "sombre" : "clair")
-     + "</dl></div>";
+  let h = '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">Le portail</h3>'
+    + '<dl class="stats-liste">'
+    + ligneStat("Nos outils", outils)
+    + ligneStat("Ressources", liens)
+    + ligneStat("Contacts", contacts().length)
+    + ligneStat("Dernière mise à jour du catalogue", majs.length ? dateFr(majs[majs.length - 1]) : "non renseignée")
+    + ligneStat("Thème courant", document.documentElement.dataset.theme === "dark" ? "sombre" : "clair")
+    + "</dl></div>";
 
   if (anomalies.length) {
     h += '<div class="stats-groupe"><h3 data-ico="attention" data-ico-taille="13">Anomalies du catalogue</h3>'
-       + '<div class="note">' + anomalies.length + " anomalie(s) détectée(s) dans catalogue.js. "
-       + "Le détail est dans la console du navigateur (touche F12).</div></div>";
+      + '<div class="note">' + anomalies.length + " anomalie(s) détectée(s) dans catalogue.js. "
+      + "Le détail est dans la console du navigateur (touche F12).</div></div>";
   }
 
   h += '<div class="stats-groupe"><h3 data-ico="horloge" data-ico-taille="13">Journal des versions</h3>'
-     + '<ul class="changelog">'
-     + CHANGELOG.map((c, i) =>
-         '<li class="' + (i === 0 ? "actuelle" : "") + '">'
-       +   '<span class="cl-ver">' + ech(c.v) + "</span>"
-       +   '<span><span class="cl-titre">' + ech(c.titre) + "</span> "
-       +     '<span class="cl-date">' + dateFr(c.date) + "</span></span>"
-       +   '<span class="cl-txt">' + ech(c.texte) + "</span>"
-       + "</li>").join("")
-     + "</ul></div>";
+    + '<ul class="changelog">'
+    + CHANGELOG.map(c =>
+        "<li>"
+      +   '<span class="cl-ver">' + ech(c.v) + "</span>"
+      +   '<span><span class="cl-titre">' + ech(c.titre) + "</span> "
+      +     '<span class="cl-date">' + dateFr(c.date) + "</span></span>"
+      +   '<span class="cl-txt">' + ech(c.texte) + "</span>"
+      + "</li>").join("")
+    + "</ul></div>";
 
   const corps = $("aproposCorps");
   corps.innerHTML = h;
@@ -926,228 +853,25 @@ function initApropos() {
   dlg.addEventListener("click", ev => {
     const r = dlg.getBoundingClientRect();
     const dedans = ev.clientX >= r.left && ev.clientX <= r.right
-                && ev.clientY >= r.top && ev.clientY <= r.bottom;
+      && ev.clientY >= r.top && ev.clientY <= r.bottom;
     if (!dedans) dlg.close();
   });
 }
 
 /* ---------------------------------------------------------------------
-   DÉMARRAGE
+   DÉPART
    --------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------
-   PHOTO DU BANDEAU
-
-   Le bandeau du hall porte une photo de chantier tirée au sort, qui change
-   régulièrement, à la manière des fonds d'écran de Windows. Elle vient
-   d'Unsplash, passe en noir et blanc puis en sépia puis au vert de B27, et
-   tout ce traitement est en CSS : voir .banniere-fond dans hub.css et
-   src/bandeau_teinte.py qui en calcule les réglages.
-
-   Trois choses méritent d'être dites, parce qu'elles ont dicté la forme du
-   code plus que le confort d'écriture.
-
-   La première est que c'est la seule requête que le hub émette vers un tiers.
-   Tout le reste tient dans le dépôt et fonctionne hors ligne. Le bandeau est
-   donc écrit pour que son échec ne soit pas un incident : pas de clé, pas de
-   réseau, un proxy d'entreprise qui bloque, un quota épuisé, et le dégradé
-   vert reste. Rien ne clignote, rien ne s'excuse, aucune erreur ne s'affiche.
-   Le hub n'a jamais l'air cassé parce qu'une photo décorative manque.
-
-   La deuxième est le quota. Un compte de démonstration Unsplash donne
-   cinquante requêtes par heure, tous visiteurs confondus. Interroger l'API à
-   chaque chargement de page l'épuiserait dès le premier midi et le bandeau
-   serait vert pour tout le monde le reste de la journée. On tire donc un lot
-   entier en une seule requête, on le garde une semaine, et chaque visite pioche
-   dedans. Une requête par poste et par semaine, et l'image change quand même
-   à chaque fois qu'on revient au hall.
-
-   La troisième est le crédit. Nommer le photographe et Unsplash, avec des
-   liens, est une obligation de la licence, pas une politesse : le bandeau
-   affiche la photo seulement quand il peut aussi afficher son crédit.
-   --------------------------------------------------------------------- */
-
-const CLE_BANDEAU = "hub_b27_bandeau";
-
-// Unsplash demande que les liens de crédit portent le nom de l'application
-// qui les émet. C'est ce qui permet au photographe de savoir d'où vient son
-// audience, et c'est la contrepartie de la gratuité.
-const UTM_BANDEAU = "?utm_source=Hub%20Outils%20B27&utm_medium=referral";
-
-const DELAI_BANDEAU = 6000;   // ms avant d'abandonner la requête
-
-function reglagesBandeau() {
-  const r = (typeof REGLAGES === "object" && REGLAGES.bandeau) || null;
-  // Pas de clé, pas de requête. C'est l'état livré, et il est correct.
-  return r && r.actif && r.cle ? r : null;
-}
-
-// Une URL qui va finir dans un href ou dans un background-image ne se fait pas
-// confiance sur parole, même venant d'une API connue : on n'accepte que du
-// https vers les deux domaines attendus. Cela ferme la porte au javascript:
-// et au data: qu'une réponse détournée pourrait glisser.
-function urlSure(url, hotes) {
-  if (typeof url !== "string") return "";
-  try {
-    const a = new URL(url);
-    return a.protocol === "https:" && hotes.indexOf(a.hostname) !== -1 ? url : "";
-  } catch (e) {
-    return "";
-  }
-}
-
-function auHasard(liste) {
-  return liste[Math.floor(Math.random() * liste.length)];
-}
-
-// On ne garde d'une photo que ce qui sert : l'API en renvoie une cinquantaine
-// de champs, et le cache n'a pas à les porter.
-function retenirPhoto(p) {
-  if (!p || !p.urls) return null;
-  const brute = urlSure(p.urls.raw, ["images.unsplash.com"]);
-  if (!brute) return null;
-  const profil = urlSure(p.user && p.user.links && p.user.links.html,
-                         ["unsplash.com", "www.unsplash.com"]);
-  const auteur = (p.user && typeof p.user.name === "string") ? p.user.name : "";
-  if (!profil || !auteur) return null;     // sans crédit possible, on renonce
-  return {
-    // Les URL brutes d'Unsplash acceptent des paramètres de recadrage. On
-    // demande directement la bande dont on a besoin : télécharger une image
-    // de quatre mille pixels de côté pour n'en montrer qu'un bandeau ferait
-    // payer au poste de travail une place qu'il ne verra jamais. Le recadrage
-    // par entropie garde la partie chargée de l'image plutôt que son centre
-    // géométrique, qui sur une photo de chantier est souvent du ciel.
-    image: brute + "&w=1920&h=560&fit=crop&crop=entropy&q=72&fm=jpg",
-    auteur: auteur,
-    profil: profil
-  };
-}
-
-function lotEnCache(r) {
-  try {
-    const lot = JSON.parse(localStorage.getItem(CLE_BANDEAU) || "null");
-    if (!lot || !Array.isArray(lot.photos) || !lot.photos.length) return null;
-    const jours = (r.joursDeCache || 7) * 86400000;
-    if (Date.now() - (lot.tire || 0) > jours) return null;
-    return lot.photos;
-  } catch (e) {
-    return null;
-  }
-}
-
-function tirerLot(r) {
-  const recherches = (r.recherches && r.recherches.length)
-    ? r.recherches : ["construction site"];
-  // Une seule recherche finirait par ramener toujours les mêmes photos :
-  // Unsplash tire au sort dans les premiers résultats, pas dans tout le fonds.
-  // Changer de recherche à chaque lot élargit le puits.
-  const quoi = auHasard(recherches);
-  const url = "https://api.unsplash.com/photos/random"
-    + "?query=" + encodeURIComponent(quoi)
-    + "&orientation=landscape&content_filter=high"
-    + "&count=" + Math.min(30, Math.max(1, r.parLot || 12))
-    + "&client_id=" + encodeURIComponent(r.cle);
-
-  // Un proxy d'entreprise qui avale la requête sans répondre laisserait la
-  // promesse pendante indéfiniment. AbortSignal.timeout manque aux navigateurs
-  // d'avant 2022 ; son absence ne doit pas empêcher la requête, seulement la
-  // borne.
-  const options = {};
-  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
-    options.signal = AbortSignal.timeout(DELAI_BANDEAU);
-  }
-
-  return fetch(url, options)
-    .then(rep => rep.ok ? rep.json() : Promise.reject(new Error("HTTP " + rep.status)))
-    .then(donnees => (Array.isArray(donnees) ? donnees : [donnees])
-      .map(retenirPhoto).filter(Boolean));
-}
-
-function poserCredit(photo) {
-  const zone = $("banniereCredit");
-  if (!zone) return;
-  zone.innerHTML = 'Photo <a href="' + ech(photo.profil + UTM_BANDEAU)
-    + '" target="_blank" rel="noopener noreferrer">' + ech(photo.auteur)
-    + '</a> sur <a href="https://unsplash.com/' + UTM_BANDEAU
-    + '" target="_blank" rel="noopener noreferrer">Unsplash</a>';
-  zone.hidden = false;
-}
-
-function poserPhoto(photo) {
-  const fond = $("banniereFond");
-  if (!fond || !photo) return;
-  // On ne pose la photo qu'une fois chargée. Une image qui se remplit par
-  // bandes derrière une salutation déjà lisible se remarque bien plus que son
-  // absence, et le fondu de .posee n'aurait plus rien à adoucir.
-  const img = new Image();
-  img.onload = () => {
-    fond.style.backgroundImage = 'url("' + photo.image.replace(/"/g, "%22") + '")';
-    fond.classList.add("posee");
-    poserCredit(photo);
-  };
-  img.src = photo.image;
-}
-
-function chargerBandeau() {
-  const r = reglagesBandeau();
-  if (!r) return;
-  const cache = lotEnCache(r);
-  if (cache) { poserPhoto(auHasard(cache)); return; }
-  tirerLot(r).then(photos => {
-    if (!photos.length) return;
-    try {
-      localStorage.setItem(CLE_BANDEAU,
-        JSON.stringify({ tire: Date.now(), photos: photos }));
-    } catch (e) {
-      // Stockage plein ou refusé par la configuration du poste : le lot vivra
-      // le temps de la visite, ce qui suffit pour que le bandeau soit juste.
-    }
-    poserPhoto(auHasard(photos));
-  }).catch(() => {
-    // Réseau coupé, proxy, quota épuisé, clé révoquée : le dégradé vert reste,
-    // et c'est un état correct. Rien à signaler à qui vient chercher un outil.
-  });
-}
-
 function init() {
   controlerCatalogue();
-  construireMarque();
-  construireAccueil();
-  construireBarre();
+  construireRayons();
+  peindreCalendrier();
   poserIcones();
   initTheme();
+  initFond();
+  initRecherche();
+  initReflets();
   initApropos();
-  chargerBandeau();
-
-
-  // Un seul écouteur pour toute la page plutôt qu'un par carte : les grilles
-  // sont reconstruites à chaque navigation, des écouteurs posés sur les
-  // cartes seraient à reposer à chaque fois.
-  document.addEventListener("click", ev => {
-    const bouton = ev.target.closest("[data-epingler]");
-    if (bouton) {
-      ev.preventDefault();
-      basculerEpingle(bouton.dataset.epingler);
-      rendre();                       // reconstruit les raccourcis au passage
-      return;
-    }
-    // Ouvrir une porte la fait entrer dans les récentes. C'est noté au clic
-    // et non au retour, puisqu'il n'y a pas de retour : la porte s'ouvre
-    // dans un autre onglet.
-    const carte = ev.target.closest("a.carte[data-id]");
-    if (carte) noterOuverture(carte.dataset.id);
-  });
-
-  // Une recherche en cours doit être abandonnée si l'on navigue : sinon la
-  // page afficherait des résultats sans rapport avec l'adresse.
-  window.addEventListener("hashchange", () => {
-    if (requete) {
-      requete = "";
-      const champ = $("inpRecherche");
-      if (champ) { champ.value = ""; $("zoneRecherche").classList.remove("remplie"); }
-    }
-    rendre();
-  });
-  rendre();
+  chargerMeteo();
 
   if (typeof Signalement !== "undefined" && typeof SIGNALEMENT !== "undefined" && SIGNALEMENT.actif) {
     Signalement.init(SIGNALEMENT);
