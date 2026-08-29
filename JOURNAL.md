@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, la mort douce des particules
+
+L'utilisateur suivait un trait de vent du regard et le voyait « depop » : quand la vie d'une particule expirait, elle etait reensemencee ailleurs d'une image a l'autre, toute sa trainee disparaissait d'un coup. Meme chose a la sortie de l'ecran, et lors d'une baisse du nombre de particules ou le surplus etait retire par pop().
+
+Desormais la mort est douce partout : un trait mourant continue de voler pendant que sa queue se resorbe plus vite que la tete n'avance — dissolution en vol sur une demi-seconde, verifiee au chiffre : 60 points, puis 52, 42, 32, 22, 12, 2, renaissance. Un flocon nait et meurt en fondu d'opacite. Le surplus d'ambiance est prie de mourir de la meme maniere puis retire du tableau une fois eteint.
+
 ## 2026-08-29, finitions du panneau : molette, barres, cases
 
 Cinq retours d'usage, dont deux qui partageaient une cause : le dialogue entier defilait en plus de son corps, d'ou une barre montant jusqu'a l'en-tete et une seconde barre parasite. La modale est devenue une colonne — en-tete fixe, seul le corps defile, une seule barre, sous l'en-tete.

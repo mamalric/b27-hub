@@ -28,6 +28,8 @@ Les traînées ont un délai d'expiration ferme, et c'est une leçon payée deux
 
 **L'orage se dit par la turbulence, jamais par la lumière.** Pas d'éclair, pas de flash, aucune variation brutale de luminosité : la règle « apaisant, jamais épileptique » domine tout le reste. Un changement de météo ne bascule rien d'un coup : chaque particule adopte la nouvelle ambiance à sa renaissance, le fond glisse d'un état à l'autre en quelques secondes.
 
+**Rien ne disparaît d'un coup, pas même une particule.** Un trait dont la vie expire ne s'évapore pas sous le regard qui le suivait : il continue de voler pendant que sa queue se résorbe plus vite que la tête n'avance, se dissout en une demi-seconde comme une rafale qui s'éteint, puis renaît ailleurs en repartant d'un point. Un flocon naît et meurt en fondu. Le surplus d'un changement d'ambiance est prié de mourir de la même manière, jamais retiré d'un coup.
+
 Si le poste demande moins d'animations (`prefers-reduced-motion`), le champ est dessiné une fois, immobile, dans l'ambiance du moment : moins d'animations, pas moins de dessin. Un onglet caché suspend le tracé.
 
 ## L'emblème

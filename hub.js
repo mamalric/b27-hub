@@ -571,6 +571,8 @@ function fondGraine(p, L, H) {
   p.x = Math.random() * L;
   p.y = Math.random() * H;
   p.vie = 120 + Math.random() * 260;
+  p.mourant = false;
+  p.retirer = false;
 
   const r = Math.random();
   p.genre = r < amb.genres.flocon ? "flocon"
@@ -619,6 +621,15 @@ function fondTracer(ctx, pts, de, jusque, couleur, a, e) {
   ctx.stroke();
 }
 
+/* La mort d'une particule est douce, jamais sèche. Une version antérieure
+   réensemençait ailleurs dès que la vie expirait : la traînée qu'on
+   suivait du regard disparaissait d'une image à l'autre — frustrant,
+   littéralement. Désormais un trait qui meurt continue de voler pendant
+   que sa queue se résorbe plus vite que la tête n'avance : il se dissout
+   en vol, comme une rafale qui s'éteint, et renaît ailleurs en repartant
+   d'un point. Un flocon, lui, naît et meurt en fondu. Le surplus après un
+   changement d'ambiance suit le même chemin : prié de mourir, jamais
+   retiré d'un coup. */
 function fondPas() {
   const { ctx, parts, L, H } = FOND;
   const amb = FOND.amb;
@@ -628,12 +639,21 @@ function fondPas() {
   if (amb.halo) peindreHalo(ctx);
   if (FOND.nuages && FOND.nuages.length) peindreNuages(ctx);
 
+  if (parts.length < amb.nb) {
+    parts.push(fondGraine({}, L, H));
+  } else if (parts.length > amb.nb) {
+    const surplus = parts.find(q => !q.mourant);
+    if (surplus) surplus.mourant = true;
+  }
+
+  let retraits = false;
   for (const p of parts) {
     if (p.genre === "flocon") {
       p.ph += 0.012;
       p.x += Math.sin(p.ph) * p.sw + amb.biaisX * 0.5;
       p.y += p.vy;
-      ctx.fillStyle = "rgba(" + amb.precip + "," + p.a + ")";
+      p.fondu = Math.max(0, Math.min(1, (p.fondu || 0) + (p.mourant ? -0.03 : 0.03)));
+      ctx.fillStyle = "rgba(" + amb.precip + "," + (p.a * p.fondu) + ")";
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
@@ -641,28 +661,35 @@ function fondPas() {
       p.x += Math.cos(p.dir) * p.v;
       p.y += Math.sin(p.dir) * p.v;
       p.pts.push([p.x, p.y]);
-      if (p.pts.length > p.long) p.pts.shift();
-      fondTracer(ctx, p.pts, 0, p.pts.length - 1, amb.precip, p.a, p.e);
+      if (p.mourant) { p.pts.shift(); p.pts.shift(); p.pts.shift(); }
+      else if (p.pts.length > p.long) p.pts.shift();
+      if (p.pts.length >= 2) fondTracer(ctx, p.pts, 0, p.pts.length - 1, amb.precip, p.a, p.e);
     } else {
       const a = fondAngle(p.x, p.y, FOND.t) * amb.turbulence;
       p.x += Math.cos(a) * p.v + amb.biaisX;
       p.y += Math.sin(a) * p.v * 0.72 + amb.biaisY;
       p.pts.push([p.x, p.y]);
-      if (p.pts.length > amb.trainee) p.pts.shift();
-      const mi = Math.floor(p.pts.length / 2);
-      fondTracer(ctx, p.pts, 0, mi, amb.traits[p.c], p.a * 0.35, p.e);
-      fondTracer(ctx, p.pts, mi, p.pts.length - 1, amb.traits[p.c], p.a, p.e);
+      if (p.mourant) { p.pts.shift(); p.pts.shift(); p.pts.shift(); }
+      else if (p.pts.length > amb.trainee) p.pts.shift();
+      if (p.pts.length >= 2) {
+        const mi = Math.floor(p.pts.length / 2);
+        fondTracer(ctx, p.pts, 0, mi, amb.traits[p.c], p.a * 0.35, p.e);
+        fondTracer(ctx, p.pts, mi, p.pts.length - 1, amb.traits[p.c], p.a, p.e);
+      }
     }
+
     p.vie--;
-    if (p.vie < 0 || p.x < -12 || p.y < -70 || p.x > L + 12 || p.y > H + 12) {
-      fondGraine(p, L, H);
+    if (!p.mourant && (p.vie < 0
+        || p.x < -12 || p.y < -70 || p.x > L + 12 || p.y > H + 12)) {
+      p.mourant = true;
+    }
+    const eteint = p.genre === "flocon" ? p.fondu <= 0 : p.pts.length < 2;
+    if (p.mourant && eteint) {
+      if (parts.length > amb.nb) { p.retirer = true; retraits = true; }
+      else fondGraine(p, L, H);
     }
   }
-
-  // Le nombre de particules suit l'ambiance en douceur : une de plus ou de
-  // moins par image, jamais un peloton d'un coup.
-  if (parts.length < amb.nb) parts.push(fondGraine({}, L, H));
-  else if (parts.length > amb.nb) parts.pop();
+  if (retraits) FOND.parts = parts.filter(p => !p.retirer);
 
   FOND.anime = requestAnimationFrame(fondPas);
 }
