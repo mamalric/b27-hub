@@ -2,6 +2,20 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, la dictée sans le navigateur
+
+L'utilisateur remonte un conseil trouvé sur Reddit : lancer Opera avec un `--user-agent` de Chrome pour débloquer le microphone. Vérification faite, cela ne s'applique pas ici, mais la question a mené à une bien meilleure réponse.
+
+**Pourquoi le conseil ne s'applique pas.** Il vise des sites comme bing.com, qui cachent leur propre bouton micro quand ils ne reconnaissent pas Chrome dans le user-agent : la fonction existe côté navigateur, c'est le site qui refuse de la montrer, et mentir sur le user-agent suffit. Le problème d'Opera est d'une autre nature. La reconnaissance vocale de Chromium envoie l'audio au service de Google, authentifiée par une clé d'API compilée dans le binaire de Chrome. Opera ne l'embarque pas, et cette clé n'a aucun rapport avec le user-agent envoyé aux sites : changer la chaîne ne fabrique pas la clé manquante. Confirmé sur les listes Chromium et les tables de compatibilité.
+
+**Un point rassurant au passage.** La détection du widget interroge l'objet `window.opr`, injecté par Opera lui-même, avant de regarder le user-agent. Elle reste donc juste même si le user-agent est truqué : le bouton reste grisé à bon droit, au lieu de faire une fausse promesse suivie de six secondes d'attente.
+
+**La vraie sortie de secours.** Windows sait dicter dans n'importe quel champ de n'importe quelle application, navigateur compris, avec son propre moteur : le raccourci `Win + H`. Cela n'a rien à voir avec l'API du navigateur et fonctionne donc sur Opera, Brave et Firefox. Le widget le propose désormais de lui-même, sur Windows, dans deux situations : quand le navigateur n'implémente pas la transcription, et quand elle échoue pour une raison qui laisse le micro intact, service injoignable, refusé par une stratégie, ou langue non prise en charge. Pas quand aucun micro n'a été trouvé, puisque Windows n'irait pas plus loin non plus.
+
+C'est une meilleure réponse que "changez de navigateur" : elle marche tout de suite, dans le champ d'à côté. Le raccourci est rendu en touches dans le message, ce qui a demandé de déplacer l'échappement HTML sur les seules parties dynamiques plutôt que sur le message assemblé.
+
+**Vérifications.** Message d'Opera avec ses deux touches rendues et le bouton grisé. Panne réseau simulée : encadré ambre portant la même sortie de secours. Chrome inchangé, bouton actif et avertissement habituel sur la transcription non locale.
+
 ## 2026-08-29, la dictée sur Opera
 
 L'utilisateur signale que la dictée marche sur Chrome mais pas sur Opera, capture d'écran à l'appui : micro autorisé, six entrées audio, et l'état bloqué sur "Démarrage de la dictée".

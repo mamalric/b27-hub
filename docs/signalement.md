@@ -125,6 +125,24 @@ Tester la présence du constructeur ne suffit donc pas : Opera et Brave sont nom
 
 Le reste de l'application, capture d'écran comprise, fonctionne normalement sur Opera comme sur Brave. Seule la dictée manque.
 
+### La sortie de secours : Win + H
+
+Quand le navigateur ne sait pas transcrire, **Windows le sait**. Le raccourci `Win + H` ouvre la saisie vocale du système, qui écrit dans n'importe quel champ de n'importe quelle application, navigateur compris, avec son propre moteur. Elle n'a rien à voir avec l'API du navigateur et fonctionne donc sur Opera, Brave et Firefox.
+
+Le widget le propose de lui-même, sur Windows, dans deux situations : quand le navigateur n'implémente pas la transcription, et quand elle échoue pour une raison qui laisse le micro intact (service injoignable, refusé par une stratégie, langue non prise en charge). Il ne le propose pas quand aucun micro n'a été trouvé, puisque Windows n'irait pas plus loin.
+
+C'est une meilleure réponse que "changez de navigateur" : elle marche tout de suite, dans le champ d'à côté.
+
+### Pourquoi changer le user-agent ne sert à rien
+
+On trouve sur les forums le conseil de lancer Opera avec un `--user-agent` de Chrome pour débloquer le microphone. **Cela ne fera pas fonctionner la dictée ici**, et il faut comprendre pourquoi les deux choses n'ont rien à voir.
+
+Ce conseil vise des sites comme bing.com, qui **cachent leur propre bouton micro** quand ils ne reconnaissent pas Chrome dans le user-agent. Là, la fonction existe côté navigateur, c'est le site qui refuse de la montrer : mentir sur le user-agent suffit à la faire réapparaître.
+
+Le problème d'Opera est ailleurs. La reconnaissance vocale de Chromium envoie l'audio au service de Google, authentifiée par une **clé d'API compilée dans le binaire de Chrome**. Opera ne l'embarque pas, et cette clé n'a rien à voir avec le user-agent envoyé aux sites. Changer la chaîne d'identification ne fabrique pas la clé manquante : l'appel échouera exactement pareil.
+
+À noter au passage : la détection du widget interroge l'objet JavaScript `window.opr`, injecté par Opera lui-même, **avant** de regarder le user-agent. Elle reste donc juste même si le user-agent est truqué, et le bouton reste grisé à bon droit plutôt que de donner une fausse promesse suivie de six secondes d'attente.
+
 ### Quand la dictée ne marche pas
 
 Elle dépend de trois choses hors de notre portée : le navigateur, l'autorisation du microphone, et l'accès au service de transcription qui passe par internet. N'importe laquelle des trois peut manquer, et sur un poste d'entreprise la troisième est un candidat sérieux : un pare-feu ou un proxy suffit à la bloquer.

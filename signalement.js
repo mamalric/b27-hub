@@ -284,7 +284,7 @@ const Signalement = (function () {
 .sg-note.sg-ok{background:var(--sg-vert-fond);border-color:var(--sg-vert-bord);color:var(--sg-vert-encre)}
 .sg-note b{display:block;margin-bottom:3px;color:var(--sg-encre)}
 .sg-note.sg-ok b{color:var(--sg-vert-encre)}
-.sg-note kbd{
+.sg-note kbd,.sg-dictee .sg-etat kbd{
   font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:11.5px;
   background:var(--sg-papier);border:1px solid var(--sg-ligne);border-bottom-width:2px;
   border-radius:4px;padding:1px 5px;
@@ -464,21 +464,29 @@ const Signalement = (function () {
   // donc les nommer, sans quoi le bouton reste sur "Démarrage de la dictée"
   // jusqu'à ce que la veille de six secondes tranche, ce qui est long et
   // n'explique rien.
+  // Windows sait dicter dans n'importe quel champ de n'importe quelle
+  // application, navigateur compris, avec son propre moteur. C'est la porte de
+  // sortie quand celui du navigateur manque, et elle vaut mieux que "changez
+  // de navigateur" : elle marche ici, tout de suite, dans le champ d'à côté.
+  function astuceDicteeWindows() {
+    if (!/Windows/i.test(navigator.userAgent)) return "";
+    return " Vous pouvez tout de même dicter ici : cliquez dans le champ ci-dessus, "
+      + "puis faites <kbd>Win</kbd> + <kbd>H</kbd>, la saisie vocale de Windows écrira à votre place.";
+  }
+
   function supportDictee() {
     if (!MoteurDictee()) {
       return { ok: false, cause: "moteur-absent",
-        raison: "Ce navigateur n'a pas de moteur de dictée. Le champ reste saisissable au clavier, "
-          + "ou ouvrez le hub dans Chrome ou Edge pour dicter." };
+        raison: "Ce navigateur n'a pas de moteur de dictée." + astuceDicteeWindows() };
     }
     if (window.opr || / OPR\//.test(navigator.userAgent)) {
       return { ok: false, cause: "opera",
         raison: "Opera n'implémente pas la transcription vocale, malgré son moteur Chromium : "
-          + "le bouton resterait sans effet. Ouvrez le hub dans Chrome ou Edge pour dicter." };
+          + "le bouton resterait sans effet." + astuceDicteeWindows() };
     }
     if (navigator.brave) {
       return { ok: false, cause: "brave",
-        raison: "Brave n'implémente pas la transcription vocale. Ouvrez le hub dans Chrome ou "
-          + "Edge pour dicter." };
+        raison: "Brave n'implémente pas la transcription vocale." + astuceDicteeWindows() };
     }
     return { ok: true, cause: "" };
   }
@@ -490,10 +498,13 @@ const Signalement = (function () {
   // sans que rien n'arrive jamais dans le champ.
   const ERREURS_DICTEE = {
     "not-allowed": "Le micro a été refusé. Cliquez sur l'icône de cadenas ou de caméra dans la barre d'adresse, autorisez le microphone, puis réessayez.",
-    "service-not-allowed": "Le service de transcription a été refusé, par le navigateur ou par une stratégie d'entreprise. La dictée ne peut pas fonctionner ici.",
+    // Ces trois-là veulent dire que le micro marche mais que la transcription
+    // du navigateur ne suit pas. La saisie vocale de Windows, elle, a son
+    // propre moteur : c'est la sortie de secours, on la propose.
+    "service-not-allowed": "Le service de transcription a été refusé, par le navigateur ou par une stratégie d'entreprise." + astuceDicteeWindows(),
     "audio-capture": "Aucun micro n'a été trouvé. Vérifiez qu'un microphone est branché et sélectionné dans les réglages son de Windows.",
-    "network": "La transcription n'a pas pu joindre son service. Elle passe par internet : un pare-feu ou un proxy peut la bloquer.",
-    "language-not-supported": "Le français n'est pas pris en charge par la transcription de ce navigateur.",
+    "network": "La transcription n'a pas pu joindre son service. Elle passe par internet : un pare-feu ou un proxy peut la bloquer." + astuceDicteeWindows(),
+    "language-not-supported": "Le français n'est pas pris en charge par la transcription de ce navigateur." + astuceDicteeWindows(),
     "bad-grammar": "La transcription a refusé sa configuration. Écrivez le texte à la main.",
     "aborted": null              // c'est nous qui avons arrêté : rien à dire
   };
@@ -523,7 +534,7 @@ const Signalement = (function () {
   function echecDictee(raison) {
     journalDictee("échec : " + raison);
     arreterDictee(true);
-    majEtatDictee(ech(raison), false, true);
+    majEtatDictee(raison, false, true);
   }
 
   async function microRefuseDavance() {
@@ -599,7 +610,7 @@ const Signalement = (function () {
         return;
       }
       if (!(ev.error in ERREURS_DICTEE)) {
-        echecDictee("La dictée s'est interrompue (" + ev.error + ").");
+        echecDictee("La dictée s'est interrompue (" + ech(ev.error) + ").");
         return;
       }
       const msg = ERREURS_DICTEE[ev.error];
@@ -629,7 +640,7 @@ const Signalement = (function () {
       setTimeout(() => {
         if (!dicteeActive) return;
         try { dicteeDepuis = Date.now(); reco.start(); }
-        catch (e) { echecDictee("La dictée n'a pas pu reprendre (" + (e.name || e) + ")."); }
+        catch (e) { echecDictee("La dictée n'a pas pu reprendre (" + ech(e.name || e) + ")."); }
       }, aussitot ? 400 : 0);
     };
 
@@ -648,7 +659,7 @@ const Signalement = (function () {
         }
       }, 6000);
     } catch (e) {
-      echecDictee("La dictée n'a pas pu démarrer (" + (e.name || e) + ").");
+      echecDictee("La dictée n'a pas pu démarrer (" + ech(e.name || e) + ").");
     }
   }
 
@@ -846,7 +857,7 @@ const Signalement = (function () {
           + "</div>"
         : '<div class="sg-dictee">'
           + '<button type="button" class="sg-btn sg-sec" data-sg="dictee" disabled>' + ico("micro", 15) + "Dicter</button>"
-          + '<span class="sg-etat sg-indispo">' + ech(support.raison) + "</span>"
+          + '<span class="sg-etat sg-indispo">' + support.raison + "</span>"
           + "</div>";
 
     // Ce texte est écrit avant qu'on sache si une capture sera jointe : il ne
