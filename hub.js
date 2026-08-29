@@ -469,29 +469,61 @@ function html_annuaire() {
 /* ---------------------------------------------------------------------
    FIL D'ARIANE
    --------------------------------------------------------------------- */
-function html_filAriane(chemin) {
-  if (!chemin.length) return "";
-  const morceaux = [
-    '<a href="#/" class="fil-lien">' + ico("maison", 14) + "Hall</a>"
-  ];
-  const d = chemin[0] === CLE_ANNUAIRE
-    ? { nom: "Qui contacter" }
-    : (dossiersRacine().find(x => x.cle === chemin[0]) || { nom: chemin[0] });
-  if (chemin.length === 1) {
-    morceaux.push('<span class="fil-ici">' + ech(d.nom) + "</span>");
-  } else {
-    morceaux.push('<a href="' + adresseDe([chemin[0]]) + '" class="fil-lien">' + ech(d.nom) + "</a>");
-    const s = sousDossiersDe(chemin[0]).find(x => x.cle === chemin[1]) || { nom: chemin[1] };
-    morceaux.push('<span class="fil-ici">' + ech(s.nom) + "</span>");
+// Ce qu'un niveau contient, pour que le dernier maillon du fil puisse
+// l'annoncer. Le fil ne dit pas seulement où l'on est, il dit aussi ce qu'on
+// y trouve : c'est utile avant même de regarder la grille.
+function contenuDuNiveau(chemin) {
+  if (!chemin.length) {
+    const n = dossiersRacine().length;
+    return { icone: "maison", nom: "Hall", compte: n, mot: n > 1 ? "dossiers" : "dossier" };
   }
+  if (chemin[0] === CLE_ANNUAIRE) {
+    const n = contacts().length;
+    return { icone: "personne", nom: "Qui contacter", compte: n, mot: n > 1 ? "fiches" : "fiche" };
+  }
+  const d = dossiersRacine().find(x => x.cle === chemin[0]) || { nom: chemin[0], icone: "dossier", portes: [] };
+  if (chemin.length === 1) {
+    const sous = sousDossiersDe(chemin[0]);
+    if (sous.length) return { icone: d.icone, nom: d.nom, compte: sous.length, mot: sous.length > 1 ? "sous-dossiers" : "sous-dossier" };
+    const n = d.portes.length;
+    return { icone: d.icone, nom: d.nom, compte: n, mot: n > 1 ? "portes" : "porte" };
+  }
+  const s = sousDossiersDe(chemin[0]).find(x => x.cle === chemin[1])
+    || { nom: chemin[1], icone: "dossier", portes: [] };
+  const n = s.portes.length;
+  return { icone: s.icone, nom: s.nom, compte: n, mot: n > 1 ? "portes" : "porte" };
+}
+
+// Le fil est affiché à tous les niveaux, hall compris. Le masquer à la racine
+// le rendait invisible sur le premier écran, donc introuvable : on ne
+// découvrait son existence qu'après être entré quelque part, c'est-à-dire
+// trop tard pour qu'il serve de repère.
+function html_filAriane(chemin) {
+  const morceaux = [];
+  const ici = contenuDuNiveau(chemin);
+
+  // Les maillons parents sont des liens, le maillon courant n'en est pas un :
+  // un lien vers la page où l'on se trouve déjà n'apprend rien et trompe.
+  if (chemin.length) {
+    morceaux.push('<a href="#/" class="fil-lien">' + ico("maison", 14) + "Hall</a>");
+  }
+  if (chemin.length > 1) {
+    const d = dossiersRacine().find(x => x.cle === chemin[0]) || { nom: chemin[0] };
+    morceaux.push('<a href="' + adresseDe([chemin[0]]) + '" class="fil-lien">' + ech(d.nom) + "</a>");
+  }
+  morceaux.push('<span class="fil-ici">' + ico(ici.icone, 15) + ech(ici.nom)
+    + '<span class="fil-compte">' + ici.compte + " " + ech(ici.mot) + "</span></span>");
 
   // Le bouton Retour double le fil d'Ariane, volontairement : le fil dit où
   // l'on est, le bouton donne une cible large et toujours au même endroit,
-  // qui est ce qu'on cherche quand on veut juste remonter d'un cran.
-  const parent = chemin.slice(0, -1);
-  return '<nav class="fil" aria-label="Fil d\'Ariane">'
-    + '<a class="fil-retour" href="' + adresseDe(parent) + '" aria-label="Remonter d\'un niveau">'
-    +   ico("retour", 15) + "</a>"
+  // qui est ce qu'on cherche quand on veut juste remonter d'un cran. Au hall,
+  // il n'y a nulle part où remonter : il ne s'affiche pas.
+  const retour = chemin.length
+    ? '<a class="fil-retour" href="' + adresseDe(chemin.slice(0, -1)) + '"'
+      + ' aria-label="Remonter d\'un niveau" title="Remonter d\'un niveau">' + ico("retour", 15) + "</a>"
+    : "";
+
+  return '<nav class="fil" aria-label="Fil d\'Ariane">' + retour
     + '<span class="fil-suite">'
     +   morceaux.join('<span class="fil-sep" aria-hidden="true">' + ico("chevron", 12) + "</span>")
     + "</span></nav>";

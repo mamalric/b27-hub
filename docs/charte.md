@@ -60,6 +60,18 @@ Le hall se parcourt comme une armoire. Le premier niveau ne montre que des dossi
 
 **Le bandeau d'accueil disparaît dès qu'on entre dans un dossier.** Il a dit ce qu'il avait à dire, et l'en-tête suffit ensuite à porter l'identité. La place revient au contenu.
 
+### Le fil d'Ariane
+
+**Il est affiché à tous les niveaux, hall compris.** Le masquer à la racine le rendait invisible sur le premier écran, donc introuvable : on ne découvrait son existence qu'après être entré quelque part, c'est-à-dire trop tard pour qu'il serve de repère.
+
+**Le dernier maillon fait office de titre de niveau.** Le bandeau d'accueil ayant disparu dès qu'on entre dans un dossier, c'est lui qui dit où l'on se trouve : il porte donc l'icône du dossier, un cran de graisse de plus, et le compte de ce qu'il contient. Cinq dossiers, trois sous-dossiers, six portes, une fiche. Le fil ne dit pas seulement où l'on est, il dit aussi ce qu'on y trouve, avant même de regarder la grille.
+
+**Les maillons parents sont des liens, le maillon courant n'en est pas un.** Un lien vers la page où l'on se trouve déjà n'apprend rien et trompe.
+
+**Le bouton Retour double le fil, volontairement.** Le fil dit où l'on est, le bouton donne une cible large et toujours au même endroit, qui est ce qu'on cherche quand on veut juste remonter d'un cran. Au hall, il n'y a nulle part où remonter : il ne s'affiche pas.
+
+Le conteneur du fil est en `flex-wrap: nowrap` et c'est le fil lui-même qui se replie à l'intérieur. Sans cela, sur un écran étroit, c'est le bloc entier qui passait à la ligne et laissait le bouton Retour seul sur la sienne.
+
 **La recherche traverse tous les niveaux d'un coup.** C'est indispensable dans une navigation en profondeur : chercher "INIES" depuis le hall doit trouver, sans avoir à deviner dans quel dossier c'est rangé. Chaque résultat rappelle son dossier d'origine, sans quoi on trouve la porte mais on ne sait pas d'où elle vient.
 
 ## Le dossier, une icône d'application

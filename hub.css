@@ -213,7 +213,10 @@ body.dedans .wrap{padding-top:20px}
 .recherche.remplie .vider{display:inline-flex}
 
 /* ----------------------------------------------------------- fil d'Ariane */
-.fil{display:flex;align-items:center;gap:11px;margin:0 0 18px;flex-wrap:wrap}
+/* flex-wrap:nowrap sur le conteneur, et c'est le fil lui-même qui se replie
+   à l'intérieur. Sans cela, sur un écran étroit, c'est le bloc de fil entier
+   qui passait à la ligne et laissait le bouton Retour seul sur la sienne. */
+.fil{display:flex;align-items:flex-start;gap:11px;margin:0 0 18px;flex-wrap:nowrap}
 .fil-retour{
   width:34px;height:34px;flex:none;border-radius:var(--rayon-s);
   border:1px solid var(--ligne);background:var(--papier);color:var(--encre-2);
@@ -225,10 +228,24 @@ body.dedans .wrap{padding-top:20px}
   background:var(--primaire-fond);color:var(--primaire-encre);
   border-color:var(--primaire-bord);text-decoration:none;transform:translateX(-2px);
 }
-.fil-suite{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;min-width:0}
+.fil-suite{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;flex:1 1 auto;min-width:0;padding-top:4px}
 .fil-lien{color:var(--discret);display:inline-flex;align-items:center;gap:5px;font-weight:500}
 .fil-lien:hover{color:var(--primaire-encre);text-decoration:none}
-.fil-ici{color:var(--encre);font-weight:700;letter-spacing:-.1px}
+/* Le maillon courant fait office de titre de niveau : le bandeau d'accueil
+   ayant disparu dès qu'on entre dans un dossier, c'est lui qui dit où l'on se
+   trouve. Il porte donc son icône et un cran de graisse de plus. */
+.fil-ici{
+  color:var(--encre);font-weight:700;letter-spacing:-.1px;font-size:14.5px;
+  display:inline-flex;align-items:center;gap:7px;min-width:0;
+}
+.fil-ici .ico{color:var(--primaire-encre)}
+/* Le compte annonce ce que contient le niveau avant même de regarder la
+   grille : cinq dossiers, six portes, une fiche. */
+.fil-compte{
+  font-size:11.5px;font-weight:600;color:var(--discret);letter-spacing:0;
+  background:var(--papier-2);border:1px solid var(--ligne-2);
+  border-radius:999px;padding:1px 9px;white-space:nowrap;
+}
 .fil-sep{color:var(--ligne);display:inline-flex;align-items:center}
 [data-theme="dark"] .fil-sep{color:var(--encre-2);opacity:.45}
 
