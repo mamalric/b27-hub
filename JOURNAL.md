@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, des cumulus, pas des taches
+
+Deux retours sur le fond en theme clair : le vent et les nuages n'y etaient pas tres perceptibles, et les nuages meritaient mieux que des taches brouillardeuses.
+
+**Le theme clair compense desormais** : le fond presque blanc mange le contraste, tout ce qui se dessine y gagne 80 % d'opacite et un peu d'epaisseur, d'un facteur applique apres les reglages d'ambiance pour ne rien dupliquer.
+
+**Les nuages deviennent des silhouettes construites** : quatre a six lobes bombes dont les bases s'alignent, les gros au centre comme un cumulus qui s'etale, et un ventre plat ombre qui les assoit — c'est lui qui transforme un amas de ronds en nuage, la lumiere venant d'en haut. Les lobes sont figes a la naissance du nuage : il derive d'un bloc, il ne bouillonne pas, la regle du calme vaut aussi pour lui. Verifie dans les deux themes.
+
 ## 2026-08-29, le rendu : panneaux qui se posent, barres immergees
 
 Deux finitions demandees. L'ouverture du panneau meteo surgissait d'un coup : les modales se posent desormais — glissement de dix-huit pixels, voile qui se floute, contenu en cascade un souffle apres le cadre — et se referment de la meme maniere, par `@starting-style` et `allow-discrete`. Un navigateur qui ignore ces regles recentes abandonne la declaration entiere et ouvre d'un coup comme avant : la degradation est propre.

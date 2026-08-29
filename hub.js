@@ -447,6 +447,17 @@ function calculerAmbiance() {
     if (code === 96 || code === 99) a.genres = { ligne: 0.85, goutte: 0, flocon: 0.15 };
   }
 
+  // Le thème clair mange le contraste : ce qui est juste sur fond sombre
+  // devient imperceptible sur fond presque blanc. Tout ce qui se dessine
+  // y gagne donc en opacité et en épaisseur — compensé, pas dupliqué.
+  if (cle === "clair") { a.alpha *= 1.8; a.alphaNuage *= 1.5; a.epaisseur = 0.3; }
+  else a.epaisseur = 0;
+  // Le ventre des nuages : la teinte qui ombre leur base et leur donne du
+  // volume. Sombre sur fond sombre, elle éteint le bas des lobes ; plus
+  // soutenue sur fond clair, elle les assoit.
+  a.teinteNuageBas = cle === "sombre" ? "14,20,12" : "96,106,92";
+  a.alphaNuageBas = a.alphaNuage * (cle === "sombre" ? 1.2 : 1.0);
+
   // Le vent incline et allonge, pour tous les genres, dans la limite du
   // calme : au maximum, les lignes vont un tiers plus vite.
   a.biaisX += vent * 0.8;
@@ -478,29 +489,66 @@ function fondAngle(x, y, t) {
         + Math.sin((x + y) * 0.0008 + t * 0.0004)) * Math.PI * 0.75;
 }
 
+/* Un nuage n'est pas une tache : c'est une silhouette. Chaque nuage est
+   construit à sa naissance — quatre à six lobes bombés dont les bases
+   s'alignent, les gros au centre, les petits aux bords, comme un cumulus
+   qui s'étale — puis un ventre plat, ombré, qui l'assoit et lui donne son
+   volume. Les lobes sont figés une fois tirés : le nuage dérive d'un
+   bloc, il ne bouillonne pas, la règle du calme vaut aussi pour lui. */
 function graineNuage() {
+  const base = 55 + Math.random() * 65;
+  const n = 4 + Math.floor(Math.random() * 3);
+  const lobes = [];
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    const r = base * (0.55 + 0.45 * Math.sin(Math.PI * t)) * (0.85 + Math.random() * 0.3);
+    lobes.push({
+      dx: (t - 0.5) * base * (2.1 + Math.random() * 0.4),
+      dy: base * 0.32 - r,          // les bases s'alignent, le haut bombe
+      r: r
+    });
+  }
   return {
     x: Math.random() * (FOND.L || 1200),
-    y: (0.05 + Math.random() * 0.5) * (FOND.H || 700),
-    r: 180 + Math.random() * 220,
+    y: (0.06 + Math.random() * 0.45) * (FOND.H || 700),
+    base: base,
+    largeur: base * 2.6,
+    lobes: lobes,
     v: 0.06 + Math.random() * 0.1,
-    k: 0.7 + Math.random() * 0.6   // pondère l'opacité, nappe par nappe
+    k: 0.75 + Math.random() * 0.5   // pondère l'opacité, nuage par nuage
   };
 }
 
-// Une nappe est un dégradé radial très doux qui dérive à peine : vue de
-// loin, une masse nuageuse. Dessinée sous les lignes, elle teinte sans
-// masquer.
 function peindreNuages(ctx) {
   const amb = FOND.amb;
   for (const n of FOND.nuages) {
     n.x += n.v * (1 + amb.biaisX);
-    if (n.x - n.r > FOND.L) n.x = -n.r;
-    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
-    g.addColorStop(0, "rgba(" + amb.teinteNuage + "," + (amb.alphaNuage * n.k) + ")");
-    g.addColorStop(1, "rgba(" + amb.teinteNuage + ",0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(n.x - n.r, n.y - n.r, n.r * 2, n.r * 2);
+    if (n.x - n.largeur > FOND.L) n.x = -n.largeur;
+
+    // Les lobes, chacun un dégradé doux : le bord reste vaporeux, la
+    // silhouette d'ensemble, elle, se lit.
+    for (const l of n.lobes) {
+      const cx = n.x + l.dx, cy = n.y + l.dy;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, l.r);
+      g.addColorStop(0, "rgba(" + amb.teinteNuage + "," + (amb.alphaNuage * n.k) + ")");
+      g.addColorStop(0.65, "rgba(" + amb.teinteNuage + "," + (amb.alphaNuage * n.k * 0.55) + ")");
+      g.addColorStop(1, "rgba(" + amb.teinteNuage + ",0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(cx - l.r, cy - l.r, l.r * 2, l.r * 2);
+    }
+
+    // Le ventre : une ombre plate et large sous les lobes. C'est elle qui
+    // transforme un amas de ronds en nuage — la lumière vient d'en haut.
+    const by = n.y + n.base * 0.3;
+    ctx.save();
+    ctx.translate(n.x, by);
+    ctx.scale(1.25, 0.42);
+    const o = ctx.createRadialGradient(0, 0, 0, 0, 0, n.base * 1.15);
+    o.addColorStop(0, "rgba(" + amb.teinteNuageBas + "," + (amb.alphaNuageBas * n.k) + ")");
+    o.addColorStop(1, "rgba(" + amb.teinteNuageBas + ",0)");
+    ctx.fillStyle = o;
+    ctx.fillRect(-n.base * 1.15, -n.base * 1.15, n.base * 2.3, n.base * 2.3);
+    ctx.restore();
   }
 }
 
@@ -542,8 +590,8 @@ function fondGraine(p, L, H) {
     p.y = Math.random() < 0.5 ? Math.random() * H : -Math.random() * 60;
     p.dir = Math.PI * 0.56 + amb.biaisX * 0.22 + (Math.random() - 0.5) * 0.05;
     p.v = (0.9 + Math.random() * 0.6) * amb.vitesse;
-    p.a = 0.08 + Math.random() * 0.07;
-    p.e = 0.5 + Math.random() * 0.5;
+    p.a = (0.08 + Math.random() * 0.07) * amb.alpha;
+    p.e = 0.5 + Math.random() * 0.5 + (amb.epaisseur || 0);
     p.pts = [[p.x, p.y]];
     p.long = 10 + Math.round(Math.random() * 8);
   } else {
@@ -552,7 +600,7 @@ function fondGraine(p, L, H) {
     const q = Math.random();
     p.c = q < 0.14 ? 2 : (q < 0.6 ? 0 : 1);
     p.a = (0.1 + Math.random() * 0.1) * amb.alpha;
-    p.e = 0.6 + Math.random() * 0.7;
+    p.e = 0.6 + Math.random() * 0.7 + (amb.epaisseur || 0);
     p.pts = [[p.x, p.y]];
   }
   return p;
