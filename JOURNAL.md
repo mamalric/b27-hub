@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, l'ete se voit meme couvert
+
+L'utilisateur, en aout : « je crois que nous sommes en ete et je n'ai pas vu de dore — est-ce bien dans l'app ? » Il etait dans le code, mais son ciel couvert le masquait totalement : les ambiances couvert et orage REMPLACAIENT la palette de saison par des teintes fixes. Ma phrase « la saison teinte tout » promettait plus que le code ne tenait.
+
+Les ambiances melangent desormais au lieu de remplacer : le couvert desature la palette de saison vers le gris (55 %), l'orage la tire vers les verts profonds (50 %). L'ete couvert donne des olives chauds — 135,150,86, pointe 160,161,116 — la ou l'hiver couvert donnera des gris froids — 108,135,114. La saison transparait sous n'importe quel ciel, et le dore d'aout existe enfin ailleurs que sous le soleil.
+
 ## 2026-08-29, un seul moteur de molette
 
 L'utilisateur sentait toujours une difference entre la molette sur le panneau et a cote, et a pose la bonne question : pourquoi une difference existe-t-elle, plutot que comment la regler ?

@@ -377,6 +377,16 @@ function sombre_ete_traits(cle, saison) {
   return base;
 }
 
+// Mélange deux teintes "r,g,b". C'est la clé de la promesse « la saison
+// teinte tout » : une première version REMPLAÇAIT la palette de saison
+// sous le couvert et l'orage — un été entier de ciel gris, et personne
+// n'aurait jamais vu le doré d'août. Désormais le temps assourdit ou
+// approfondit la saison, il ne l'efface pas.
+function melerTeinte(de, vers, part) {
+  const a = de.split(",").map(Number), b = vers.split(",").map(Number);
+  return a.map((v, i) => Math.round(v + (b[i] - v) * part)).join(",");
+}
+
 function calculerAmbiance() {
   const sombre = document.documentElement.dataset.theme !== "light";
   const cle = sombre ? "sombre" : "clair";
@@ -418,9 +428,10 @@ function calculerAmbiance() {
     // ralenti, dans une palette assourdie.
     a.vitesse = 0.7; a.alpha = 0.8; a.nb = 65;
     a.nuages = 7;
-    a.traits = cle === "sombre"
-      ? ["118,132,112", "84,96,80", "150,162,140"]
-      : ["96,108,90", "112,124,104", "130,142,120"];
+    // La saison, désaturée par le ciel gris : l'été couvert reste un peu
+    // chaud, l'hiver couvert un peu froid.
+    const grisCouvert = cle === "sombre" ? "108,118,102" : "108,118,102";
+    a.traits = a.traits.map(t => melerTeinte(t, grisCouvert, 0.55));
   } else if (groupe === "brouillard") {
     // Presque immobile : traits courts et pâles, et des nappes très
     // larges, très diffuses, qui noient le bas de page.
@@ -443,7 +454,8 @@ function calculerAmbiance() {
     a.nuages = 6;
     a.teinteNuage = cle === "sombre" ? "70,104,92" : "80,104,94";
     a.alphaNuage = 0.09;
-    a.traits = [a.precip, PALETTES_SAISON[cle][saison][1], PALETTES_SAISON[cle][saison][2]];
+    // La saison, tirée vers les verts profonds de l'orage, sans disparaître.
+    a.traits = a.traits.map(t => melerTeinte(t, cle === "sombre" ? "64,108,94" : "70,100,88", 0.5));
     const code = FOND.meteo && FOND.meteo.code;
     if (code === 96 || code === 99) a.genres = { ligne: 0.85, goutte: 0, flocon: 0.15 };
   }
