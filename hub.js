@@ -94,7 +94,6 @@ const TRACES_ICONES = {
   engrenage: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
   fermer: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
-  etiquette: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
   courrier: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
   telephone: '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>',
   personne: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
@@ -932,21 +931,6 @@ function remplirApropos() {
      + ligneStat("Thème courant", document.documentElement.dataset.theme === "dark" ? "sombre" : "clair")
      + "</dl></div>";
 
-  h += '<div class="stats-groupe"><h3 data-ico="porte" data-ico-taille="13">Ce que fait le hub</h3>'
-     + '<dl class="stats-liste gauche">'
-     + ligneStat("Rôle", "Point d'entrée unique vers les outils et les ressources du bureau d'études. Le hub n'héberge rien, il redirige.")
-     + ligneStat("Navigation", "Par dossiers. La position est dans l'adresse, le bouton Précédent fonctionne, et le lien d'un dossier précis peut se transmettre tel quel.")
-     + ligneStat("Données", "Aucune ne sort du poste. Aucun compte, aucun formulaire, aucun suivi.")
-     + ligneStat("Ce qui est retenu", "Votre thème, vos épingles et vos six dernières portes ouvertes, dans ce navigateur seulement. Vider les données du site les efface.")
-     + ligneStat("Vos épingles", epingles().length + " porte(s) épinglée(s), " + recents().length + " ouverture(s) récente(s)")
-     + "</dl></div>";
-
-  h += '<div class="stats-groupe"><h3 data-ico="etiquette" data-ico-taille="13">Ajouter une porte</h3>'
-     + '<div class="note">Un seul fichier à modifier : <code>catalogue.js</code>. Copier une fiche existante, '
-     + "remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis enregistrer. Le dossier apparaît, "
-     + "les compteurs suivent. Le contrôle <code>python tests/verifier_catalogue.py</code> dit si la fiche "
-     + "est complète avant publication.</div></div>";
-
   if (anomalies.length) {
     h += '<div class="stats-groupe"><h3 data-ico="attention" data-ico-taille="13">Anomalies du catalogue</h3>'
        + '<div class="note">' + anomalies.length + " anomalie(s) détectée(s) dans catalogue.js. "
@@ -963,13 +947,6 @@ function remplirApropos() {
        +   '<span class="cl-txt">' + ech(c.texte) + "</span>"
        + "</li>").join("")
      + "</ul></div>";
-
-  if (REGLAGES.contact) {
-    h += '<div class="stats-groupe"><h3 data-ico="courrier" data-ico-taille="13">Un bug, une idée d\'outil</h3>'
-       + '<div class="note">Le plus rapide est la pastille de signalement, en bas à droite de l\'écran : '
-       + "elle joint une capture de ce que vous avez sous les yeux et permet de dicter le problème à voix haute. "
-       + 'Sinon, par mail : <a href="mailto:' + ech(REGLAGES.contact) + '">' + ech(REGLAGES.contact) + "</a>.</div></div>";
-  }
 
   const corps = $("aproposCorps");
   corps.innerHTML = h;

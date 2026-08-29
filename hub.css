@@ -624,7 +624,6 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 .stats-liste{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:0}
 .stats-liste dt{color:var(--encre-2)}
 .stats-liste dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.stats-liste.gauche dd{text-align:left;font-weight:400}
 .note{
   background:var(--note-fond);border:1px solid var(--note-bord);border-radius:var(--rayon-s);
   padding:10px 12px;font-size:12.5px;color:var(--encre-2);line-height:1.55;

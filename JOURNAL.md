@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, epuration du panneau A propos
+
+Suite de l'epuration. Retires du panneau ouvert par l'engrenage : le bloc « Un bug, une idee d'outil », le groupe « Ce que fait le hub » (role, navigation, donnees, ce qui est retenu, vos epingles) et le groupe « Ajouter une porte ». Restent les chiffres du hall, le journal des versions, et les anomalies du catalogue quand il y en a.
+
+Le code mort part avec, comme la fois precedente : l'icone `etiquette`, que plus rien ne posait, la regle CSS `.stats-liste.gauche`, que plus rien ne produisait, et le champ `REGLAGES.contact`, que plus aucune ligne ne lisait. L'adresse de contact reste dans `SIGNALEMENT.destinataire`, ou elle sert reellement : le signalement continue d'arriver dans la boite. Le controle du catalogue perd son avertissement sur ce champ devenu inexistant.
+
 ## 2026-08-29, bandeau photo au vert B27
 
 La charpente dessinée ne convient pas : approximative, pas dans la fibre de B27, et pas même la bonne couleur de verre. Elle est supprimée, script compris. À la place, une photo de chantier tirée au sort, à la manière des fonds d'écran Windows, ramenée au vert de la maison. L'utilisateur précise en cours de route la teinte voulue : `#95C03D`, celle du logo.

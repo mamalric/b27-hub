@@ -244,8 +244,6 @@ def controler():
             erreurs.append("REGLAGES : champ '%s' manquant." % champ)
     if not reglages.get("accroche"):
         avertissements.append("REGLAGES : pas d'accroche, le bandeau d'accueil sera nu.")
-    if "contact" not in reglages:
-        avertissements.append("REGLAGES : pas de champ 'contact', aucune adresse ne sera proposée.")
 
     # --- photo du bandeau
     bandeau = reglages.get("bandeau")

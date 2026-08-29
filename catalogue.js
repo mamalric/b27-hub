@@ -310,10 +310,6 @@ const REGLAGES = {
   accroche: "Toutes les portes, au même endroit.",
   chapeau: "Ouvrez un dossier pour trouver un outil, un site ou une ressource. Ce que nous fabriquons fonctionne dans le navigateur : rien à installer, aucun compte à créer.",
 
-  // Adresse affichée dans le pied de page et le panneau "À propos".
-  // Chaîne vide : la ligne de contact disparaît.
-  contact: "mamalric@b27.fr",
-
   // Photo du bandeau d'accueil. Le hub tire au sort une image de chantier
   // chez Unsplash, la passe en noir et blanc puis en sépia puis au vert de
   // B27, et en change régulièrement, à la manière des fonds d'écran Windows.
