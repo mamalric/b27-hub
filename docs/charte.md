@@ -78,7 +78,30 @@ Le conteneur du fil est en `flex-wrap: nowrap` et c'est le fil lui-même qui se 
 
 Un carré plein coloré, glyphe blanc au centre, le nom posé dessous, hors de la tuile, et le compte en pastille sur le coin. C'est la grammaire d'un écran d'accueil, et elle est reprise telle quelle : **le carré coloré est le dossier**, il ne flotte pas dans une carte. Il n'y a donc aucun cadre autour de lui.
 
-**La couleur ne change pas avec le thème.** Une icône d'application garde sa couleur quel que soit le fond de l'écran d'accueil. La tuile porte un dégradé très court, de `#779c2b` à `#5f7f1f`, entre l'olive des outils et le vert profond de B27 Mobility. Les deux valeurs tiennent au moins 3:1 avec le blanc du glyphe, seuil de contraste des éléments graphiques.
+**Une couleur par catégorie, prise sur les conventions de lot de B27.** Les teintes ne sont pas décoratives : elles viennent du projet du site (`b27-site/src/styles/tokens.css`), où B27 code déjà ses lots en CAO. Un ingénieur B27 y reconnaît le code couleur de ses plans.
+
+| Catégorie | Couleur | Origine |
+|---|---|---|
+| Chauffage et climatisation | `#3e8fb8` | lot CVC |
+| Ventilation | `#2f7f92` | dérivée de la famille CVC |
+| Plomberie et ECS | `#1f7a6e` | lot Plomberie |
+| Thermique et réglementation | `#c4562f` | lot Thermique |
+| Sécurité incendie | `#c62828` | lot SSI, éclairci |
+| Carbone et environnement | `#557a3a` | lot Paysage |
+| Électricité | `#b17e00` | lot Électricité, assombri |
+| B27 | `#5f7f1f` | le vert de marque, profond |
+| Ressources et référentiels | `#6b5ba6` | lot BIM |
+| Qui contacter | `#6e6a63` | gris chaud neutre |
+
+Trois écarts, assumés. L'ocre de l'électricité est assombri de `#c18900` à `#b17e00`, le premier ne tenant que 3,07:1 avec le glyphe blanc. Le rouge SSI est au contraire éclairci de `#b01818` à `#c62828` : l'original tenait très bien face au glyphe, mais tombait à 2,68:1 face au fond du thème sombre, où la tuile se confondait avec la page. La ventilation n'a pas de teinte propre chez B27, où elle appartient à la famille CVC ; un cyan la distingue du chauffage sans quitter la famille de l'air.
+
+Le gris de la structure `#4a4a4a` avait d'abord été retenu pour l'annuaire, puis écarté à la mesure : 2,12:1 sur fond sombre, la tuile y disparaissait.
+
+**Toute couleur nouvelle doit tenir au moins 3:1 sur trois fronts** : avec le glyphe blanc, avec le fond du thème clair, et avec celui du thème sombre. Une teinte trop claire efface le glyphe, une teinte trop foncée fait disparaître la tuile. `tests/verifier_catalogue.py` calcule les trois et refuse de passer en dessous. La palette actuelle tient partout, avec un minimum de 3,13:1.
+
+**La couleur ne change pas avec le thème.** Une icône d'application garde sa couleur quel que soit le fond de l'écran d'accueil : c'est précisément pourquoi chaque teinte doit tenir contre les deux fonds à la fois. Le bas du dégradé n'est pas écrit à la main, il est calculé en `color-mix` à 82 pour cent de la teinte : une seule valeur à saisir par catégorie, et les deux extrémités restent cohérentes. Un aplat simple sert de repli aux navigateurs sans `color-mix`.
+
+**Les sous-dossiers héritent de la couleur de leur catégorie.** En entrant dans Ressources, les trois sous-dossiers restent violets, et l'icône du fil d'Ariane aussi : on voit d'un coup d'oeil qu'on est toujours dans la même branche. Un champ `couleur` sur une sous-catégorie force malgré tout une teinte.
 
 **Le rayon vaut 23 pour cent du côté**, proportion des icônes d'application des systèmes courants. Exprimé en pourcentage et non en pixels, il reste juste quelle que soit la taille de la tuile.
 

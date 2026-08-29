@@ -42,6 +42,30 @@ CHAMPS_PORTE = {"id", "nom", "pitch", "url", "categorie", "statut", "type", "ico
 CHAMPS_PORTE_FACULTATIFS = {"sousCategorie"}
 CHAMPS_CONTACT = {"id", "nom", "role", "agence", "mail", "tel", "sujets"}
 
+# Fonds contre lesquels une couleur de tuile doit tenir. Le glyphe est blanc,
+# et la tuile est un aplat posé sur la page : une teinte trop claire efface le
+# glyphe, une teinte trop foncée fait disparaître la tuile sur fond sombre.
+# Les deux fonds sont ceux de hub.css, jetons --fond des deux thèmes.
+GLYPHE = "#ffffff"
+FOND_CLAIR = "#eef0ed"
+FOND_SOMBRE = "#101211"
+CONTRASTE_MINI = 3.0          # seuil WCAG des éléments graphiques
+
+
+def _luminance(hexa: str) -> float:
+    h = hexa.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    canaux = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    canaux = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in canaux]
+    return 0.2126 * canaux[0] + 0.7152 * canaux[1] + 0.0722 * canaux[2]
+
+
+def contraste(a: str, b: str) -> float:
+    la, lb = _luminance(a), _luminance(b)
+    haut, bas = max(la, lb), min(la, lb)
+    return round((haut + 0.05) / (bas + 0.05), 2)
+
 
 # --------------------------------------------------------------------------
 # Lecture des littéraux JavaScript
@@ -145,6 +169,25 @@ def cles_icones() -> set:
 # Contrôles
 # --------------------------------------------------------------------------
 
+def controler_couleur(ou: str, couleur):
+    """Une couleur de tuile doit tenir sur trois fronts, ou elle ne va pas."""
+    if not couleur:
+        return []
+    if not re.fullmatch(r"#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?", str(couleur)):
+        return ["%s : couleur '%s' hors format (#rgb ou #rrggbb)." % (ou, couleur)]
+    faits = []
+    for fond, quoi in ((GLYPHE, "le glyphe blanc"),
+                       (FOND_CLAIR, "le fond du thème clair"),
+                       (FOND_SOMBRE, "le fond du thème sombre")):
+        c = contraste(couleur, fond)
+        if c < CONTRASTE_MINI:
+            faits.append("%s : couleur %s à %.2f:1 avec %s, il faut au moins %.1f:1. "
+                         "Trop claire, le glyphe s'efface ; trop foncée, la tuile "
+                         "disparaît sur fond sombre."
+                         % (ou, couleur, c, quoi, CONTRASTE_MINI))
+    return faits
+
+
 def controler():
     erreurs, avertissements = [], []
 
@@ -169,6 +212,10 @@ def controler():
         cles_categories.append(c.get("cle"))
         if icones and c.get("icone") and c["icone"] not in icones:
             erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, c["icone"]))
+        erreurs.extend(controler_couleur(ou, c.get("couleur")))
+        if not c.get("couleur"):
+            avertissements.append("%s : pas de couleur, la tuile prendra le vert de repli."
+                                  % ou)
 
     # --- sous-catégories
     cles_sous = []
@@ -187,6 +234,9 @@ def controler():
                            % (ou, sc.get("categorie")))
         if icones and sc.get("icone") and sc["icone"] not in icones:
             erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, sc["icone"]))
+        # Une sous-catégorie sans couleur hérite de la sienne : rien à vérifier.
+        if sc.get("couleur"):
+            erreurs.extend(controler_couleur(ou, sc["couleur"]))
 
     # --- réglages
     for champ in ("titre", "sousTitre", "seuilFiltres"):

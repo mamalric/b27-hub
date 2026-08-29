@@ -238,7 +238,9 @@ body.dedans .wrap{padding-top:20px}
   color:var(--encre);font-weight:700;letter-spacing:-.1px;font-size:14.5px;
   display:inline-flex;align-items:center;gap:7px;min-width:0;
 }
-.fil-ici .ico{color:var(--primaire-encre)}
+/* L'icône du maillon courant reprend la teinte du dossier : c'est le même
+   repère de couleur que sur la tuile, il ne change pas en descendant. */
+.fil-ici .ico{color:var(--c,var(--primaire-encre))}
 /* Le compte annonce ce que contient le niveau avant même de regarder la
    grille : cinq dossiers, six portes, une fiche. */
 .fil-compte{
@@ -289,7 +291,16 @@ body.dedans .wrap{padding-top:20px}
    juste quelle que soit la taille de la tuile. */
 .dossier .glyphe{
   width:100%;aspect-ratio:1;border-radius:23%;
-  background:linear-gradient(160deg,var(--app-haut),var(--app-bas));
+  /* La teinte vient de la catégorie, posée en --c sur la tuile depuis
+     catalogue.js. Deux déclarations : la première est un aplat, servant de
+     repli aux navigateurs qui ne connaissent pas color-mix, qui ignoreront la
+     seconde. Le bas du dégradé est calculé et non écrit à la main, ce qui
+     évite d'avoir à saisir deux valeurs par catégorie et garantit qu'elles
+     restent cohérentes. */
+  background:var(--c,var(--app-haut));
+  background:linear-gradient(160deg,
+    var(--c,var(--app-haut)),
+    color-mix(in srgb, var(--c,var(--app-haut)) 82%, #000));
   color:#fff;
   display:grid;place-items:center;
   box-shadow:var(--ombre-app);
@@ -316,7 +327,11 @@ body.dedans .wrap{padding-top:20px}
 .dossier .compte{
   position:absolute;top:-6px;right:-6px;
   min-width:22px;height:22px;padding:0 6px;border-radius:11px;
-  background:var(--papier);color:var(--primaire-encre);
+  /* Le chiffre reprend la teinte de sa tuile : sur fond papier, la couleur de
+     catégorie y tient largement le contraste du texte, toutes valeurs de la
+     palette faisant au moins 3,59:1 avec le blanc, donc bien davantage avec
+     le papier. */
+  background:var(--papier);color:var(--c,var(--primaire-encre));
   border:1px solid var(--ligne);
   display:grid;place-items:center;
   font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
@@ -334,7 +349,7 @@ body.dedans .wrap{padding-top:20px}
     box-shadow:var(--ombre-app-haute);
   }
   .dossier:hover .nom,.dossier:focus-visible .nom{opacity:1;transform:none}
-  .dossier:hover .compte,.dossier:focus-visible .compte{border-color:var(--primaire-bord)}
+  .dossier:hover .compte,.dossier:focus-visible .compte{border-color:var(--c,var(--primaire-bord))}
   .dossier:active .glyphe{transform:translateY(-1px) scale(1.01)}
 }
 .dossier:focus-visible{outline:none}

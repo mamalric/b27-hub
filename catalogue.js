@@ -237,6 +237,26 @@ const CONTACTS = [
 /* ---------------------------------------------------------------------
    CATÉGORIES
 
+   LES COULEURS VIENNENT DES CONVENTIONS DE LOT DE B27, relevées dans le
+   projet du site (b27-site/src/styles/tokens.css) : CVC bleu, plomberie
+   sarcelle, thermique terre cuite, SSI rouge, électricité ocre, paysage
+   vert, BIM violet, structure gris. Ce ne sont donc pas des teintes
+   décoratives : un ingénieur B27 y reconnaît le code couleur de ses plans.
+
+   Trois écarts, assumés et signalés. L'ocre de l'électricité est assombri de
+   #c18900 à #b17e00, le premier ne tenant que 3,07:1 avec le glyphe blanc.
+   Le rouge SSI est au contraire éclairci de #b01818 à #c62828 : l'original
+   tenait très bien face au glyphe, mais tombait à 2,68:1 face au fond du
+   thème sombre, où la tuile se distinguait mal de la page. La ventilation
+   n'a pas de teinte propre chez B27, où elle appartient à la famille CVC :
+   un cyan #2f7f92 la distingue du chauffage sans quitter la famille de l'air.
+
+   TOUTE COULEUR NOUVELLE DOIT TENIR AU MOINS 3:1 SUR TROIS FRONTS : avec le
+   glyphe blanc, avec le fond du thème clair, et avec celui du thème sombre.
+   Une teinte trop claire efface le glyphe, une teinte trop foncée fait
+   disparaître la tuile sur fond noir. Le contrôle du catalogue vérifie les
+   trois et refuse de passer en dessous.
+
    Les dossiers du premier niveau. L'ordre de ce tableau est l'ordre
    d'affichage. Une catégorie sans aucune porte n'apparaît pas : elles
    peuvent donc être déclarées d'avance, elles restent invisibles jusqu'à
@@ -244,15 +264,15 @@ const CONTACTS = [
    --------------------------------------------------------------------- */
 
 const CATEGORIES = [
-  { cle: "cvc",         nom: "Chauffage et climatisation",  icone: "radiateur" },
-  { cle: "ventilation", nom: "Ventilation",                 icone: "vent" },
-  { cle: "plomberie",   nom: "Plomberie et ECS",            icone: "gouttes" },
-  { cle: "thermique",   nom: "Thermique et réglementation", icone: "thermometre" },
-  { cle: "securite",    nom: "Sécurité incendie",           icone: "bouclier" },
-  { cle: "carbone",     nom: "Carbone et environnement",    icone: "feuille" },
-  { cle: "electricite", nom: "Électricité",                 icone: "eclair" },
-  { cle: "b27",         nom: "B27",                         icone: "immeuble" },
-  { cle: "ressources",  nom: "Ressources et référentiels",  icone: "livre" }
+  { cle: "cvc",         nom: "Chauffage et climatisation",  icone: "radiateur",   couleur: "#3e8fb8" },
+  { cle: "ventilation", nom: "Ventilation",                 icone: "vent",        couleur: "#2f7f92" },
+  { cle: "plomberie",   nom: "Plomberie et ECS",            icone: "gouttes",     couleur: "#1f7a6e" },
+  { cle: "thermique",   nom: "Thermique et réglementation", icone: "thermometre", couleur: "#c4562f" },
+  { cle: "securite",    nom: "Sécurité incendie",           icone: "bouclier",    couleur: "#c62828" },
+  { cle: "carbone",     nom: "Carbone et environnement",    icone: "feuille",     couleur: "#557a3a" },
+  { cle: "electricite", nom: "Électricité",                 icone: "eclair",      couleur: "#b17e00" },
+  { cle: "b27",         nom: "B27",                         icone: "immeuble",    couleur: "#5f7f1f" },
+  { cle: "ressources",  nom: "Ressources et référentiels",  icone: "livre",       couleur: "#6b5ba6" }
 ];
 
 /* ---------------------------------------------------------------------
@@ -261,6 +281,12 @@ const CATEGORIES = [
    Les dossiers du deuxième niveau. Chacune appartient à une catégorie.
    Facultatif : une catégorie sans sous-catégorie peuplée s'ouvre
    directement sur ses portes.
+
+   Elles n'ont pas de couleur : elles héritent de celle de leur catégorie.
+   C'est ce qui fait qu'en descendant dans Ressources, les trois
+   sous-dossiers restent violets, et que l'on voit d'un coup d'oeil qu'on
+   est toujours dans la même branche. Un champ "couleur" peut malgré tout
+   être ajouté sur une sous-catégorie pour forcer une teinte.
    --------------------------------------------------------------------- */
 
 const SOUS_CATEGORIES = [

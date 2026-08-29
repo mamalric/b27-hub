@@ -165,6 +165,21 @@ const TYPES = { outil: true, lien: true };
 const DIVERS = "__divers";
 const CLE_ANNUAIRE = "annuaire";
 
+// Teinte du dossier de l'annuaire, et repli de toute catégorie qui n'en
+// déclare pas. Un gris chaud, neutre : des personnes ne sont pas un lot, elles
+// n'ont donc pas de couleur de lot. Le gris de la structure de B27, #4a4a4a,
+// a été écarté après mesure : il ne tenait que 2,12:1 face au fond du thème
+// sombre, la tuile s'y confondait avec la page.
+const COULEUR_ANNUAIRE = "#6e6a63";
+const COULEUR_REPLI = "#779c2b";
+
+// La couleur part du fichier de données et finit dans un attribut style :
+// on ne laisse passer qu'une notation hexadécimale, faute de quoi une faute
+// de frappe dans catalogue.js pourrait injecter de la déclaration CSS.
+function couleurSure(c) {
+  return /^#[0-9a-fA-F]{3,8}$/.test(String(c || "")) ? c : COULEUR_REPLI;
+}
+
 /* ---------------------------------------------------------------------
    ARBORESCENCE
    --------------------------------------------------------------------- */
@@ -187,15 +202,23 @@ function portesDe(cle) { return PORTES.filter(o => o.categorie === cle); }
 function sousDossiersDe(cle) {
   const dedans = portesDe(cle);
   const toutes = typeof SOUS_CATEGORIES === "undefined" ? [] : SOUS_CATEGORIES;
+  // La couleur de la catégorie descend dans ses sous-dossiers, sauf si l'un
+  // d'eux en déclare une. C'est ce qui fait qu'en entrant dans Ressources,
+  // les trois sous-dossiers restent violets : on voit qu'on est toujours
+  // dans la même branche.
+  const parente = categorie(cle);
+  const teinte = parente ? parente.couleur : null;
   const liste = toutes
     .filter(s => s.categorie === cle)
-    .map(s => ({ ...s, portes: dedans.filter(o => o.sousCategorie === s.cle) }))
+    .map(s => ({ ...s, couleur: s.couleur || teinte,
+                 portes: dedans.filter(o => o.sousCategorie === s.cle) }))
     .filter(s => s.portes.length);
   if (!liste.length) return [];
   const clesConnues = new Set(liste.map(s => s.cle));
   const orphelines = dedans.filter(o => !o.sousCategorie || !clesConnues.has(o.sousCategorie));
   if (orphelines.length) {
-    liste.push({ cle: DIVERS, categorie: cle, nom: "Divers", icone: "dossier", portes: orphelines });
+    liste.push({ cle: DIVERS, categorie: cle, nom: "Divers", icone: "dossier",
+                 couleur: teinte, portes: orphelines });
   }
   return liste;
 }
@@ -221,6 +244,7 @@ function dossiersRacine() {
   const liste = categoriesPeuplees().concat(categoriesOrphelines());
   if (contacts().length) {
     liste.push({ cle: CLE_ANNUAIRE, nom: "Qui contacter", icone: "personne",
+                 couleur: COULEUR_ANNUAIRE,
                  portes: [], compte: contacts().length, annuaire: true });
   }
   return liste;
@@ -367,7 +391,7 @@ function html_dossier(d, chemin, index) {
     : (compte > 1 ? "portes" : "porte");
   const recherche = normaliser(d.nom + " " + (d.portes || []).map(o => o.nom + " " + o.pitch).join(" "));
   return '<a class="dossier" href="' + adresseDe(chemin) + '"'
-    + ' style="--i:' + index + '"'
+    + ' style="--i:' + index + ';--c:' + couleurSure(d.couleur) + '"'
     + ' data-recherche="' + ech(recherche) + '"'
     + ' title="' + ech(d.nom) + " : " + compte + " " + motCompte + '">'
     +   '<span class="glyphe">' + ico(d.icone, 110, 1.4) + "</span>"
@@ -475,23 +499,28 @@ function html_annuaire() {
 function contenuDuNiveau(chemin) {
   if (!chemin.length) {
     const n = dossiersRacine().length;
-    return { icone: "maison", nom: "Hall", compte: n, mot: n > 1 ? "dossiers" : "dossier" };
+    return { icone: "maison", nom: "Hall", couleur: COULEUR_REPLI,
+             compte: n, mot: n > 1 ? "dossiers" : "dossier" };
   }
   if (chemin[0] === CLE_ANNUAIRE) {
     const n = contacts().length;
-    return { icone: "personne", nom: "Qui contacter", compte: n, mot: n > 1 ? "fiches" : "fiche" };
+    return { icone: "personne", nom: "Qui contacter", couleur: COULEUR_ANNUAIRE,
+             compte: n, mot: n > 1 ? "fiches" : "fiche" };
   }
   const d = dossiersRacine().find(x => x.cle === chemin[0]) || { nom: chemin[0], icone: "dossier", portes: [] };
   if (chemin.length === 1) {
     const sous = sousDossiersDe(chemin[0]);
-    if (sous.length) return { icone: d.icone, nom: d.nom, compte: sous.length, mot: sous.length > 1 ? "sous-dossiers" : "sous-dossier" };
+    if (sous.length) return { icone: d.icone, nom: d.nom, couleur: d.couleur,
+      compte: sous.length, mot: sous.length > 1 ? "sous-dossiers" : "sous-dossier" };
     const n = d.portes.length;
-    return { icone: d.icone, nom: d.nom, compte: n, mot: n > 1 ? "portes" : "porte" };
+    return { icone: d.icone, nom: d.nom, couleur: d.couleur,
+             compte: n, mot: n > 1 ? "portes" : "porte" };
   }
   const s = sousDossiersDe(chemin[0]).find(x => x.cle === chemin[1])
     || { nom: chemin[1], icone: "dossier", portes: [] };
   const n = s.portes.length;
-  return { icone: s.icone, nom: s.nom, compte: n, mot: n > 1 ? "portes" : "porte" };
+  return { icone: s.icone, nom: s.nom, couleur: s.couleur,
+           compte: n, mot: n > 1 ? "portes" : "porte" };
 }
 
 // Le fil est affiché à tous les niveaux, hall compris. Le masquer à la racine
@@ -501,6 +530,8 @@ function contenuDuNiveau(chemin) {
 function html_filAriane(chemin) {
   const morceaux = [];
   const ici = contenuDuNiveau(chemin);
+  // La teinte du niveau descend sur le fil, dont l'icone la reprend.
+  const teinte = couleurSure(ici.couleur);
 
   // Les maillons parents sont des liens, le maillon courant n'en est pas un :
   // un lien vers la page où l'on se trouve déjà n'apprend rien et trompe.
@@ -523,7 +554,7 @@ function html_filAriane(chemin) {
       + ' aria-label="Remonter d\'un niveau" title="Remonter d\'un niveau">' + ico("retour", 15) + "</a>"
     : "";
 
-  return '<nav class="fil" aria-label="Fil d\'Ariane">' + retour
+  return '<nav class="fil" aria-label="Fil d\'Ariane" style="--c:' + teinte + '">' + retour
     + '<span class="fil-suite">'
     +   morceaux.join('<span class="fil-sep" aria-hidden="true">' + ico("chevron", 12) + "</span>")
     + "</span></nav>";
