@@ -66,7 +66,11 @@ Un seul champ, centré, qui filtre tout en direct : cartes, rangées, fiches. La
 
 **Un panneau ne surgit pas, il se pose.** L'ouverture des modales — météo détaillée, À propos — est un glissement : le cadre monte de dix-huit pixels en s'opacifiant, le voile d'arrière-plan se floute progressivement, et le contenu suit en cascade, un souffle après le cadre. La fermeture est animée aussi, par `@starting-style` et `transition-behavior: allow-discrete` : un navigateur qui ignore ces règles ouvre d'un coup, comme avant, sans rien casser. `prefers-reduced-motion` coupe tout.
 
-**Les barres de défilement appartiennent à l'interface, pas au système.** Fines, gouttière invisible, poucier au vert discret qui se révèle un peu au survol — via la propriété standard `scrollbar-color`, qui hérite partout, panneau météo compris. Les navigateurs qui l'ignorent gardent leurs barres.
+**Les barres de défilement appartiennent à l'interface, pas au système.** Pas de flèches, gouttière transparente, poucier fin au vert discret qui se révèle au survol. Chromium ignore `::-webkit-scrollbar` dès qu'on lui donne `scrollbar-color` : les deux mondes sont séparés — pseudo-éléments pour Chrome et Edge, propriétés standard pour Firefox. `scrollbar-gutter: stable` évite que la page saute quand un panneau verrouille le défilement.
+
+**Un panneau ouvert possède la molette.** Le fond est verrouillé (`body:has(.modale[open])`), et une molette qui tourne hors du corps du panneau — sur le voile, sur l'en-tête — fait quand même défiler le panneau. La modale est une colonne : en-tête fixe, seul le corps défile, une seule barre, qui démarre sous l'en-tête.
+
+**Les cases à cocher sont dessinées dans la charte** : plaque arrondie bordée, fond vert de marque au coché, coche sombre qui se déploie en un cinquième de seconde.
 
 ## Ce qui ne bouge pas
 

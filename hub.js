@@ -1609,6 +1609,21 @@ function remplirApropos() {
   poserIcones(corps);
 }
 
+/* Panneau ouvert, la molette lui appartient : si elle tourne hors du
+   corps du panneau — sur le voile, sur l'en-tête —, c'est quand même le
+   panneau qui défile, jamais la page derrière, que le CSS a de toute
+   façon verrouillée. */
+function initMolettePanneaux() {
+  document.addEventListener("wheel", ev => {
+    const dlg = document.querySelector(".modale[open]");
+    if (!dlg) return;
+    const corps = dlg.querySelector(".modale-corps");
+    if (!corps || corps.contains(ev.target)) return;
+    corps.scrollTop += ev.deltaY;
+    ev.preventDefault();
+  }, { passive: false });
+}
+
 function initApropos() {
   const dlg = $("dlgApropos");
   $("btnApropos").addEventListener("click", () => { remplirApropos(); dlg.showModal(); });
@@ -1636,6 +1651,7 @@ function init() {
   initAncre();
   initApropos();
   initDetailMeteo();
+  initMolettePanneaux();
   chargerMeteo();
   initVeille();
 

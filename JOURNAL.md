@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, finitions du panneau : molette, barres, cases
+
+Cinq retours d'usage, dont deux qui partageaient une cause : le dialogue entier defilait en plus de son corps, d'ou une barre montant jusqu'a l'en-tete et une seconde barre parasite. La modale est devenue une colonne — en-tete fixe, seul le corps defile, une seule barre, sous l'en-tete.
+
+La molette appartient desormais au panneau ouvert : le fond est verrouille par CSS et la molette hors du corps est redirigee vers lui. Les barres perdent leurs fleches et leur fond : pseudo-elements WebKit pour Chrome et Edge (Chromium ignore le style natif des qu'on lui donne scrollbar-color), proprietes standard pour Firefox. Les cases a cocher du composeur sont dessinees dans la charte, vert de marque au coche.
+
 ## 2026-08-29, des cumulus, pas des taches
 
 Deux retours sur le fond en theme clair : le vent et les nuages n'y etaient pas tres perceptibles, et les nuages meritaient mieux que des taches brouillardeuses.

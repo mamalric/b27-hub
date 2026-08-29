@@ -59,14 +59,29 @@
 
 *{box-sizing:border-box}
 /* Les barres de défilement appartiennent à l'interface, pas au système :
-   fines, gouttière invisible, poucier au vert discret. La propriété
-   standard scrollbar-color hérite partout, panneau météo compris, et les
-   navigateurs qui l'ignorent gardent leurs barres — rien ne casse. */
-html{
-  -webkit-text-size-adjust:100%;background:var(--fond);
-  scrollbar-width:thin;scrollbar-color:var(--barre) transparent;
+   pas de flèches, gouttière transparente, poucier fin au vert discret qui
+   se révèle au survol. Chromium ignore ::-webkit-scrollbar dès qu'on lui
+   donne scrollbar-color : les deux mondes sont donc séparés — les
+   pseudo-éléments pour Chrome et Edge, les propriétés standard pour
+   Firefox, dont les barres fines n'ont de toute façon ni flèches ni fond.
+   scrollbar-gutter réserve la place de la barre : ouvrir un panneau, qui
+   verrouille le défilement du fond, ne fait plus sauter la page. */
+html{-webkit-text-size-adjust:100%;background:var(--fond);scrollbar-gutter:stable}
+::-webkit-scrollbar{width:9px;height:9px;background:transparent}
+::-webkit-scrollbar-button{display:none;width:0;height:0}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-corner{background:transparent}
+::-webkit-scrollbar-thumb{
+  background:var(--barre);border-radius:99px;
+  border:2px solid transparent;background-clip:content-box;
 }
-*:hover{scrollbar-color:var(--barre-vive) transparent}
+::-webkit-scrollbar-thumb:hover{background:var(--barre-vive);background-clip:content-box}
+@supports (-moz-appearance:none){
+  html{scrollbar-width:thin;scrollbar-color:var(--barre) transparent}
+}
+/* Panneau ouvert : le fond ne défile plus. La molette est redirigée vers
+   le corps du panneau par hub.js, où que soit la souris. */
+body:has(.modale[open]){overflow:hidden}
 body{
   font-family:Inter,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   margin:0;color:var(--encre);background:transparent;
@@ -386,7 +401,12 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   background:var(--carte-pleine);color:var(--encre);padding:0;
   width:min(560px,calc(100vw - 32px));max-height:min(78vh,720px);
   box-shadow:var(--ombre);
+  /* Colonne à en-tête fixe : le dialogue lui-même ne défile jamais, seul
+     son corps le fait. Sans cela, deux barres cohabitent et celle du
+     dialogue monte jusqu'à l'en-tête. */
+  overflow:hidden;flex-direction:column;
 }
+.modale[open]{display:flex}
 /* L'ouverture ne doit pas surgir : le panneau se pose, le voile se
    floute, le contenu suit en cascade. @starting-style donne l'état de
    départ de la transition d'entrée, allow-discrete anime aussi la
@@ -421,11 +441,11 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 .modale-corps > :nth-child(n+8){animation-delay:340ms}
 .modale-tete{
   display:flex;align-items:center;gap:10px;padding:16px 20px;
-  border-bottom:1px solid var(--ligne);position:sticky;top:0;background:inherit;
+  border-bottom:1px solid var(--ligne);flex:none;
 }
 .modale-tete h2{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .modale-tete .espace{flex:1}
-.modale-corps{padding:18px 20px 22px;overflow-y:auto}
+.modale-corps{padding:18px 20px 22px;overflow-y:auto;flex:1;min-height:0}
 .stats-groupe{margin:0 0 18px}
 .stats-groupe h3{
   margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:1.2px;
@@ -542,7 +562,22 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   display:flex;align-items:center;gap:8px;font-size:13px;color:var(--encre-2);
   cursor:pointer;padding:3px 0;
 }
-.md-composer input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.md-composer input{
+  appearance:none;-webkit-appearance:none;
+  width:17px;height:17px;margin:0;flex:none;cursor:pointer;
+  border:1px solid var(--ligne-forte);border-radius:5px;background:transparent;
+  display:grid;place-items:center;
+  transition:background var(--vitesse),border-color var(--vitesse);
+}
+.md-composer input::before{
+  content:"";width:9px;height:5px;margin-top:-2px;
+  border:2px solid var(--accent-encre);border-top:0;border-right:0;
+  transform:rotate(-45deg) scale(0);
+  transition:transform .18s var(--courbe);
+}
+.md-composer input:checked{background:var(--accent);border-color:var(--accent)}
+.md-composer input:checked::before{transform:rotate(-45deg) scale(1)}
+.md-composer input:hover{border-color:var(--accent)}
 .md-composer input:disabled + span{opacity:.45}
 .md-note{margin:10px 0 0;font-size:10.5px;color:var(--discret);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .md-note a{color:inherit;text-decoration:underline;text-decoration-color:var(--ligne-forte)}
