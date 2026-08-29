@@ -13,16 +13,18 @@
    ce qui rend le bouton Précédent du navigateur fonctionnel et permet
    d'envoyer le lien d'un dossier précis à un collègue.
 
-   Aucune dépendance, aucune requête réseau : le hub s'ouvre aussi bien
-   depuis GitHub Pages que par un double-clic sur index.html.
+   Aucune dépendance, et une seule requête réseau, facultative : la photo
+   décorative du bandeau d'accueil. Sans elle, tout fonctionne à l'identique.
+   Le hub s'ouvre aussi bien depuis GitHub Pages que par un double-clic sur
+   index.html.
    ===================================================================== */
 
 /* ---------------------------------------------------------------------
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
-  { v: "v5", date: "2026-08-29", titre: "Bandeau de charpente",
-    texte: "Un bandeau d'accueil portant une charpente métallique dessinée en axonométrie, qui passe du construit au dessiné de gauche à droite. Dessin original en SVG, calculé et non tracé à la main, quelques kilo-octets et net à toute taille." },
+  { v: "v6", date: "2026-08-29", titre: "Bandeau photo, épuré",
+    texte: "Le bandeau d'accueil va désormais d'un bord à l'autre de l'écran et porte une photo de chantier tirée au sort, qui change d'une visite à l'autre. Elle passe en noir et blanc, puis en sépia, puis prend le vert de B27 : teinte et saturation calculées pour tomber sur le #95C03D du logo. Le pied de page et le lien de contact latéral disparaissent. Sans réseau, le bandeau garde son dégradé vert et le hub fonctionne à l'identique." },
   { v: "v4", date: "2026-08-29", titre: "Tableau de bord, et ce qui vous appartient",
     texte: "Barre latérale permanente : toutes les catégories à un clic depuis n'importe où. Recherche en haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Surtout : le hall devient personnel sans le moindre compte. Épinglez une porte, elle remonte en tête à chacune de vos visites, et les dernières portes ouvertes s'y ajoutent. Tout vit dans votre navigateur et n'en sort jamais." },
   { v: "v3", date: "2026-08-29", titre: "Navigation par dossiers",
@@ -669,6 +671,7 @@ function rendre() {
   // la place revient à ce qu'on est venu chercher.
   const auHall = chemin.length === 0 && !requete;
   $("accueil").hidden = !auHall;
+  $("banniere").hidden = !auHall;
   // Les raccourcis sont reconstruits à chaque retour au hall, et non une
   // seule fois au chargement : une porte ouverte entre-temps doit apparaître
   // dans les récentes sans qu'il faille recharger la page.
@@ -988,6 +991,180 @@ function initApropos() {
 /* ---------------------------------------------------------------------
    DÉMARRAGE
    --------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+   PHOTO DU BANDEAU
+
+   Le bandeau du hall porte une photo de chantier tirée au sort, qui change
+   régulièrement, à la manière des fonds d'écran de Windows. Elle vient
+   d'Unsplash, passe en noir et blanc puis en sépia puis au vert de B27, et
+   tout ce traitement est en CSS : voir .banniere-fond dans hub.css et
+   src/bandeau_teinte.py qui en calcule les réglages.
+
+   Trois choses méritent d'être dites, parce qu'elles ont dicté la forme du
+   code plus que le confort d'écriture.
+
+   La première est que c'est la seule requête que le hub émette vers un tiers.
+   Tout le reste tient dans le dépôt et fonctionne hors ligne. Le bandeau est
+   donc écrit pour que son échec ne soit pas un incident : pas de clé, pas de
+   réseau, un proxy d'entreprise qui bloque, un quota épuisé, et le dégradé
+   vert reste. Rien ne clignote, rien ne s'excuse, aucune erreur ne s'affiche.
+   Le hub n'a jamais l'air cassé parce qu'une photo décorative manque.
+
+   La deuxième est le quota. Un compte de démonstration Unsplash donne
+   cinquante requêtes par heure, tous visiteurs confondus. Interroger l'API à
+   chaque chargement de page l'épuiserait dès le premier midi et le bandeau
+   serait vert pour tout le monde le reste de la journée. On tire donc un lot
+   entier en une seule requête, on le garde une semaine, et chaque visite pioche
+   dedans. Une requête par poste et par semaine, et l'image change quand même
+   à chaque fois qu'on revient au hall.
+
+   La troisième est le crédit. Nommer le photographe et Unsplash, avec des
+   liens, est une obligation de la licence, pas une politesse : le bandeau
+   affiche la photo seulement quand il peut aussi afficher son crédit.
+   --------------------------------------------------------------------- */
+
+const CLE_BANDEAU = "hub_b27_bandeau";
+
+// Unsplash demande que les liens de crédit portent le nom de l'application
+// qui les émet. C'est ce qui permet au photographe de savoir d'où vient son
+// audience, et c'est la contrepartie de la gratuité.
+const UTM_BANDEAU = "?utm_source=Hub%20Outils%20B27&utm_medium=referral";
+
+const DELAI_BANDEAU = 6000;   // ms avant d'abandonner la requête
+
+function reglagesBandeau() {
+  const r = (typeof REGLAGES === "object" && REGLAGES.bandeau) || null;
+  // Pas de clé, pas de requête. C'est l'état livré, et il est correct.
+  return r && r.actif && r.cle ? r : null;
+}
+
+// Une URL qui va finir dans un href ou dans un background-image ne se fait pas
+// confiance sur parole, même venant d'une API connue : on n'accepte que du
+// https vers les deux domaines attendus. Cela ferme la porte au javascript:
+// et au data: qu'une réponse détournée pourrait glisser.
+function urlSure(url, hotes) {
+  if (typeof url !== "string") return "";
+  try {
+    const a = new URL(url);
+    return a.protocol === "https:" && hotes.indexOf(a.hostname) !== -1 ? url : "";
+  } catch (e) {
+    return "";
+  }
+}
+
+function auHasard(liste) {
+  return liste[Math.floor(Math.random() * liste.length)];
+}
+
+// On ne garde d'une photo que ce qui sert : l'API en renvoie une cinquantaine
+// de champs, et le cache n'a pas à les porter.
+function retenirPhoto(p) {
+  if (!p || !p.urls) return null;
+  const brute = urlSure(p.urls.raw, ["images.unsplash.com"]);
+  if (!brute) return null;
+  const profil = urlSure(p.user && p.user.links && p.user.links.html,
+                         ["unsplash.com", "www.unsplash.com"]);
+  const auteur = (p.user && typeof p.user.name === "string") ? p.user.name : "";
+  if (!profil || !auteur) return null;     // sans crédit possible, on renonce
+  return {
+    // Les URL brutes d'Unsplash acceptent des paramètres de recadrage. On
+    // demande directement la bande dont on a besoin : télécharger une image
+    // de quatre mille pixels de côté pour n'en montrer qu'un bandeau ferait
+    // payer au poste de travail une place qu'il ne verra jamais. Le recadrage
+    // par entropie garde la partie chargée de l'image plutôt que son centre
+    // géométrique, qui sur une photo de chantier est souvent du ciel.
+    image: brute + "&w=1920&h=560&fit=crop&crop=entropy&q=72&fm=jpg",
+    auteur: auteur,
+    profil: profil
+  };
+}
+
+function lotEnCache(r) {
+  try {
+    const lot = JSON.parse(localStorage.getItem(CLE_BANDEAU) || "null");
+    if (!lot || !Array.isArray(lot.photos) || !lot.photos.length) return null;
+    const jours = (r.joursDeCache || 7) * 86400000;
+    if (Date.now() - (lot.tire || 0) > jours) return null;
+    return lot.photos;
+  } catch (e) {
+    return null;
+  }
+}
+
+function tirerLot(r) {
+  const recherches = (r.recherches && r.recherches.length)
+    ? r.recherches : ["construction site"];
+  // Une seule recherche finirait par ramener toujours les mêmes photos :
+  // Unsplash tire au sort dans les premiers résultats, pas dans tout le fonds.
+  // Changer de recherche à chaque lot élargit le puits.
+  const quoi = auHasard(recherches);
+  const url = "https://api.unsplash.com/photos/random"
+    + "?query=" + encodeURIComponent(quoi)
+    + "&orientation=landscape&content_filter=high"
+    + "&count=" + Math.min(30, Math.max(1, r.parLot || 12))
+    + "&client_id=" + encodeURIComponent(r.cle);
+
+  // Un proxy d'entreprise qui avale la requête sans répondre laisserait la
+  // promesse pendante indéfiniment. AbortSignal.timeout manque aux navigateurs
+  // d'avant 2022 ; son absence ne doit pas empêcher la requête, seulement la
+  // borne.
+  const options = {};
+  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
+    options.signal = AbortSignal.timeout(DELAI_BANDEAU);
+  }
+
+  return fetch(url, options)
+    .then(rep => rep.ok ? rep.json() : Promise.reject(new Error("HTTP " + rep.status)))
+    .then(donnees => (Array.isArray(donnees) ? donnees : [donnees])
+      .map(retenirPhoto).filter(Boolean));
+}
+
+function poserCredit(photo) {
+  const zone = $("banniereCredit");
+  if (!zone) return;
+  zone.innerHTML = 'Photo <a href="' + ech(photo.profil + UTM_BANDEAU)
+    + '" target="_blank" rel="noopener noreferrer">' + ech(photo.auteur)
+    + '</a> sur <a href="https://unsplash.com/' + UTM_BANDEAU
+    + '" target="_blank" rel="noopener noreferrer">Unsplash</a>';
+  zone.hidden = false;
+}
+
+function poserPhoto(photo) {
+  const fond = $("banniereFond");
+  if (!fond || !photo) return;
+  // On ne pose la photo qu'une fois chargée. Une image qui se remplit par
+  // bandes derrière une salutation déjà lisible se remarque bien plus que son
+  // absence, et le fondu de .posee n'aurait plus rien à adoucir.
+  const img = new Image();
+  img.onload = () => {
+    fond.style.backgroundImage = 'url("' + photo.image.replace(/"/g, "%22") + '")';
+    fond.classList.add("posee");
+    poserCredit(photo);
+  };
+  img.src = photo.image;
+}
+
+function chargerBandeau() {
+  const r = reglagesBandeau();
+  if (!r) return;
+  const cache = lotEnCache(r);
+  if (cache) { poserPhoto(auHasard(cache)); return; }
+  tirerLot(r).then(photos => {
+    if (!photos.length) return;
+    try {
+      localStorage.setItem(CLE_BANDEAU,
+        JSON.stringify({ tire: Date.now(), photos: photos }));
+    } catch (e) {
+      // Stockage plein ou refusé par la configuration du poste : le lot vivra
+      // le temps de la visite, ce qui suffit pour que le bandeau soit juste.
+    }
+    poserPhoto(auHasard(photos));
+  }).catch(() => {
+    // Réseau coupé, proxy, quota épuisé, clé révoquée : le dégradé vert reste,
+    // et c'est un état correct. Rien à signaler à qui vient chercher un outil.
+  });
+}
+
 function init() {
   controlerCatalogue();
   construireRail();
@@ -996,6 +1173,7 @@ function init() {
   poserIcones();
   initTheme();
   initApropos();
+  chargerBandeau();
 
   $("btnRail").innerHTML = ico("menu", 17);
   $("btnRail").addEventListener("click", () => ouvrirRail(!document.body.classList.contains("rail-ouvert")));

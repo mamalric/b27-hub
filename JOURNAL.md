@@ -2,6 +2,30 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, bandeau photo au vert B27
+
+La charpente dessinée ne convient pas : approximative, pas dans la fibre de B27, et pas même la bonne couleur de verre. Elle est supprimée, script compris. À la place, une photo de chantier tirée au sort, à la manière des fonds d'écran Windows, ramenée au vert de la maison. L'utilisateur précise en cours de route la teinte voulue : `#95C03D`, celle du logo.
+
+**Le fournisseur.** `source.unsplash.com`, l'URL sans clé que tout le monde utilisait, est arrêtée depuis 2024 : il n'existe plus d'endpoint aléatoire fiable sans compte. Unsplash reste le bon choix pour la profondeur en architecture et chantier, et sa clé d'accès est publique par conception, ce qui convient à un site statique sans serveur. Reste que créer le compte revient à l'utilisateur. Le code est donc écrit pour fonctionner sans clé : le bandeau garde son dégradé vert, n'émet aucune requête, et rien n'a l'air cassé. C'est la même logique que les trois transports du signalement.
+
+**Le quota a dicté la forme du code.** Cinquante requêtes par heure en mode démonstration, tous visiteurs confondus : interroger l'API à chaque chargement l'épuiserait dès le premier midi, et le bandeau serait vert pour tout le monde jusqu'au soir sans que personne ne signale rien. Le hub demande donc douze photos en une requête, garde le lot une semaine, et pioche dedans à chaque visite. Une requête par poste et par semaine, et l'image change quand même à chaque retour au hall.
+
+**La teinte est calculée, pas réglée à l'oeil.** Les fonctions de `filter` sont des matrices spécifiées au millième près : `src/bandeau_teinte.py` les applique et balaie angle, saturation et luminosité. Quatre tentatives avant la bonne. Viser la teinte seule donnait un gris verdâtre à 10 % de saturation, juste en teinte et méconnaissable. Viser la couleur entière au milieu de la plage la touchait au pixel près en brûlant tout le haut, parce que `#95C03D` est trop clair pour laisser de la marge au-dessus. Contraindre le haut sans contraindre le bas faisait écraser le bleu à zéro par `saturate(4)`, ombres olive et lumières fluo.
+
+Le vrai coupable était `sepia(1)` lui-même : ses lignes de matrice somment à 1,35, donc il brûle le canal rouge de tout gris supérieur à 0,74. Un `brightness(.74)` placé **avant** le sépia y remédie, la chaîne redevient linéaire de bout en bout, et la teinte cesse de dériver. La couleur de marque est alors visée dans les lumières et non dans les demi-teintes, ce qui est du reste le principe du duotone. Résultat : teinte 79,4 degrés et saturation 52 % constantes du noir au blanc, celles du logo, et le gris 0,85 ressort à deux niveaux sur 255 du `#95C03D`.
+
+**Vérifié contre le navigateur, pas seulement calculé.** La rampe redessinée dans un canvas avec la même chaîne s'écarte du calcul de deux niveaux sur 255 : du bruit d'arrondi. Le calcul décrit bien ce que fait le moteur de rendu.
+
+**Un défaut invisible trouvé à la mesure.** Le voile sous le texte était dimensionné sur le pixel le plus clair, 51 % d'opacité pour tenir 4,5:1. Mais il faiblissait dès le tiers de la largeur, alors que le chapeau s'étend jusqu'aux 36 % : mesure faite en recomposant photo filtrée et voile dans un canvas, 3,91:1 sous la fin du chapeau, sous le seuil. Rien de visible à l'oeil. Le voile garde désormais son plateau jusqu'où le texte s'arrête, et couvre toute la largeur sous 1240 px, là où le chapeau déborde la moitié. Après correction : 5,75:1 sous le texte, 5,59:1 sous le crédit.
+
+Cette mesure a elle-même demandé une correction : échantillonner le rectangle de `.salut` revenait à échantillonner toute la largeur du bandeau, puisque c'est un bloc, donc surtout du vide à droite. Il a fallu passer par les rectangles réels des glyphes.
+
+**Le bandeau sort de la grille.** Il ne prenait pas toute la largeur parce qu'il vivait dans `.wrap`, borné à 1360 px. Il est remonté dans `.page`, seul élément du hub à aller d'un bord à l'autre ; le texte, lui, garde la largeur et le retrait du contenu.
+
+**Le crédit est une obligation de licence**, pas une politesse : une photo dont le nom d'auteur ou le lien de profil manque est écartée plutôt qu'affichée sans crédit.
+
+Prochaine étape côté utilisateur : créer le compte Unsplash et coller la clé. Tout le reste est en place et se contente de l'attendre.
+
 ## 2026-08-29, epuration
 
 L'utilisateur ne trouve pas le resultat convaincant et commence par faire de la place. Retires : le lien de contact en pied de barre laterale, et tout le pied de page (compte des portes, phrase sur ce que le hub ne collecte pas, adresse de contact). Le code mort qui les alimentait est parti avec, dans les trois fichiers, plutot que de laisser des elements orphelins.

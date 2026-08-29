@@ -76,23 +76,21 @@ Le hub n'a pas de portail de connexion et n'en aura pas. La personnalisation ne 
 
 **La salutation suit l'heure du poste.** Bonjour, bonsoir, bonne nuit : c'est la seule chose que le hub sait de vous, et il la lit sur l'horloge. Accueillant sans rien demander.
 
-## Le bandeau de charpente
+## Le bandeau d'accueil
 
-Le hall s'ouvre sur une charpente métallique en axonométrie, qui passe du construit au dessiné de gauche à droite : membrures épaisses et pleines à gauche, trait fin seul à droite, sur une trame de calque. Un ouvrage qui se lèverait depuis son plan.
+Le hall s'ouvre sur un bandeau pleine largeur portant une photo de chantier tirée au sort, passée en noir et blanc, puis en sépia, puis ramenée au vert de B27. Le détail du branchement est dans [bandeau.md](bandeau.md) ; ce qui suit est ce qui relève de la charte.
 
-**C'est un dessin original, pas une photo vectorisée.** La demande partait d'une image de charpente, vraisemblablement une photo de banque d'images : la tracer en aurait produit une oeuvre dérivée. Le dessin a donc été refait, dans le même esprit. Il y gagne aussi techniquement : neuf kilo-octets, net à toute taille, aucune requête, et il se recadre du grand écran au téléphone.
+**Il sort de la grille.** C'est la seule surface du hub qui va d'un bord à l'autre de l'écran. Tout le reste est borné à 1360 px pour que les lignes restent lisibles, mais une photo bornée sur un écran large se lit comme une vignette agrandie. Le texte du bandeau, lui, reprend la largeur et le retrait du contenu : la photo déborde, le texte reste dans l'axe.
 
-**La géométrie est calculée, pas tracée à l'oeil.** `src/charpente.py` produit le SVG : deux files de poteaux, poutres longitudinales et transversales, fermes à treillis, contreventement une travée sur trois. C'est la seule façon d'obtenir des membrures réellement parallèles et une trame régulière. Une charpente mal d'aplomb se voit immédiatement, surtout chez un BET. Pour la modifier : éditer le script, relancer `python src/charpente.py bandeau-charpente.svg`, recoller le résultat dans `index.html`.
+**La couleur de marque est visée dans les lumières, pas dans les demi-teintes.** `#95C03D` est un vert clair et saturé : le poser au milieu de la plage ne laisse aucune marge au-dessus et brûle tout ce qui est plus clair. Les ombres vont donc au vert sombre et les lumières à la couleur de marque, comme dans n'importe quel duotone. C'est elle que l'oeil retient, parce qu'elle occupe les zones les plus lumineuses de l'image.
 
-**Axonométrie et non perspective**, volontairement : c'est le mode de représentation des plans d'exécution, et elle se répète proprement sur toute la largeur d'un bandeau.
+**La teinte est calculée, pas réglée à l'oeil.** Les fonctions de `filter` sont des matrices spécifiées au millième près : `src/bandeau_teinte.py` balaie les paramètres et retient ceux qui posent la photo sur le vert de marque. La teinte se tient à 79,4 degrés et la saturation à 52 % du noir au blanc, celles du logo. Vérifié contre le navigateur, l'écart est de deux niveaux sur 255.
 
-**Le rapport du viewBox suit celui du bandeau**, autour de 5,5 pour 1. Avec un recadrage en `slice`, tout écart entre les deux se paie en rognage : un premier essai en 1200 x 280 coupait les poteaux à mi-hauteur, et la charpente n'était plus qu'un enchevêtrement de poutres sans appui visible.
+**Le voile tient son plateau sur toute l'étendue du texte.** Il faut 51 % d'opacité pour que le blanc tienne 4,5:1 sur le pixel le plus clair que la chaîne puisse produire. Un premier réglage partait à la bonne valeur mais faiblissait dès le tiers de la largeur : 3,91:1 mesurés sous la fin du chapeau, invisible à l'oeil. Le voile garde donc sa pleine force jusqu'où le texte s'arrête. Sa couleur est prise sur la rampe de la photo elle-même : voile et image partagent la même teinte, et le voile ne se lit pas comme un rectangle rapporté.
 
-**Le texte est protégé par un voile dégradé.** Le fond suffirait presque, mais une membrure blanche qui passe derrière une lettre blanche fait tomber le contraste localement, et cela ne se voit qu'à l'usage. Le voile reprend le vert le plus foncé du bandeau, où le blanc tient 8,1:1, et s'efface avant la moitié pour ne pas éteindre le dessin. Le dégradé de fond va de `#5f7f1f` à `#3f5714`, les deux extrémités tenant au moins 4,6:1 avec le texte blanc.
+**Le crédit du photographe est une obligation de licence**, pas une politesse : une photo dont le crédit ne peut pas être construit est écartée. La pastille en bas à droite porte son propre fond, calculé sur le même pire cas.
 
-**Sous 700 px, la charpente recule à l'état de texture.** Le bandeau y devient presque carré alors que le dessin est fait pour 5,5 pour 1 : le recadrage n'en montre plus qu'une tranche, qui ne se lit plus comme une charpente et se met à concurrencer le texte.
-
-**Elle ne s'imprime pas.** Elle mangerait de l'encre pour un décor, et le bandeau garde son sens sans elle.
+**Sans réseau, le bandeau garde un dégradé vert.** C'est un état de fonctionnement normal, pas une panne : le hub n'a jamais l'air cassé parce qu'une photo décorative manque. La photo ne s'imprime pas non plus, elle mangerait de l'encre pour un décor.
 
 ## Les cartes chiffrées
 

@@ -247,6 +247,40 @@ def controler():
     if "contact" not in reglages:
         avertissements.append("REGLAGES : pas de champ 'contact', aucune adresse ne sera proposée.")
 
+    # --- photo du bandeau
+    bandeau = reglages.get("bandeau")
+    if isinstance(bandeau, dict) and bandeau.get("actif"):
+        if not bandeau.get("cle"):
+            avertissements.append(
+                "REGLAGES.bandeau : pas de clé d'accès Unsplash. Le bandeau gardera "
+                "son dégradé vert et n'émettra aucune requête. Voir docs/bandeau.md.")
+        recherches = bandeau.get("recherches")
+        if not isinstance(recherches, list) or not recherches:
+            erreurs.append("REGLAGES.bandeau : 'recherches' doit être une liste non vide.")
+        elif not all(isinstance(r, str) and r.strip() for r in recherches):
+            erreurs.append("REGLAGES.bandeau : chaque recherche doit être une chaîne non vide.")
+        # L'API Unsplash plafonne le paramètre count à 30 : au-delà, elle
+        # renvoie une erreur et le bandeau reste vert sans que rien ne le dise.
+        lot = bandeau.get("parLot")
+        if not isinstance(lot, int) or not 1 <= lot <= 30:
+            erreurs.append("REGLAGES.bandeau : 'parLot' doit être un entier de 1 à 30 "
+                           "(plafond du paramètre count de l'API Unsplash).")
+        jours = bandeau.get("joursDeCache")
+        if not isinstance(jours, int) or jours < 1:
+            erreurs.append("REGLAGES.bandeau : 'joursDeCache' doit être un entier positif.")
+        elif jours > 30:
+            avertissements.append(
+                "REGLAGES.bandeau : lot gardé %d jours. Au-delà d'un mois les mêmes "
+                "photos reviennent longtemps." % jours)
+        # Le quota d'un compte de démonstration est de 50 requêtes par heure,
+        # tous visiteurs confondus. Un lot d'une seule photo gardé un seul jour
+        # ramènerait une requête par poste et par jour, ce qui tient encore,
+        # mais supprimerait tout tirage au sort : autant le dire.
+        if isinstance(lot, int) and lot < 4:
+            avertissements.append(
+                "REGLAGES.bandeau : lot de %d photo(s). Le tirage au sort n'a plus "
+                "guère de sens en dessous de quatre." % lot)
+
     # --- signalement
     if signalement.get("actif"):
         transport = signalement.get("transport")

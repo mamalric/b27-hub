@@ -28,11 +28,11 @@ python tests/verifier_catalogue.py
 | `hub.css` | Charte graphique reprise des outils B27 existants. |
 | `signalement.js` | La pastille "Signaler un problème", autonome et réutilisable ailleurs. |
 | `logo-b27.svg` | Le logo, qui sert aussi de favicon. |
-| `bandeau-charpente.svg` | Le dessin du bandeau d'accueil, collé dans `index.html`. |
-| `src/charpente.py` | Génère ce dessin. Géométrie calculée, pas tracée à l'oeil. |
+| `src/bandeau_teinte.py` | Calcule et vérifie la chaîne de filtres qui met la photo du bandeau au vert B27. |
 | `tests/verifier_catalogue.py` | Contrôle du catalogue, bibliothèque standard uniquement. |
 | `docs/charte.md` | Palette, logo, types de carte, conventions visuelles. |
 | `docs/signalement.md` | Fonctionnement du signalement et modes d'envoi. |
+| `docs/bandeau.md` | Photo du bandeau : clé Unsplash, quota, traitement des couleurs. |
 
 HTML, CSS et JavaScript sans framework et sans étape de build. Aucune requête externe : la page s'ouvre aussi bien en ligne que par un double-clic sur `index.html`.
 

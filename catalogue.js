@@ -314,6 +314,40 @@ const REGLAGES = {
   // Chaîne vide : la ligne de contact disparaît.
   contact: "mamalric@b27.fr",
 
+  // Photo du bandeau d'accueil. Le hub tire au sort une image de chantier
+  // chez Unsplash, la passe en noir et blanc puis en sépia puis au vert de
+  // B27, et en change régulièrement, à la manière des fonds d'écran Windows.
+  //
+  // La clé d'accès Unsplash est publique par conception : elle n'ouvre que
+  // des lectures et le fournisseur la destine explicitement au code d'un site.
+  // Elle peut donc rester dans le dépôt. Tant qu'elle est vide, le bandeau
+  // garde son dégradé vert et n'émet aucune requête : c'est un état de
+  // fonctionnement normal, pas une panne. La marche à suivre pour en obtenir
+  // une, en deux minutes et sans frais, est dans docs/bandeau.md.
+  bandeau: {
+    actif: true,
+    cle: "",
+
+    // Ce que l'on demande à Unsplash. Plusieurs recherches valent mieux
+    // qu'une seule, qui finirait par ramener toujours les mêmes photos.
+    recherches: [
+      "construction site",
+      "steel structure building",
+      "architecture facade concrete",
+      "building under construction crane",
+      "industrial building interior"
+    ],
+
+    // Nombre de photos ramenées en une seule requête, puis tirées au sort à
+    // chaque visite. Le quota d'un compte de démonstration est de cinquante
+    // requêtes par heure, tous visiteurs confondus : interroger l'API à
+    // chaque chargement de page l'épuiserait en un midi. Un lot gardé
+    // plusieurs jours ramène cela à une requête par poste et par semaine,
+    // et le tirage reste différent à chaque visite.
+    parLot: 12,
+    joursDeCache: 7
+  },
+
   // La barre de recherche n'apparaît qu'à partir de ce nombre de portes.
   // En dessous elle encombre plus qu'elle n'aide : le hall tient déjà tout
   // entier sous les yeux.
