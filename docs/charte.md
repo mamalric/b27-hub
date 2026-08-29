@@ -64,13 +64,15 @@ Le hall se parcourt comme une armoire. Le premier niveau ne montre que des dossi
 
 ## Le dossier
 
-Carré, l'icône au centre dans un pavé teinté, le nom en dessous qui se révèle au survol, et le compte de ce qu'il contient dans le coin.
+Carré, l'icône au centre, le nom en dessous qui se révèle au survol, et le compte de ce qu'il contient dans le coin.
+
+**Un seul cadre par dossier.** L'icône se pose à même la carte, sans pavé teinté autour d'elle, et le compte n'a pas de pastille. Un cadre dans un cadre alourdissait la tuile et faisait lire deux objets là où il n'y en a qu'un : la carte est le dossier, l'icône est son contenu. Débarrassée de sa boîte, l'icône est aussi dessinée plus grand, à 46 px.
 
 **Le nom est visible par défaut, et le masquage n'intervient que sous `@media (hover: hover) and (pointer: fine)`.** L'ordre compte : sur tablette et sur téléphone, où le survol n'existe pas, des tuiles muettes seraient indéchiffrables, et c'est aussi le repli si la requête média n'est pas comprise. Le focus clavier révèle le nom au même titre que la souris, sans quoi la navigation au clavier ferait défiler des dossiers anonymes. Le nom est toujours présent dans le code, même invisible, pour les lecteurs d'écran, et le `title` du lien porte le nom et le compte.
 
 Un dossier est un `<a href="#/...">` et non un `<div>` avec un écouteur de clic. On gagne ainsi le clavier, le clic du milieu, le menu contextuel et l'historique sans écrire une ligne de plus.
 
-**Les micro-animations.** Au survol, la carte se soulève de 3 px, le pavé d'icône monte de 13 px et se remplit du vert plein, le nom apparaît en montant de 7 px, la pastille de compte passe au vert. À l'apparition d'une grille, chaque élément entre avec un décalage de 26 ms sur le précédent : le regard suit la construction au lieu de recevoir tout d'un bloc. Le remplissage de l'animation est `backwards` et non `both`, détail qui compte : avec `both`, la valeur finale resterait appliquée après la fin et bloquerait le `transform` du survol.
+**Les micro-animations.** Au survol, la carte se soulève de 3 px et sa bordure se teinte, l'icône monte de 13 px, grandit de 7 pour cent et fonce d'un cran, le nom apparaît en montant de 7 px, le compte passe au vert. Les deux verts de l'icône vont chacun dans le sens du contraste : `--primaire` au repos, `--primaire-encre` au survol, ce qui donne plus foncé sur fond clair et plus clair sur fond sombre. À l'apparition d'une grille, chaque élément entre avec un décalage de 26 ms sur le précédent : le regard suit la construction au lieu de recevoir tout d'un bloc. Le remplissage de l'animation est `backwards` et non `both`, détail qui compte : avec `both`, la valeur finale resterait appliquée après la fin et bloquerait le `transform` du survol.
 
 Tout cela disparaît sous `prefers-reduced-motion`.
 
