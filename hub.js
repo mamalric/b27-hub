@@ -20,6 +20,8 @@
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v9", date: "2026-08-29", titre: "La météo en grand",
+    texte: "Un clic sur la tuile météo ouvre le panneau détaillé : dix mesures du moment dont le point de rosée calculé par Magnus, les prochaines vingt-quatre heures, la semaine, le soleil et la qualité de l'air avec les pollens. Et chacun compose sa tuile : les mesures affichées par défaut se cochent dans le panneau, le choix reste dans le navigateur." },
   { v: "v8", date: "2026-08-29", titre: "Le fond vit avec le ciel",
     texte: "Le champ d'écoulement suit désormais la météo affichée : bruine et pluie en fines stries inclinées par le vent mesuré, neige en flocons qui oscillent, brouillard presque immobile, orage en turbulence — jamais en éclairs, le calme est la règle. La saison teinte la palette, hiver froid, été doré. Au défilement, tout s'ancre : la météo et le calendrier se replient en pastilles, le logo et le titre se posent dans une pilule centrale qui ramène en haut." },
   { v: "v7", date: "2026-08-29", titre: "Le portail",
@@ -753,7 +755,8 @@ function tirerMeteo(lieu) {
     + "?latitude=" + encodeURIComponent(lieu.lat)
     + "&longitude=" + encodeURIComponent(lieu.lon)
     + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,"
-    + "surface_pressure,weather_code,wind_speed_10m,wind_direction_10m"
+    + "surface_pressure,pressure_msl,weather_code,wind_speed_10m,"
+    + "wind_direction_10m,wind_gusts_10m,cloud_cover,precipitation,uv_index"
     + "&wind_speed_unit=kmh&timezone=auto";
   const options = {};
   if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
@@ -766,6 +769,58 @@ function tirerMeteo(lieu) {
       if (!c || !isFinite(c.temperature_2m)) throw new Error("réponse sans mesure");
       return c;
     });
+}
+
+/* Les mesures que la tuile peut afficher. Chacun compose la sienne : le
+   choix est enregistré dans le navigateur, comme le thème, et nulle part
+   ailleurs. Le point de rosée n'est pas fourni par le service : il est
+   calculé par la formule de Magnus depuis la température et l'humidité —
+   c'est la donnée du fluidiste, celle de la condensation. */
+const CLE_METEO_CHAMPS = "hub_b27_meteo_champs";
+const CHAMPS_DEFAUT = ["ressenti", "vent", "humidite", "pression"];
+const CHAMPS_MAX = 6;
+
+function pointDeRosee(t, hr) {
+  const a = 17.625, b = 243.04;
+  const g = Math.log(hr / 100) + a * t / (b + t);
+  return b * g / (a - g);
+}
+
+const METRIQUES = {
+  ressenti:    { nom: "Ressenti",       val: m => virgule(m.apparent_temperature) + "\u00a0\u00b0C" },
+  vent:        { nom: "Vent",           val: m => Math.round(m.wind_speed_10m) + "\u00a0km/h " + cardinal(m.wind_direction_10m) },
+  rafales:     { nom: "Rafales",        val: m => Math.round(m.wind_gusts_10m) + "\u00a0km/h" },
+  humidite:    { nom: "Humidit\u00e9",      val: m => Math.round(m.relative_humidity_2m) + "\u00a0%" },
+  pression:    { nom: "Pression",       val: m => virgule(m.surface_pressure) + "\u00a0hPa" },
+  pressionMer: { nom: "Pression mer",   val: m => virgule(m.pressure_msl) + "\u00a0hPa" },
+  nebulosite:  { nom: "N\u00e9bulosit\u00e9",    val: m => Math.round(m.cloud_cover) + "\u00a0%" },
+  precip:      { nom: "Pr\u00e9cipitations", val: m => virgule(m.precipitation) + "\u00a0mm" },
+  rosee:       { nom: "Point de ros\u00e9e", val: m => virgule(pointDeRosee(m.temperature_2m, m.relative_humidity_2m)) + "\u00a0\u00b0C" },
+  uv:          { nom: "Indice UV",      val: m => virgule(m.uv_index) }
+};
+
+function champsChoisis() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CLE_METEO_CHAMPS) || "null");
+    if (Array.isArray(c)) {
+      const valides = c.filter(k => METRIQUES[k]);
+      if (valides.length) return valides.slice(0, CHAMPS_MAX);
+    }
+  } catch (e) { /* choix illisible : les valeurs d'usine */ }
+  return CHAMPS_DEFAUT;
+}
+
+// La dernière mesure reste sous la main : recomposer la tuile après un
+// changement de réglage ne doit pas coûter une requête.
+let MESURE_COURANTE = null, LIEU_COURANT = null, QUAND_COURANT = 0;
+
+function html_mesuresTuile(mesure) {
+  return champsChoisis().map(k => {
+    let v;
+    try { v = METRIQUES[k].val(mesure); } catch (e) { v = null; }
+    return "<div><dt>" + ech(METRIQUES[k].nom) + "</dt><dd>"
+      + (v == null || /NaN|undefined/.test(String(v)) ? "\u2014" : v) + "</dd></div>";
+  }).join("");
 }
 
 function peindreMeteo(mesure, lieu, quand) {
@@ -789,16 +844,11 @@ function peindreMeteo(mesure, lieu, quand) {
     +     '<span class="meteo-lieu">' + ech(lieu.nom || "Position choisie") + "</span>"
     +   "</span>"
     + "</div>"
-    + '<dl class="meteo-mesures">'
-    +   "<div><dt>Ressenti</dt><dd>" + ech(virgule(mesure.apparent_temperature)) + "&nbsp;°C</dd></div>"
-    +   "<div><dt>Vent</dt><dd>" + Math.round(mesure.wind_speed_10m) + "&nbsp;km/h "
-    +     ech(cardinal(mesure.wind_direction_10m)) + "</dd></div>"
-    +   "<div><dt>Humidité</dt><dd>" + Math.round(mesure.relative_humidity_2m) + "&nbsp;%</dd></div>"
-    +   "<div><dt>Pression</dt><dd>" + ech(virgule(mesure.surface_pressure)) + "&nbsp;hPa</dd></div>"
-    + "</dl>"
+    + '<dl class="meteo-mesures">' + html_mesuresTuile(mesure) + "</dl>"
     + '<p class="meteo-pied"><span>Relevé ' + hhmm + "</span>"
     +   '<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">données Open-Meteo</a></p>'
     + "</div>";
+  MESURE_COURANTE = mesure; LIEU_COURANT = lieu; QUAND_COURANT = quand;
   $("tuileMeteo").hidden = false;
   $("btnPosition").addEventListener("click", demanderPosition);
   // Actualiser force le relevé, sans attendre l'expiration du cache.
@@ -817,6 +867,7 @@ function chargerMeteo(force) {
     try {
       const cache = JSON.parse(localStorage.getItem(CLE_METEO) || "null");
       if (cache && cache.mesure
+          && cache.mesure.wind_gusts_10m != null   // relevé d'une version antérieure : à rejeter
           && Date.now() - cache.quand < FRAICHEUR_METEO
           && cache.lat === lieu.lat && cache.lon === lieu.lon) {
         peindreMeteo(cache.mesure, lieu, cache.quand);
@@ -916,6 +967,238 @@ function demanderPosition() {
     nommerLieu(lieu);
   }, () => { /* refusée ou impossible : on reste sur le lieu du catalogue */ },
   { timeout: 8000 });
+}
+
+/* ---------------------------------------------------------------------
+   MÉTÉO DÉTAILLÉE
+
+   Un clic sur la tuile ouvre le panneau : le moment présent dans le
+   détail, les prochaines vingt-quatre heures, la semaine, le soleil,
+   la qualité de l'air — et le composeur, qui décide de ce que la tuile
+   affiche. Deux requêtes de plus, prévisions et air, toutes deux
+   Open-Meteo, sans clé, gardées vingt minutes. La qualité de l'air peut
+   manquer sans que le reste en souffre : sa section disparaît, voilà
+   tout.
+   --------------------------------------------------------------------- */
+const CLE_METEO_DETAIL = "hub_b27_meteo_detail";
+
+function tirerPrevisions(lieu) {
+  const url = "https://api.open-meteo.com/v1/forecast"
+    + "?latitude=" + encodeURIComponent(lieu.lat)
+    + "&longitude=" + encodeURIComponent(lieu.lon)
+    + "&hourly=temperature_2m,precipitation_probability,weather_code"
+    + "&daily=weather_code,temperature_2m_max,temperature_2m_min,"
+    + "precipitation_sum,precipitation_probability_max,wind_speed_10m_max,"
+    + "wind_gusts_10m_max,sunrise,sunset,daylight_duration,uv_index_max"
+    + "&forecast_days=7&wind_speed_unit=kmh&timezone=auto";
+  const options = {};
+  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
+    options.signal = AbortSignal.timeout(8000);
+  }
+  return fetch(url, options).then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)));
+}
+
+function tirerAir(lieu) {
+  const url = "https://air-quality-api.open-meteo.com/v1/air-quality"
+    + "?latitude=" + encodeURIComponent(lieu.lat)
+    + "&longitude=" + encodeURIComponent(lieu.lon)
+    + "&current=european_aqi,pm10,pm2_5,nitrogen_dioxide,ozone,"
+    + "alder_pollen,birch_pollen,grass_pollen&timezone=auto";
+  const options = {};
+  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
+    options.signal = AbortSignal.timeout(8000);
+  }
+  return fetch(url, options).then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)));
+}
+
+// L'indice européen de qualité de l'air, par paliers officiels.
+function libelleAqi(v) {
+  if (v <= 20) return { t: "Bon", c: "#7ab648" };
+  if (v <= 40) return { t: "Correct", c: "#a8c24a" };
+  if (v <= 60) return { t: "D\u00e9grad\u00e9", c: "#c9a227" };
+  if (v <= 80) return { t: "Mauvais", c: "#c4562f" };
+  if (v <= 100) return { t: "Tr\u00e8s mauvais", c: "#b0303f" };
+  return { t: "Extr\u00eame", c: "#8a2fb0" };
+}
+
+function heureCourte(iso) {
+  return iso && iso.length >= 16 ? iso.slice(11, 16) : "\u2014";
+}
+
+function html_detailMeteo(d) {
+  const m = MESURE_COURANTE, prev = d.prev, air = d.air;
+  const t = tempsDe(m.weather_code);
+  let h = "";
+
+  // ---- le moment présent, toutes mesures dehors
+  h += '<div class="md-actuel">'
+    + '<span class="meteo-icone">' + ico(t.icone, 44, 1.5) + "</span>"
+    + '<span class="md-temp">' + ech(virgule(m.temperature_2m)) + "<small>\u00b0C</small></span>"
+    + '<span class="md-quoi"><span class="md-libelle">' + ech(t.libelle) + "</span>"
+    + '<span class="md-sous">' + ech(LIEU_COURANT.nom || "Position choisie")
+    + " \u00b7 relev\u00e9 " + heureCourte(new Date(QUAND_COURANT - new Date().getTimezoneOffset() * 60000).toISOString()) + "</span></span>"
+    + "</div>"
+    + '<dl class="md-grille">'
+    + Object.keys(METRIQUES).map(k => {
+        let v; try { v = METRIQUES[k].val(m); } catch (e) { v = null; }
+        return "<div><dt>" + ech(METRIQUES[k].nom) + "</dt><dd>"
+          + (v == null || /NaN|undefined/.test(String(v)) ? "\u2014" : v) + "</dd></div>";
+      }).join("")
+    + "</dl>";
+
+  // ---- les prochaines vingt-quatre heures, de trois en trois
+  if (prev && prev.hourly && prev.hourly.time) {
+    const H = prev.hourly;
+    const maintenant = new Date();
+    let i0 = H.time.findIndex(x => new Date(x) >= maintenant);
+    if (i0 < 0) i0 = 0;
+    let hh = "";
+    for (let i = i0; i < Math.min(i0 + 24, H.time.length); i += 3) {
+      const w = tempsDe(H.weather_code[i]);
+      hh += '<div class="md-heure"><span class="quand">' + heureCourte(H.time[i]) + "</span>"
+        + ico(w.icone, 17)
+        + "<b>" + Math.round(H.temperature_2m[i]) + "\u00b0</b>"
+        + '<span class="pluie">' + (H.precipitation_probability ? Math.round(H.precipitation_probability[i]) + "\u00a0%" : "") + "</span></div>";
+    }
+    h += '<div class="stats-groupe"><h3 data-ico="horloge" data-ico-taille="13">Prochaines 24 heures</h3>'
+      + '<div class="md-heures">' + hh + "</div></div>";
+  }
+
+  // ---- la semaine
+  if (prev && prev.daily && prev.daily.time) {
+    const D = prev.daily;
+    const noms = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
+    h += '<div class="stats-groupe"><h3 data-ico="calendrier" data-ico-taille="13">La semaine</h3><div class="md-jours">'
+      + D.time.map((jour, i) => {
+          const w = tempsDe(D.weather_code[i]);
+          const dj = new Date(jour + "T12:00");
+          return '<div class="md-jour">'
+            + '<span class="quand">' + (i === 0 ? "auj." : noms[dj.getDay()] + " " + dj.getDate()) + "</span>"
+            + ico(w.icone, 17)
+            + '<span class="temps">' + ech(w.libelle) + "</span>"
+            + '<span class="pluie">' + virgule(D.precipitation_sum[i]) + "\u00a0mm \u00b7 "
+            + Math.round(D.precipitation_probability_max[i]) + "\u00a0% \u00b7 vent "
+            + Math.round(D.wind_speed_10m_max[i]) + "</span>"
+            + "<b>" + Math.round(D.temperature_2m_max[i]) + "\u00b0<small> / "
+            + Math.round(D.temperature_2m_min[i]) + "\u00b0</small></b>"
+            + "</div>";
+        }).join("")
+      + "</div></div>";
+
+    // ---- le soleil du jour
+    const dj = prev.daily;
+    const duree = Math.round(dj.daylight_duration[0] / 60);
+    h += '<div class="stats-groupe"><h3 data-ico="soleil" data-ico-taille="13">Le soleil</h3>'
+      + '<dl class="md-grille">'
+      + "<div><dt>Lever</dt><dd>" + heureCourte(dj.sunrise[0]) + "</dd></div>"
+      + "<div><dt>Coucher</dt><dd>" + heureCourte(dj.sunset[0]) + "</dd></div>"
+      + "<div><dt>Jour</dt><dd>" + Math.floor(duree / 60) + "\u00a0h\u00a0" + String(duree % 60).padStart(2, "0") + "</dd></div>"
+      + "<div><dt>UV max</dt><dd>" + virgule(dj.uv_index_max[0]) + "</dd></div>"
+      + "</dl></div>";
+  }
+
+  // ---- la qualité de l'air, si le service a répondu
+  if (air && air.current && isFinite(air.current.european_aqi)) {
+    const c = air.current;
+    const q = libelleAqi(c.european_aqi);
+    const pollen = [["Aulne", c.alder_pollen], ["Bouleau", c.birch_pollen], ["Gramin\u00e9es", c.grass_pollen]]
+      .filter(x => isFinite(x[1]) && x[1] > 0);
+    h += '<div class="stats-groupe"><h3 data-ico="feuille" data-ico-taille="13">Qualit\u00e9 de l\u2019air'
+      + ' <span class="aqi" style="--c:' + q.c + '"><i></i>' + ech(q.t) + " \u00b7 " + Math.round(c.european_aqi) + "</span></h3>"
+      + '<dl class="md-grille">'
+      + "<div><dt>PM2,5</dt><dd>" + virgule(c.pm2_5) + "\u00a0\u00b5g/m\u00b3</dd></div>"
+      + "<div><dt>PM10</dt><dd>" + virgule(c.pm10) + "\u00a0\u00b5g/m\u00b3</dd></div>"
+      + "<div><dt>NO\u2082</dt><dd>" + virgule(c.nitrogen_dioxide) + "\u00a0\u00b5g/m\u00b3</dd></div>"
+      + "<div><dt>O\u2083</dt><dd>" + virgule(c.ozone) + "\u00a0\u00b5g/m\u00b3</dd></div>"
+      + pollen.map(x => "<div><dt>Pollen " + x[0].toLowerCase() + "</dt><dd>" + Math.round(x[1]) + "\u00a0gr/m\u00b3</dd></div>").join("")
+      + "</dl></div>";
+  }
+
+  // ---- le composeur de tuile
+  const choisis = champsChoisis();
+  h += '<div class="stats-groupe"><h3 data-ico="engrenage" data-ico-taille="13">Composer la tuile</h3>'
+    + '<p class="note">Les mesures cochées sont celles que la tuile du portail affiche, jusqu\u2019\u00e0 '
+    + CHAMPS_MAX + ". Ce choix reste dans ce navigateur.</p>"
+    + '<div class="md-composer">'
+    + Object.keys(METRIQUES).map(k =>
+        '<label><input type="checkbox" data-champ="' + k + '"'
+        + (choisis.indexOf(k) !== -1 ? " checked" : "") + "><span>"
+        + ech(METRIQUES[k].nom) + "</span></label>").join("")
+    + "</div></div>";
+
+  h += '<p class="md-note"><span>Mod\u00e8le best_match \u00b7 point \u00e0 '
+    + (prev && isFinite(prev.elevation) ? Math.round(prev.elevation) + "\u00a0m d\u2019altitude" : "altitude inconnue")
+    + "</span><a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener noreferrer\">donn\u00e9es Open-Meteo</a></p>";
+  return h;
+}
+
+function peindreDetailMeteo(d) {
+  const corps = $("meteoDetail");
+  corps.innerHTML = html_detailMeteo(d);
+  poserIcones(corps);
+  // Le composeur agit tout de suite : cocher recompose la tuile derrière
+  // le panneau, sans requête, la mesure courante étant déjà là.
+  corps.querySelectorAll("[data-champ]").forEach(c => {
+    c.addEventListener("change", () => {
+      let actifs = [...corps.querySelectorAll("[data-champ]:checked")].map(x => x.dataset.champ);
+      if (actifs.length > CHAMPS_MAX) { c.checked = false; return; }
+      if (!actifs.length) { c.checked = true; return; }   // une mesure au moins
+      // L'ordre affiché est celui du registre, pas celui des clics : stable.
+      actifs = Object.keys(METRIQUES).filter(k => actifs.indexOf(k) !== -1);
+      try { localStorage.setItem(CLE_METEO_CHAMPS, JSON.stringify(actifs)); } catch (e) { /* tant pis */ }
+      if (MESURE_COURANTE) peindreMeteo(MESURE_COURANTE, LIEU_COURANT, QUAND_COURANT);
+    });
+  });
+}
+
+function ouvrirDetailMeteo() {
+  if (!MESURE_COURANTE) return;
+  const dlg = $("dlgMeteo");
+  $("dlgMeteoTitre").innerHTML = ico("nuage", 15) + " M\u00e9t\u00e9o \u00e0 " + ech(LIEU_COURANT.nom || "votre position");
+  dlg.showModal();
+
+  const lieu = LIEU_COURANT;
+  try {
+    const cache = JSON.parse(localStorage.getItem(CLE_METEO_DETAIL) || "null");
+    if (cache && Date.now() - cache.quand < FRAICHEUR_METEO
+        && cache.lat === lieu.lat && cache.lon === lieu.lon) {
+      peindreDetailMeteo(cache);
+      return;
+    }
+  } catch (e) { /* cache illisible : on redemande */ }
+
+  $("meteoDetail").innerHTML = '<p class="note">Interrogation du mod\u00e8le\u2026</p>';
+  // L'air peut échouer seul : sa promesse est amortie, le panneau s'ouvre
+  // avec ce qui a répondu.
+  Promise.all([tirerPrevisions(lieu), tirerAir(lieu).catch(() => null)])
+    .then(([prev, air]) => {
+      const d = { quand: Date.now(), lat: lieu.lat, lon: lieu.lon, prev, air };
+      try { localStorage.setItem(CLE_METEO_DETAIL, JSON.stringify(d)); } catch (e) { /* trop gros ou refusé */ }
+      peindreDetailMeteo(d);
+    })
+    .catch(() => {
+      $("meteoDetail").innerHTML = '<p class="note">Les pr\u00e9visions ne r\u00e9pondent pas. '
+        + "R\u00e9seau coup\u00e9 ou service indisponible : r\u00e9essayez plus tard.</p>";
+    });
+}
+
+function initDetailMeteo() {
+  const dlg = $("dlgMeteo");
+  $("btnMeteoFermer").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", ev => {
+    const r = dlg.getBoundingClientRect();
+    const dedans = ev.clientX >= r.left && ev.clientX <= r.right
+      && ev.clientY >= r.top && ev.clientY <= r.bottom;
+    if (!dedans) dlg.close();
+  });
+  // Le clic sur la tuile ouvre le panneau, sauf sur ses boutons et liens,
+  // et sauf en pastille repliée, où le clic ramène en haut de page.
+  $("tuileMeteo").addEventListener("click", ev => {
+    if (ev.target.closest("button, a")) return;
+    if (document.body.classList.contains("defile")) return;
+    ouvrirDetailMeteo();
+  });
+  $("tuileMeteo").setAttribute("title", "D\u00e9tails et r\u00e9glages");
 }
 
 /* ---------------------------------------------------------------------
@@ -1304,6 +1587,7 @@ function init() {
   initReflets();
   initAncre();
   initApropos();
+  initDetailMeteo();
   chargerMeteo();
   initVeille();
 

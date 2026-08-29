@@ -440,6 +440,71 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   .cal-grille span{height:24px;font-size:11.5px;border-radius:6px}
 }
 
+/* ===================================================== MÉTÉO DÉTAIL ==
+   Le panneau ouvert d'un clic sur la tuile : le moment présent en grand,
+   les prochaines heures, la semaine, le soleil, l'air. Et le composeur,
+   qui décide de ce que la petite tuile affiche. */
+.modale-large{width:min(680px,calc(100vw - 32px))}
+.md-actuel{display:flex;align-items:center;gap:16px;margin:0 0 6px}
+.md-actuel .meteo-icone .ico{width:44px;height:44px}
+.md-temp{font-size:38px;font-weight:800;letter-spacing:-1.5px;line-height:1;font-variant-numeric:tabular-nums}
+.md-temp small{font-size:17px;font-weight:600;color:var(--encre-2);vertical-align:13px}
+.md-quoi{display:flex;flex-direction:column;gap:2px}
+.md-libelle{font-size:15px;font-weight:700}
+.md-sous{font-size:12px;color:var(--discret)}
+.md-grille{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:7px;margin:12px 0 0;
+}
+.md-grille div{
+  display:flex;flex-direction:column;gap:1px;padding:9px 12px;
+  border:1px solid var(--ligne);border-radius:10px;background:var(--carte);
+}
+.md-grille dt{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--discret)}
+.md-grille dd{margin:0;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.md-heures{
+  display:flex;gap:4px;overflow-x:auto;padding:2px 0 6px;
+  scrollbar-width:thin;
+}
+.md-heure{
+  flex:1 0 58px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 4px;border:1px solid var(--ligne);border-radius:10px;
+  font-size:11.5px;font-variant-numeric:tabular-nums;
+}
+.md-heure .ico{color:var(--accent)}
+[data-theme="light"] .md-heure .ico{color:#5f7f1f}
+.md-heure b{font-size:13px}
+.md-heure .quand{color:var(--discret)}
+.md-heure .pluie{color:var(--discret);font-size:10.5px}
+.md-jours{display:flex;flex-direction:column;gap:4px}
+.md-jour{
+  display:grid;grid-template-columns:44px 22px 1fr auto auto;gap:10px;align-items:center;
+  padding:8px 12px;border:1px solid var(--ligne);border-radius:10px;
+  font-size:12.5px;font-variant-numeric:tabular-nums;
+}
+.md-jour .ico{color:var(--accent)}
+[data-theme="light"] .md-jour .ico{color:#5f7f1f}
+.md-jour .quand{color:var(--discret);text-transform:capitalize}
+.md-jour .temps{color:var(--encre-2)}
+.md-jour .pluie{color:var(--discret);font-size:11.5px;white-space:nowrap}
+.md-jour b{white-space:nowrap}
+.md-jour b small{color:var(--discret);font-weight:600}
+.aqi{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  padding:3px 10px;border-radius:99px;border:1px solid var(--ligne-forte);
+}
+.aqi i{width:8px;height:8px;border-radius:50%;background:var(--c,#95c03d);font-style:normal}
+.md-composer{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;margin:8px 0 0}
+.md-composer label{
+  display:flex;align-items:center;gap:8px;font-size:13px;color:var(--encre-2);
+  cursor:pointer;padding:3px 0;
+}
+.md-composer input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.md-composer input:disabled + span{opacity:.45}
+.md-note{margin:10px 0 0;font-size:10.5px;color:var(--discret);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.md-note a{color:inherit;text-decoration:underline;text-decoration-color:var(--ligne-forte)}
+#tuileMeteo{cursor:pointer}
+
 /* ============================================================ ÉTROIT == */
 @media (max-width:720px){
   .portail{padding:0 14px 84px}

@@ -2,6 +2,20 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, la meteo en grand (v9)
+
+L'utilisateur envoie le catalogue complet des API Open-Meteo et rappelle son fil rouge, la precision : la tuile doit s'ouvrir sur tout ce qui est disponible pour sa position, et chacun doit pouvoir composer les mesures qu'elle affiche par defaut.
+
+**Le panneau detaille**, d'un clic sur la tuile (sauf sur ses boutons, et sauf en pastille repliee ou le clic continue de ramener en haut) : les dix mesures du moment, les prochaines vingt-quatre heures de trois en trois avec probabilite de pluie, la semaine complete, le soleil (lever, coucher, duree du jour, UV max), la qualite de l'air a l'indice europeen avec PM2,5, PM10, NO2, O3 et les pollens d'aulne, de bouleau et de graminees. En pied, l'altitude du point de calcul et le modele. Deux requetes de plus, previsions et air, sans cle, cache vingt minutes ; l'air est amorti et peut manquer seul.
+
+**Le point de rosee est calcule, pas fourni** : formule de Magnus depuis temperature et humidite. C'est la donnee du fluidiste — celle de la condensation — et le service ne la donne pas en mesure courante.
+
+**Le composeur** : dix mesures au registre, des cases dans le panneau, entre une et six sur la tuile, ordre stable du registre. Choix enregistre en localStorage (`hub_b27_meteo_champs`), par navigateur, sans compte, comme le theme. Cocher recompose la tuile immediatement et sans requete, la mesure courante etant gardee sous la main.
+
+La requete de la tuile s'est elargie (rafales, nebulosite, pressions, UV, precipitations) : un cache ecrit par une version anterieure est rejete faute de ces champs.
+
+Verifie en apercu sur donnees reelles : Dijon, couvert 22,2 degres, rosee 13,0, rafales 28 km/h, AQI 24 correct ; composition testee de bout en bout, la tuile suit et le choix persiste.
+
 ## 2026-08-29, le ciel devient lisible
 
 Retour de l'utilisateur, a Dijon sous un ciel couvert : le fond n'a pas change, toujours le meme vent leger qui fait des loopings. Il a raison, et le diagnostic est instructif : mes ambiances calme, couvert et soleil ne differaient que par la vitesse et l'opacite — techniquement actives, perceptivement identiques. Une differenciation que personne ne voit n'existe pas.
