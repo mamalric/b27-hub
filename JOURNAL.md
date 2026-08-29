@@ -2,6 +2,24 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, tableau de bord et personnalisation sans compte
+
+L'utilisateur veut quelque chose de plus accueillant, capture d'un tableau de bord à l'appui (portail Jobie) : barre latérale, recherche en haut, cartes chiffrées colorées, carte de profil. Contrainte posée par lui : pas de portail de connexion, et il pense qu'il n'y en aura jamais.
+
+**Le point qui débloque tout.** Ce qui rend ce genre de page accueillante, c'est qu'elle a l'air de vous appartenir, et cela semble exiger un compte. Ce n'est pas le cas : sans identité, la personnalisation peut vivre en `localStorage`. Épingler une porte, et retrouver ce qu'on a ouvert récemment, sont deux choses personnelles qui ne demandent aucune inscription et ne sortent pas du poste. C'est ce qui remplace la carte de profil de la référence.
+
+**Disposition.** Barre latérale permanente, chaque catégorie portant sa couleur de lot, la catégorie courante teintée de cette même couleur. Sous 960 px elle sort du flux et devient un tiroir, ouvert par un bouton, refermé par le voile, par Échap ou en suivant un lien : c'est la même barre, seule sa position change. Recherche au centre de la barre du haut. Titre de page et titre d'onglet suivent le niveau, un onglet parmi douze devant dire où il mène.
+
+**Quatre cartes chiffrées** à l'arrivée : portes ouvertes, nos outils, ressources, en préparation. Leurs teintes sont plus foncées que celles des tuiles, et c'est délibéré : une tuile ne porte qu'un glyphe, seuil 3:1, une carte chiffrée porte du texte de petite taille, seuil 4,5:1. Le bleu et l'ocre ont donc été assombris.
+
+**Ce que je n'ai pas repris de la référence.** Le graphique. Un hub n'a aucune donnée à tracer, une courbe y serait de la décoration déguisée en information. La carte de profil non plus, remplacée par la salutation selon l'heure et les raccourcis.
+
+**Détails de mise en oeuvre.** La carte reste un lien pur, l'épingle se pose par-dessus en frère : un bouton dans un lien serait invalide, et cliquer sur l'épingle suivrait le lien. L'épingle ne se montre qu'au survol ou si elle est posée, sauf sur tactile où elle reste visible. Les deux listes sont filtrées contre le catalogue à la lecture, faute de quoi une porte retirée y laisserait un fantôme. Un seul écouteur de clic pour toute la page plutôt qu'un par carte, les grilles étant reconstruites à chaque navigation.
+
+**Un défaut trouvé à l'essai.** Les raccourcis n'étaient construits qu'au chargement : ouvrir une porte puis revenir au hall n'y ajoutait rien tant qu'on ne rechargeait pas la page. Ils sont désormais reconstruits à chaque retour au hall, et `rendre()` en est le seul responsable.
+
+**Vérifications.** Parcours complet : entrer dans un dossier, épingler, revenir au hall, voir apparaître le bloc et disparaître l'invite. Ouverture de deux portes simulée sans ouvrir d'onglet, avec contrôle du contenu de `localStorage` puis de l'affichage. Clair et sombre, ordinateur et mobile. Tiroir mesuré ouvert et fermé. Aucun débordement horizontal, console propre.
+
 ## 2026-08-29, navigation par dossiers
 
 Retour de l'utilisateur sur la présentation : il veut une navigation par dossiers, pas une liste à plat. Des cartes carrées avec une icône au centre, le nom en dessous qui n'apparaît qu'au survol, des micro-animations, et une descente par catégories puis sous-catégories jusqu'à l'élément final.

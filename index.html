@@ -17,7 +17,6 @@
 <meta property="og:description" content="Le hall d'entrée des outils et applications du bureau d'études B27.">
 
 <link rel="icon" href="logo-b27.svg">
-
 <link rel="stylesheet" href="hub.css">
 
 <!-- Thème posé avant le premier rendu : sans cette ligne, un poste réglé en
@@ -27,50 +26,59 @@
 
 <body>
 
-<header>
-  <span class="logo" id="enteteLogo"></span>
-  <div class="titre">
-    <h1 id="titreHub">Outils B27</h1>
-    <span class="sub" id="sousTitreHub"></span>
+<!-- Barre latérale : toutes les catégories accessibles d'un clic, depuis
+     n'importe où. Sur mobile elle se rétracte et s'ouvre par le bouton de la
+     barre du haut. Son contenu est construit par hub.js. -->
+<aside class="rail" id="rail" aria-label="Navigation principale">
+  <div class="rail-marque">
+    <span class="rail-logo" id="railLogo"></span>
+    <span class="rail-nom">
+      <b id="railTitre">Outils B27</b>
+      <small id="railSousTitre"></small>
+    </span>
   </div>
-  <span class="espace"></span>
-  <button type="button" class="bouton-icone noprint" id="btnTheme" aria-label="Changer de thème"></button>
-  <button type="button" class="bouton-icone noprint" id="btnApropos" data-ico="engrenage" aria-label="À propos du hub" title="À propos du hub"></button>
-</header>
+  <nav class="rail-nav" id="railNav"></nav>
+  <div class="rail-pied" id="railPied"></div>
+</aside>
 
-<!-- Bandeau d'accueil. Logo, accroche et compte des portes ouvertes sont
-     posés par hub.js depuis les réglages du catalogue. -->
-<section class="hall">
-  <div class="hall-dedans">
-    <span class="hall-logo" id="hallLogo"></span>
-    <div class="hall-mots">
-      <p class="hall-accroche" id="hallAccroche" hidden></p>
-      <p class="hall-chapeau" id="hallChapeau" hidden></p>
-    </div>
-    <ul class="hall-chiffres" id="hallChiffres"></ul>
-  </div>
-</section>
+<!-- Voile d'assombrissement du tiroir sur mobile. -->
+<div class="rail-voile" id="railVoile" hidden></div>
 
-<div class="wrap">
-  <!-- Barre de recherche : construite par hub.js seulement au-delà de
-       REGLAGES.seuilFiltres portes, elle reste vide en dessous. -->
-  <div class="barre noprint" id="barre"></div>
+<div class="page">
 
-  <!-- Fil d'Ariane, vide au niveau du hall. -->
-  <div id="filAriane"></div>
+  <header class="barre-haute">
+    <button type="button" class="bouton-icone noprint" id="btnRail" aria-label="Ouvrir la navigation" aria-expanded="false"></button>
+    <h1 id="titrePage">Hall</h1>
+    <div class="barre-recherche noprint" id="barre"></div>
+    <span class="espace"></span>
+    <button type="button" class="bouton-icone noprint" id="btnTheme" aria-label="Changer de thème"></button>
+    <button type="button" class="bouton-icone noprint" id="btnApropos" data-ico="engrenage" aria-label="À propos du hub" title="À propos du hub"></button>
+  </header>
 
-  <!-- Dossiers ou portes, selon l'endroit où l'on est dans l'arborescence.
-       Tout est construit à partir de catalogue.js, rien à écrire ici. -->
-  <div id="contenu"></div>
+  <main class="wrap">
+    <!-- Accueil : salutation, chiffres, raccourcis. Masqué dès qu'on entre
+         dans un dossier ou qu'une recherche est en cours. -->
+    <section class="accueil" id="accueil">
+      <p class="salut" id="salut"></p>
+      <p class="chapeau" id="chapeau"></p>
+      <div class="chiffres" id="chiffres"></div>
+      <div id="raccourcis"></div>
+    </section>
+
+    <!-- Fil d'Ariane, puis dossiers ou portes selon l'endroit. -->
+    <div id="filAriane"></div>
+    <div id="contenu"></div>
+  </main>
+
+  <footer class="pied">
+    <span id="piedCompte"></span>
+    <span class="sep">|</span>
+    <span>Le hub ne fait que rediriger : il ne collecte rien. Vos épingles, vos ouvertures récentes et votre thème restent dans ce navigateur.</span>
+    <br>
+    <span id="piedContact"></span>
+  </footer>
+
 </div>
-
-<footer class="pied">
-  <span id="piedCompte"></span>
-  <span class="sep">|</span>
-  <span>Le hub ne fait que rediriger : il ne collecte rien et n'enregistre que votre choix de thème.</span>
-  <br>
-  <span id="piedContact"></span>
-</footer>
 
 <dialog id="dlgApropos" class="modale noprint" aria-labelledby="dlgAproposTitre">
   <div class="modale-tete">
@@ -82,8 +90,7 @@
 </dialog>
 
 <!-- catalogue.js d'abord : hub.js le lit au chargement.
-     signalement.js est autonome et n'a besoin de rien d'autre ; il pose la
-     pastille de signalement, en bas à droite. Le retirer ne casse rien. -->
+     signalement.js est autonome et pose la pastille en bas à droite. -->
 <script src="catalogue.js"></script>
 <script src="signalement.js"></script>
 <script src="hub.js"></script>

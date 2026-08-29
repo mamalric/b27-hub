@@ -2,9 +2,14 @@
    hub.css : habillage du hall d'entrée des outils B27.
    =====================================================================
 
-   La palette, les rayons, les ombres et la pile de polices sont repris tels
-   quels du Sélectionneur de radiateurs et de la Calculette ECS et Bouclage,
-   pour qu'un collègue qui passe du hall à un outil ne change pas d'univers.
+   Disposition de tableau de bord : une barre latérale permanente à gauche,
+   une recherche en haut, le contenu au centre. C'est ce qui distingue un
+   hall d'une simple arborescence : toutes les catégories sont à un clic,
+   depuis n'importe où, on n'a jamais à remonter pour changer de branche.
+
+   La palette, les rayons et la pile de polices restent celles du
+   Sélectionneur de radiateurs et de la Calculette ECS et Bouclage, pour
+   qu'un collègue qui passe du hall à un outil ne change pas d'univers.
 
    Deux verts, et ils ne font pas le même travail :
      --marque    #95c03d, le vert exact du logo B27. Il ne sert qu'au logo.
@@ -17,7 +22,7 @@
 
 :root{
   color-scheme: light;
-  --fond:#eef0ed;
+  --fond:#f3f5f2;
   --papier:#ffffff;
   --papier-2:#f4f6f3;
   --papier-3:#e8ebe6;
@@ -46,24 +51,19 @@
   --rayon-g:14px;
   --ombre:0 1px 2px rgba(30,34,32,.05), 0 6px 20px rgba(30,34,32,.06);
   --ombre-haute:0 2px 4px rgba(30,34,32,.06), 0 12px 28px rgba(30,34,32,.10);
-  /* Tuile d'icône d'application : un dégradé très court entre l'olive des
-     outils et le vert profond de B27 Mobility. Les deux valeurs tiennent au
-     moins 3:1 avec le blanc du glyphe, seuil des éléments graphiques. Elle ne
-     change pas avec le thème : une icône d'application garde sa couleur, quel
-     que soit le fond de l'écran d'accueil. */
+  /* Tuile d'icône d'application : la teinte vient de la catégorie, le bas du
+     dégradé est calculé. --app-haut sert de repli quand aucune n'est déclarée. */
   --app-haut:#779c2b;
-  --app-bas:#5f7f1f;
   --ombre-app:0 3px 8px rgba(30,34,32,.16), 0 8px 20px rgba(30,34,32,.10);
   --ombre-app-haute:0 6px 14px rgba(30,34,32,.20), 0 16px 34px rgba(30,34,32,.16);
   --vitesse:.12s;
-  /* Les dossiers ont leur propre allure de mouvement : un peu plus lente et
-     décélérée, pour que le nom qui se révèle ait le temps de se lire. */
   --vitesse-dossier:.22s;
   --courbe:cubic-bezier(.2,.7,.3,1);
+  --rail:250px;
 }
 [data-theme="dark"]{
   color-scheme: dark;
-  --fond:#101211;
+  --fond:#0e100f;
   --papier:#1a1d1b;
   --papier-2:#232725;
   --papier-3:#2c312e;
@@ -102,6 +102,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   font-family:Inter,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   margin:0;color:var(--encre);background:var(--fond);font-size:14px;line-height:1.5;
+  display:flex;min-height:100vh;
   transition:background-color var(--vitesse),color var(--vitesse);
 }
 a{color:var(--lien);text-decoration:none}
@@ -110,101 +111,116 @@ a:hover{text-decoration:underline}
 .ico{vertical-align:-3px;flex:none}
 .logo-b27{display:block}
 
-/* Entrée des éléments d'une grille, légèrement décalée d'un élément à
-   l'autre : le regard suit la construction au lieu de recevoir tout d'un
-   bloc. Le remplissage est "backwards" et non "both" : la valeur de
-   remplissage ne vaut alors que pendant le délai, et pas après la fin de
-   l'animation, faute de quoi le transform final bloquerait celui du survol. */
 @keyframes entree{
   from{opacity:0;transform:translateY(9px)}
   to{opacity:1;transform:none}
 }
 
-/* ---------------------------------------------------------------- en-tête */
-header{
-  display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;
-  padding:12px 22px;background:var(--papier);border-bottom:1px solid var(--ligne);
-  position:sticky;top:0;z-index:6;box-shadow:0 1px 3px rgba(0,0,0,.05);
+/* ==================================================== BARRE LATÉRALE ==
+   Elle reste en place, la page défile à côté. Sur écran étroit elle sort du
+   flux et devient un tiroir, ouvert par le bouton de la barre du haut. */
+.rail{
+  width:var(--rail);flex:none;
+  position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;
+  background:var(--papier);border-right:1px solid var(--ligne);
+  z-index:20;
 }
-header .logo{color:var(--marque);flex:none;display:inline-flex;align-items:center}
-header .titre{display:flex;flex-direction:column;gap:1px;min-width:0;flex:0 1 auto}
-header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.3px;color:var(--encre);line-height:1.2}
-header .sub{font-size:12.5px;color:var(--discret);font-weight:400}
-header .espace{flex:1}
+.rail-marque{
+  display:flex;align-items:center;gap:11px;
+  padding:18px 18px 16px;border-bottom:1px solid var(--ligne-2);
+}
+.rail-logo{color:var(--marque);flex:none;line-height:0}
+.rail-nom{display:flex;flex-direction:column;min-width:0;gap:1px}
+.rail-nom b{font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
+.rail-nom small{font-size:11.5px;color:var(--discret);line-height:1.3}
+
+.rail-nav{flex:1;overflow-y:auto;padding:12px 10px}
+.rail-titre{
+  margin:14px 0 6px;padding:0 8px;
+  font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--discret);
+}
+.rail-lien{
+  display:flex;align-items:center;gap:11px;
+  padding:8px 9px;border-radius:var(--rayon-s);margin-bottom:2px;
+  color:var(--encre-2);font-size:13.5px;font-weight:600;
+  transition:background-color var(--vitesse),color var(--vitesse);
+}
+.rail-lien:hover{background:var(--papier-2);color:var(--encre);text-decoration:none}
+/* La catégorie courante est teintée de sa propre couleur, pas d'un vert
+   générique : c'est le même repère que sur sa tuile. */
+.rail-lien.actif{
+  background:color-mix(in srgb, var(--c,var(--primaire)) 13%, transparent);
+  color:var(--encre);
+}
+.rail-lien > span:not(.rail-puce):not(.rail-compte){
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.rail-puce{
+  width:28px;height:28px;flex:none;border-radius:8px;
+  display:grid;place-items:center;color:#fff;
+  background:var(--c,var(--primaire));
+}
+.rail-compte{
+  font-size:11px;font-weight:600;color:var(--discret);
+  font-variant-numeric:tabular-nums;flex:none;
+}
+.rail-pied{padding:12px 14px 16px;border-top:1px solid var(--ligne-2)}
+.rail-contact{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--discret)}
+.rail-contact:hover{color:var(--primaire-encre);text-decoration:none}
+
+.rail-voile{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:19}
+
+/* ============================================================= PAGE == */
+.page{flex:1;min-width:0;display:flex;flex-direction:column}
+
+.barre-haute{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:14px 26px;background:var(--papier);border-bottom:1px solid var(--ligne);
+  position:sticky;top:0;z-index:15;
+}
+.barre-haute h1{
+  margin:0;font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--encre);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:34%;
+}
+.barre-haute .espace{flex:1}
+#btnRail{display:none}
 .bouton-icone{
   background:transparent;border:1px solid var(--ligne);color:var(--encre-2);border-radius:var(--rayon-s);
-  width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:background-color var(--vitesse),transform var(--vitesse);flex:none;
+  width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:background-color var(--vitesse),color var(--vitesse);flex:none;
 }
-.bouton-icone:hover{background:var(--papier-3);transform:rotate(15deg)}
+.bouton-icone:hover{background:var(--papier-2);color:var(--encre)}
 
-/* ------------------------------------------------------ bandeau d'accueil
-   Le seuil du hall. Il ne se montre qu'au premier niveau : une fois dans un
-   dossier, l'en-tête suffit à porter l'identité et la place revient au
-   contenu. Le lavis vert est posé au radial-gradient, très dilué. */
-.hall{
-  background-color:var(--papier);
-  background-image:radial-gradient(56rem 22rem at 5% -45%, var(--marque-lavis), transparent 68%);
-  border-bottom:1px solid var(--ligne);
-}
-body.dedans .hall{display:none}
-.hall-dedans{
-  max-width:1200px;margin:0 auto;padding:34px 22px 28px;
-  display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;
-}
-.hall-logo{color:var(--marque);flex:none;line-height:0;padding-top:2px}
-.hall-mots{flex:1 1 420px;min-width:0}
-.hall-accroche{
-  margin:0 0 9px;font-size:27px;font-weight:800;letter-spacing:-.7px;
-  line-height:1.15;color:var(--encre);
-}
-.hall-chapeau{margin:0;font-size:14px;color:var(--encre-2);line-height:1.6;max-width:62ch}
-.hall-chiffres{
-  list-style:none;margin:20px 0 0;padding:0;flex-basis:100%;
-  display:flex;gap:8px;flex-wrap:wrap;
-}
-.hall-chiffres li{
-  font-size:12.5px;color:var(--discret);background:var(--papier-2);
-  border:1px solid var(--ligne);border-radius:999px;padding:4px 13px;
-}
-.hall-chiffres li b{color:var(--encre);font-weight:700;font-variant-numeric:tabular-nums}
-.hall-chiffres li.fort{background:var(--primaire-fond);border-color:var(--primaire-bord);color:var(--primaire-encre)}
-.hall-chiffres li.fort b{color:var(--primaire-encre)}
+.wrap{padding:26px;flex:1;max-width:1360px;width:100%}
+.pied{padding:10px 26px 34px;max-width:1360px;font-size:12px;color:var(--discret);line-height:1.7}
+.pied .sep{margin:0 7px;opacity:.5}
 
-.wrap{padding:24px 22px 20px;max-width:1200px;margin:0 auto}
-body.dedans .wrap{padding-top:20px}
-
-@media (max-width:560px){
-  header{padding:10px 16px;gap:6px 12px;flex-wrap:nowrap}
-  header h1{font-size:17px}
-  .hall-dedans{padding:24px 16px 22px;gap:16px}
-  .hall-accroche{font-size:22px;letter-spacing:-.5px}
-  .wrap{padding:20px 16px 16px}
-  footer.pied{padding:6px 16px 30px}
-}
-
-/* ------------------------------------------------------------- recherche
-   Elle traverse tous les niveaux d'un coup : chercher "INIES" depuis le
-   hall doit trouver, sans avoir à deviner dans quel dossier c'est rangé. */
-.barre{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 20px}
-.recherche{position:relative;flex:1 1 260px;max-width:420px}
+/* ------------------------------------------------------------ recherche
+   Au centre de la barre du haut, comme sur un tableau de bord : c'est le
+   geste le plus rapide quand on sait déjà ce qu'on cherche. Elle traverse
+   tous les niveaux d'un coup. */
+.barre-recherche{flex:1 1 240px;min-width:0;max-width:440px}
+.recherche{position:relative}
 .recherche .ico{
-  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
   color:var(--discret);pointer-events:none;
 }
 .recherche input{
   width:100%;font:inherit;font-size:13.5px;color:var(--encre);
-  background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon-s);
-  padding:8px 30px 8px 32px;
-  transition:border-color var(--vitesse),box-shadow var(--vitesse);
+  background:var(--papier-2);border:1px solid transparent;border-radius:999px;
+  padding:9px 32px 9px 36px;
+  transition:border-color var(--vitesse),box-shadow var(--vitesse),background-color var(--vitesse);
 }
 .recherche input::placeholder{color:var(--discret)}
-/* type="search" apporte la touche Échap pour vider le champ, mais aussi une
-   croix déjà dessinée par le navigateur, qui ferait doublon avec la nôtre. */
 .recherche input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
-.recherche input:focus{outline:none;border-color:var(--primaire);box-shadow:0 0 0 3px var(--anneau)}
+.recherche input:focus{
+  outline:none;background:var(--papier);
+  border-color:var(--primaire);box-shadow:0 0 0 3px var(--anneau);
+}
 .recherche .vider{
-  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
   width:22px;height:22px;padding:0;border:none;border-radius:50%;
   background:transparent;color:var(--discret);cursor:pointer;
   display:none;align-items:center;justify-content:center;
@@ -212,10 +228,71 @@ body.dedans .wrap{padding-top:20px}
 .recherche .vider:hover{background:var(--papier-3);color:var(--encre)}
 .recherche.remplie .vider{display:inline-flex}
 
+/* =========================================================== ACCUEIL ==
+   Ce bloc n'appartient qu'au hall. Il disparaît dès qu'on entre dans un
+   dossier ou qu'une recherche est en cours. */
+.salut{
+  margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-.7px;
+  line-height:1.15;color:var(--encre);
+}
+.chapeau{margin:0 0 22px;font-size:14px;color:var(--encre-2);line-height:1.6;max-width:64ch}
+
+/* ---- cartes chiffrées
+   Aplat coloré, texte blanc. Les teintes sont plus foncées que celles des
+   tuiles, et ce n'est pas une inadvertance : une tuile ne porte qu'un
+   glyphe, seuil de contraste 3:1, une carte chiffrée porte du texte de
+   petite taille, seuil 4,5:1. */
+.chiffres{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));
+  gap:14px;margin:0 0 28px;
+}
+.chiffre{
+  background:var(--c);color:#fff;border-radius:var(--rayon-g);
+  padding:16px 18px;
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px 14px;
+  align-items:center;
+  box-shadow:var(--ombre-app);
+  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
+  animation-delay:calc(var(--i, 0) * 40ms);
+}
+.chiffre-ico{
+  grid-area:1 / 1 / 4 / 2;align-self:center;
+  width:46px;height:46px;border-radius:13px;
+  background:rgba(255,255,255,.17);
+  display:grid;place-items:center;
+}
+.chiffre-titre{grid-area:1 / 2;font-size:12.5px;font-weight:700;opacity:.92}
+.chiffre-n{grid-area:2 / 2;font-size:30px;font-weight:800;line-height:1.08;font-variant-numeric:tabular-nums}
+.chiffre-detail{grid-area:3 / 2;font-size:11.5px;opacity:.86}
+
+/* ---- blocs du hall (raccourcis, récemment ouvert) */
+.bloc{margin:0 0 26px}
+.bloc > h2, .section > h2{
+  margin:0 0 13px;font-size:14.5px;font-weight:700;letter-spacing:-.2px;
+  color:var(--encre);display:flex;align-items:center;gap:10px;
+}
+.bloc > h2 .pave, .section > h2 .pave{
+  width:27px;height:27px;border-radius:var(--rayon-s);flex:none;
+  background:var(--c,var(--papier-3));color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.bloc > h2 .compte, .section > h2 .compte{
+  font-size:11.5px;font-weight:600;color:var(--discret);
+  background:var(--papier-2);border:1px solid var(--ligne-2);
+  border-radius:999px;padding:1px 8px;
+}
+
+/* Invite d'épinglage, tant que rien n'est épinglé. Elle explique une
+   fonction que rien d'autre n'annonce, plutôt que de laisser un vide. */
+.invite{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--papier);border:1px dashed var(--ligne);border-radius:var(--rayon-g);
+  padding:16px 18px;font-size:13px;color:var(--encre-2);line-height:1.6;max-width:74ch;
+}
+.invite .ico{color:var(--moyenne);margin-top:2px}
+.invite b{color:var(--encre)}
+
 /* ----------------------------------------------------------- fil d'Ariane */
-/* flex-wrap:nowrap sur le conteneur, et c'est le fil lui-même qui se replie
-   à l'intérieur. Sans cela, sur un écran étroit, c'est le bloc de fil entier
-   qui passait à la ligne et laissait le bouton Retour seul sur la sienne. */
 .fil{display:flex;align-items:flex-start;gap:11px;margin:0 0 18px;flex-wrap:nowrap}
 .fil-retour{
   width:34px;height:34px;flex:none;border-radius:var(--rayon-s);
@@ -225,24 +302,20 @@ body.dedans .wrap{padding-top:20px}
              border-color var(--vitesse),transform var(--vitesse);
 }
 .fil-retour:hover{
-  background:var(--primaire-fond);color:var(--primaire-encre);
-  border-color:var(--primaire-bord);text-decoration:none;transform:translateX(-2px);
+  background:var(--papier-2);color:var(--encre);
+  text-decoration:none;transform:translateX(-2px);
 }
-.fil-suite{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;flex:1 1 auto;min-width:0;padding-top:4px}
+.fil-suite{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;
+  flex:1 1 auto;min-width:0;padding-top:4px;
+}
 .fil-lien{color:var(--discret);display:inline-flex;align-items:center;gap:5px;font-weight:500}
 .fil-lien:hover{color:var(--primaire-encre);text-decoration:none}
-/* Le maillon courant fait office de titre de niveau : le bandeau d'accueil
-   ayant disparu dès qu'on entre dans un dossier, c'est lui qui dit où l'on se
-   trouve. Il porte donc son icône et un cran de graisse de plus. */
 .fil-ici{
   color:var(--encre);font-weight:700;letter-spacing:-.1px;font-size:14.5px;
   display:inline-flex;align-items:center;gap:7px;min-width:0;
 }
-/* L'icône du maillon courant reprend la teinte du dossier : c'est le même
-   repère de couleur que sur la tuile, il ne change pas en descendant. */
 .fil-ici .ico{color:var(--c,var(--primaire-encre))}
-/* Le compte annonce ce que contient le niveau avant même de regarder la
-   grille : cinq dossiers, six portes, une fiche. */
 .fil-compte{
   font-size:11.5px;font-weight:600;color:var(--discret);letter-spacing:0;
   background:var(--papier-2);border:1px solid var(--ligne-2);
@@ -251,26 +324,17 @@ body.dedans .wrap{padding-top:20px}
 .fil-sep{color:var(--ligne);display:inline-flex;align-items:center}
 [data-theme="dark"] .fil-sep{color:var(--encre-2);opacity:.45}
 
-/* ------------------------------------------------------------- dossiers
+/* ========================================================== DOSSIERS ==
    Des icônes d'application. Le carré plein coloré EST le dossier, le nom se
-   pose dessous, hors de la tuile, comme sur un écran d'accueil. Il n'y a donc
-   plus de carte autour : la tuile ne flotte pas dans un cadre, elle est
-   l'objet.
+   pose dessous, hors de la tuile, comme sur un écran d'accueil.
 
-   Le nom est visible PAR DÉFAUT, et c'est délibéré : c'est l'état sur
-   tablette et téléphone, où le survol n'existe pas et où des tuiles muettes
-   seraient indéchiffrables. C'est aussi le repli si la requête média n'est
-   pas comprise. Le masquage n'intervient qu'à l'intérieur du bloc
-   (hover:hover), là où il y a une souris pour le révéler. Le focus clavier le
-   révèle aussi, sans quoi la navigation au clavier ferait défiler des
-   dossiers anonymes.
-
-   Le nom reste dans le flux même invisible : l'opacité ne change rien à la
-   place occupée, la grille ne bouge donc pas au survol. */
+   Le nom est visible PAR DÉFAUT : c'est l'état sur tablette et téléphone, où
+   le survol n'existe pas et où des tuiles muettes seraient indéchiffrables,
+   et c'est le repli si la requête média n'est pas comprise. Le masquage
+   n'intervient qu'à l'intérieur du bloc (hover:hover), là où il y a une
+   souris pour le révéler. Le focus clavier le révèle aussi. */
 .grille-dossiers{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
-  gap:22px 16px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:22px 16px;
 }
 @media (min-width:760px){
   .grille-dossiers{grid-template-columns:repeat(auto-fill,minmax(112px,138px))}
@@ -286,17 +350,13 @@ body.dedans .wrap{padding-top:20px}
 }
 .dossier:hover{text-decoration:none}
 
-/* La tuile. Rayon de 23 pour cent du côté, proportion des icônes d'application
-   des systèmes courants : exprimé en pourcentage et non en pixels, il reste
-   juste quelle que soit la taille de la tuile. */
+/* La tuile. Rayon de 23 pour cent du côté, proportion des icônes
+   d'application des systèmes courants : en pourcentage et non en pixels, il
+   reste juste quelle que soit la taille. Le bas du dégradé est calculé, une
+   seule valeur à saisir par catégorie ; l'aplat sert de repli aux
+   navigateurs sans color-mix. */
 .dossier .glyphe{
   width:100%;aspect-ratio:1;border-radius:23%;
-  /* La teinte vient de la catégorie, posée en --c sur la tuile depuis
-     catalogue.js. Deux déclarations : la première est un aplat, servant de
-     repli aux navigateurs qui ne connaissent pas color-mix, qui ignoreront la
-     seconde. Le bas du dégradé est calculé et non écrit à la main, ce qui
-     évite d'avoir à saisir deux valeurs par catégorie et garantit qu'elles
-     restent cohérentes. */
   background:var(--c,var(--app-haut));
   background:linear-gradient(160deg,
     var(--c,var(--app-haut)),
@@ -307,10 +367,9 @@ body.dedans .wrap{padding-top:20px}
   transition:transform var(--vitesse-dossier) var(--courbe),
              box-shadow var(--vitesse-dossier) var(--courbe);
 }
-/* Le glyphe occupe un peu plus de la moitié de la tuile, proportion habituelle
-   d'une icône d'application. Son trait est demandé à 1,4 dans hub.js, au lieu
-   de 2 : à cette taille le trait d'origine serait épais, et le blanc sur fond
-   coloré supporte mal la surcharge. */
+/* Le glyphe est demandé à 1,4 d'épaisseur dans hub.js, au lieu de 2 : à
+   cette taille le trait d'origine serait épais, et le blanc sur fond coloré
+   supporte mal la surcharge. */
 .dossier .glyphe .ico{width:54%;height:auto;display:block;vertical-align:baseline}
 
 .dossier .nom{
@@ -320,30 +379,23 @@ body.dedans .wrap{padding-top:20px}
   transition:opacity var(--vitesse-dossier) var(--courbe),
              transform var(--vitesse-dossier) var(--courbe);
 }
-
-/* Le compte se pose sur le coin de la tuile, comme la pastille de
-   notification d'une application. Fond papier et non rouge : ce n'est pas une
-   alerte, c'est un inventaire. */
+/* Le compte se pose sur le coin, comme la pastille de notification d'une
+   application. Fond papier et non rouge : ce n'est pas une alerte. */
 .dossier .compte{
   position:absolute;top:-6px;right:-6px;
   min-width:22px;height:22px;padding:0 6px;border-radius:11px;
-  /* Le chiffre reprend la teinte de sa tuile : sur fond papier, la couleur de
-     catégorie y tient largement le contraste du texte, toutes valeurs de la
-     palette faisant au moins 3,59:1 avec le blanc, donc bien davantage avec
-     le papier. */
   background:var(--papier);color:var(--c,var(--primaire-encre));
   border:1px solid var(--ligne);
   display:grid;place-items:center;
   font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
   box-shadow:0 1px 3px rgba(0,0,0,.18);
-  transition:color var(--vitesse-dossier),border-color var(--vitesse-dossier);
+  transition:border-color var(--vitesse-dossier);
 }
 
 @media (hover:hover) and (pointer:fine){
-  /* Il y a une souris : le nom se retire et n'apparaît qu'au survol, comme
-     demandé. C'est la tuile entière qui se soulève, pas un contenu à
-     l'intérieur d'un cadre : le geste est celui d'une icône que l'on vise. */
   .dossier .nom{opacity:0;transform:translateY(4px)}
+  /* C'est la tuile entière qui se soulève, pas un contenu à l'intérieur d'un
+     cadre : le geste est celui d'une icône que l'on vise. */
   .dossier:hover .glyphe,.dossier:focus-visible .glyphe{
     transform:translateY(-4px) scale(1.05);
     box-shadow:var(--ombre-app-haute);
@@ -355,16 +407,24 @@ body.dedans .wrap{padding-top:20px}
 .dossier:focus-visible{outline:none}
 .dossier:focus-visible .glyphe{outline:2px solid var(--primaire);outline-offset:4px}
 
-/* --------------------------------------------------------------- grilles */
-.grille{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,340px));
-  gap:14px;
-}
+/* =========================================================== GRILLES == */
+.section{margin:0 0 30px}
+.section:last-child{margin-bottom:0}
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,340px));gap:14px}
 .grille-dense{grid-template-columns:repeat(auto-fill,minmax(228px,272px))}
 @media (max-width:700px){ .grille, .grille-dense{grid-template-columns:1fr} }
 
-/* ------------------------------------------------------------ carte, fiche */
+/* ====================================================== PORTE, CARTE ==
+   La porte enveloppe la carte et son épingle. La carte reste un lien pur :
+   un bouton à l'intérieur d'un lien serait invalide, et cliquer sur
+   l'épingle suivrait le lien. */
+.porte{
+  position:relative;display:flex;
+  animation:entree var(--vitesse-dossier) var(--courbe) backwards;
+  animation-delay:calc(var(--i, 0) * 26ms);
+}
+.porte > .carte{flex:1;animation:none}
+
 .carte, .fiche{
   position:relative;display:flex;flex-direction:column;gap:9px;
   background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon);
@@ -381,6 +441,26 @@ a.carte:hover{
 a.carte:active{transform:translateY(0)}
 a.carte:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
 
+/* L'épingle ne se montre qu'au survol de la carte, ou si elle est déjà
+   posée : une rangée d'épingles grises sur toutes les cartes ferait un bruit
+   permanent pour une action occasionnelle. Au clavier elle reste atteignable
+   en toutes circonstances, et sur tactile elle est toujours visible faute de
+   survol pour la révéler. */
+.epingle{
+  position:absolute;top:9px;right:9px;z-index:2;
+  width:26px;height:26px;padding:0;border-radius:50%;
+  border:1px solid var(--ligne);background:var(--papier);color:var(--discret);
+  display:grid;place-items:center;cursor:pointer;
+  opacity:0;transform:scale(.9);
+  transition:opacity var(--vitesse),transform var(--vitesse),
+             background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
+}
+.porte:hover .epingle,.epingle:focus-visible,.epingle.posee{opacity:1;transform:none}
+.epingle:hover{background:var(--note-fond);color:var(--moyenne);border-color:var(--note-bord)}
+.epingle.posee{background:var(--moyenne);color:#fff;border-color:var(--moyenne)}
+.epingle.posee:hover{filter:brightness(1.08)}
+@media (hover:none){ .epingle{opacity:1;transform:none} }
+
 .carte .tete, .fiche .tete{display:flex;align-items:flex-start;gap:11px}
 .carte .vignette, .fiche .vignette{
   width:36px;height:36px;flex:none;border-radius:var(--rayon-s);
@@ -394,8 +474,9 @@ a.carte:hover .vignette{background:var(--primaire);color:var(--sur-primaire);bor
   margin:0;font-size:14.5px;font-weight:700;line-height:1.3;color:var(--encre);
   letter-spacing:-.2px;flex:1;min-width:0;
 }
+/* La flèche de sortie laisse la place à l'épingle, qui occupe le même coin. */
 .carte .sortie{
-  flex:none;color:var(--discret);margin-top:1px;
+  flex:none;color:var(--discret);margin-top:1px;margin-right:28px;
   transition:color var(--vitesse),transform var(--vitesse);
 }
 a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
@@ -429,47 +510,33 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 .carte.inerte h3{color:var(--encre-2)}
 .carte.obsolete h3{text-decoration:line-through;text-decoration-thickness:1px}
 
-/* --------------------------------------------------------------- annuaire */
+/* ========================================================== ANNUAIRE == */
 .fiche{box-shadow:none;gap:10px}
 .fiche .tete{align-items:center}
 .fiche h3{font-size:14px}
 .fiche .role{margin:1px 0 0;font-size:12px;color:var(--discret);line-height:1.35}
 .fiche .vignette{width:32px;height:32px}
 .joindre{display:flex;flex-direction:column;gap:5px;margin-top:1px}
-.joindre a{
-  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;
-  color:var(--lien);overflow-wrap:anywhere;
-}
+.joindre a{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--lien);overflow-wrap:anywhere}
 
-/* ------------------------------------------------- résultats de recherche
-   Chaque résultat rappelle le dossier d'où il vient : sans cela, on trouve
-   la porte mais on ne sait pas où elle était rangée, ni comment y revenir. */
+/* ============================================ RÉSULTATS DE RECHERCHE == */
 .resultat{
   display:flex;flex-direction:column;gap:6px;
   animation:entree var(--vitesse-dossier) var(--courbe) backwards;
   animation-delay:calc(var(--i, 0) * 26ms);
 }
-.resultat .carte{animation:none}
+.resultat .porte,.resultat .carte{animation:none}
 .resultat-ou{
-  font-size:11.5px;color:var(--discret);display:inline-flex;align-items:center;gap:5px;
-  padding-left:3px;
+  font-size:11.5px;color:var(--discret);display:inline-flex;align-items:center;gap:5px;padding-left:3px;
 }
 
-/* --------------------------------------------------- message aucun résultat */
 .vide{
   border:1px dashed var(--ligne);border-radius:var(--rayon);background:var(--papier-2);
   padding:30px 20px;text-align:center;color:var(--discret);font-size:13px;
 }
 .vide b{display:block;color:var(--encre-2);font-size:14px;margin-bottom:4px}
 
-/* -------------------------------------------------------------- pied de page */
-footer.pied{
-  padding:26px 22px 40px;max-width:1200px;margin:0 auto;
-  font-size:12px;color:var(--discret);line-height:1.7;
-}
-footer.pied .sep{margin:0 7px;opacity:.5}
-
-/* ------------------------------------- panneau "À propos", repris des outils */
+/* ================================================= PANNEAU À PROPOS == */
 .modale{
   border:none;padding:0;border-radius:var(--rayon);background:var(--papier);color:var(--encre);
   box-shadow:0 8px 32px rgba(35,31,32,.22);width:min(680px,94vw);max-height:88vh;overflow:hidden;
@@ -501,7 +568,6 @@ footer.pied .sep{margin:0 7px;opacity:.5}
   font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:12px;
   background:var(--papier);border:1px solid var(--ligne);border-radius:4px;padding:1px 5px;
 }
-
 .changelog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
 .changelog li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
 .changelog .cl-ver{
@@ -515,9 +581,38 @@ footer.pied .sep{margin:0 7px;opacity:.5}
 .changelog .cl-date{font-weight:400;color:var(--discret);font-size:11.5px}
 .changelog .cl-txt{color:var(--encre-2);line-height:1.5}
 
-/* ---------------------------------------------------------------- impression
-   Sur papier, un dossier fermé ne sert à rien : le nom est donc toujours
-   visible, et chaque carte est suivie de son adresse complète. */
+/* ============================================================ ÉTROIT ==
+   Sous 960 px, la barre latérale sort du flux et devient un tiroir. Elle
+   reste la même barre, seule sa position change : rien à maintenir en
+   double. */
+@media (max-width:960px){
+  .rail{
+    position:fixed;left:0;top:0;bottom:0;height:100%;
+    transform:translateX(-100%);
+    transition:transform var(--vitesse-dossier) var(--courbe);
+    box-shadow:0 0 40px rgba(0,0,0,.25);
+  }
+  body.rail-ouvert .rail{transform:none}
+  #btnRail{display:inline-flex}
+  .barre-haute{padding:12px 16px;gap:10px}
+  .barre-haute h1{max-width:none;flex:1}
+  /* La recherche passe sous le titre : à cette largeur, la garder sur la
+     même ligne la réduirait à un champ où l'on ne lit plus ce qu'on tape. */
+  .barre-recherche{order:9;flex-basis:100%;max-width:none}
+  .wrap{padding:20px 16px}
+  .pied{padding:8px 16px 30px}
+  .salut{font-size:22px}
+}
+@media (max-width:560px){
+  .chiffres{grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px}
+  .chiffre{padding:13px 14px;gap:1px 11px}
+  .chiffre-ico{width:38px;height:38px;border-radius:11px}
+  .chiffre-n{font-size:25px}
+}
+
+/* ======================================================== IMPRESSION ==
+   La barre latérale et les commandes disparaissent, la tuile garde son
+   aplat : son glyphe est blanc, sans fond il disparaîtrait. */
 @media print{
   :root,[data-theme="dark"]{
     color-scheme:light;
@@ -526,24 +621,21 @@ footer.pied .sep{margin:0 7px;opacity:.5}
     --ligne:#c7cbc6;--ligne-2:#dcdfda;
     --marque:#7da32f;--marque-lavis:transparent;
     --primaire:#7da32f;--primaire-fond:#eaf3d8;--primaire-bord:#a9c67d;--primaire-encre:#3f5a12;
-    --ombre:none;--ombre-haute:none;
+    --ombre:none;--ombre-haute:none;--ombre-app:none;
   }
-  body{background:#fff}
-  header{position:static;box-shadow:none}
-  .hall{background-image:none}
-  .noprint,.barre,.fil-retour{display:none !important}
+  body{display:block;background:#fff}
+  .rail,.rail-voile,.noprint,.barre-recherche,.fil-retour,.epingle{display:none !important}
+  .barre-haute{position:static;border-bottom:1px solid var(--ligne)}
   .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
   .grille-dossiers{grid-template-columns:repeat(4,1fr)}
-  /* Le nom redevient visible, et la tuile garde son aplat vert : le glyphe
-     est blanc, sur du papier sans fond il disparaîtrait. D'où l'impression
-     forcée des couleurs de fond pour cette tuile seulement. */
   .dossier .nom{opacity:1;transform:none}
   .dossier .glyphe{
     transform:none;box-shadow:none;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
-  .carte,.fiche,.dossier{break-inside:avoid;box-shadow:none}
-  .carte .sortie{display:none}
+  .chiffre{-webkit-print-color-adjust:exact;print-color-adjust:exact;box-shadow:none}
+  .carte,.fiche,.dossier,.porte{break-inside:avoid;box-shadow:none}
+  .carte .sortie{display:none;margin-right:0}
   a.carte[href]::after{
     content:" " attr(href);display:block;margin-top:6px;
     font-size:10px;color:#636965;overflow-wrap:anywhere;

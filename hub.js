@@ -21,6 +21,8 @@
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v4", date: "2026-08-29", titre: "Tableau de bord, et ce qui vous appartient",
+    texte: "Barre latérale permanente : toutes les catégories à un clic depuis n'importe où. Recherche en haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Surtout : le hall devient personnel sans le moindre compte. Épinglez une porte, elle remonte en tête à chacune de vos visites, et les dernières portes ouvertes s'y ajoutent. Tout vit dans votre navigateur et n'en sort jamais." },
   { v: "v3", date: "2026-08-29", titre: "Navigation par dossiers",
     texte: "Le hall s'ouvre sur des dossiers carrés, une icône au centre et le nom qui se révèle au survol. On ouvre un dossier, parfois un sous-dossier, et on arrive aux portes. Fil d'Ariane, adresse qui suit la position, bouton Précédent du navigateur fonctionnel. La recherche, elle, traverse tous les niveaux d'un coup." },
   { v: "v2", date: "2026-08-29", titre: "Hall d'entrée, logo B27 et signalement",
@@ -98,7 +100,10 @@ const TRACES_ICONES = {
   porte: '<path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5.442 20.1a1 1 0 0 1-.442-.83V5.562a1 1 0 0 1 .58-.908l6-2.769a1 1 0 0 1 1.42.908z"/>',
   maison: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   chevron: '<path d="m9 18 6-6-6-6"/>',
-  retour: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>'
+  retour: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  menu: '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>',
+  epingle: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
+  etincelle: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>'
 };
 
 // L'épaisseur de trait est réglable, et il faut s'en servir dès qu'on agrandit
@@ -312,6 +317,59 @@ function controlerCatalogue() {
 }
 
 /* ---------------------------------------------------------------------
+   CE QUI VOUS APPARTIENT
+
+   Le hub n'a pas de portail de connexion et n'en aura pas. La
+   personnalisation ne passe donc par aucun compte : elle vit dans le
+   navigateur de chacun, en localStorage. C'est personnel sans être
+   identifiant, et cela ne quitte jamais le poste.
+
+   Deux listes seulement : ce que l'on épingle, et ce que l'on a ouvert
+   récemment. Les deux sont filtrées contre le catalogue à la lecture, sans
+   quoi une porte retirée y laisserait un fantôme.
+   --------------------------------------------------------------------- */
+const CLE_EPINGLES = "hub_b27_epingles";
+const CLE_RECENTS = "hub_b27_recents";
+const RECENTS_MAX = 6;
+
+function lireListe(cle) {
+  try {
+    const v = JSON.parse(localStorage.getItem(cle) || "[]");
+    return Array.isArray(v) ? v.filter(x => typeof x === "string") : [];
+  } catch (e) { return []; }
+}
+function ecrireListe(cle, valeurs) {
+  try { localStorage.setItem(cle, JSON.stringify(valeurs)); } catch (e) { /* mode privé */ }
+}
+function porteParId(id) { return PORTES.find(o => o.id === id) || null; }
+
+function epingles() { return lireListe(CLE_EPINGLES).filter(porteParId); }
+function estEpingle(id) { return epingles().indexOf(id) !== -1; }
+function basculerEpingle(id) {
+  const liste = epingles();
+  const i = liste.indexOf(id);
+  if (i === -1) liste.unshift(id); else liste.splice(i, 1);
+  ecrireListe(CLE_EPINGLES, liste);
+}
+
+function recents() { return lireListe(CLE_RECENTS).filter(porteParId).slice(0, RECENTS_MAX); }
+function noterOuverture(id) {
+  if (!porteParId(id)) return;
+  const liste = lireListe(CLE_RECENTS).filter(x => x !== id);
+  liste.unshift(id);
+  ecrireListe(CLE_RECENTS, liste.slice(0, RECENTS_MAX * 2));
+}
+
+// Salutation selon l'heure. C'est la seule chose que le hub sait de vous, et
+// il la lit sur l'horloge du poste : accueillant sans rien demander.
+function salutation() {
+  const h = new Date().getHours();
+  if (h < 6) return "Bonne nuit";
+  if (h < 18) return "Bonjour";
+  return "Bonsoir";
+}
+
+/* ---------------------------------------------------------------------
    THÈME CLAIR ET SOMBRE
    --------------------------------------------------------------------- */
 const CLE_THEME = "hub_b27_theme";
@@ -458,10 +516,27 @@ function html_carte(o, index) {
   return "<a" + attrs + ' href="' + ech(o.url) + '" target="_blank" rel="noopener">' + interieur + "</a>";
 }
 
+// Une porte est enveloppée : la carte reste un lien pur, et le bouton
+// d'épingle se pose par-dessus en frère et non en enfant. Un bouton à
+// l'intérieur d'un lien serait du HTML invalide, et cliquer sur l'épingle
+// suivrait le lien.
+function html_porte(o, index) {
+  const posee = estEpingle(o.id);
+  return '<div class="porte" style="--i:' + index + '">'
+    + html_carte(o, index)
+    + '<button type="button" class="epingle' + (posee ? " posee" : "") + '"'
+    +   ' data-epingler="' + ech(o.id) + '"'
+    +   ' aria-pressed="' + (posee ? "true" : "false") + '"'
+    +   ' title="' + (posee ? "Retirer des raccourcis" : "Ajouter à vos raccourcis") + '"'
+    +   ' aria-label="' + (posee ? "Retirer " : "Épingler ") + ech(o.nom) + '">'
+    +   ico("epingle", 14) + "</button>"
+    + "</div>";
+}
+
 function html_grillePortes(portes) {
   const queDesLiens = portes.length && portes.every(o => o.type === "lien");
   return '<div class="grille' + (queDesLiens ? " grille-dense" : "") + '">'
-    + portes.map((o, i) => html_carte(o, i)).join("")
+    + portes.map((o, i) => html_porte(o, i)).join("")
     + "</div>";
 }
 
@@ -585,14 +660,31 @@ let requete = "";
 function rendre() {
   const chemin = cheminValide(cheminDepuisAdresse());
   const cible = $("contenu");
+  const ici = contenuDuNiveau(chemin);
 
-  // Le bandeau se resserre dès qu'on quitte le hall : passé le seuil, il a
-  // dit ce qu'il avait à dire et la place revient au contenu.
-  document.body.classList.toggle("dedans", chemin.length > 0 || !!requete);
+  // Le bloc d'accueil, salutation et raccourcis compris, n'appartient qu'au
+  // hall : dès qu'on entre dans un dossier ou qu'une recherche est en cours,
+  // la place revient à ce qu'on est venu chercher.
+  const auHall = chemin.length === 0 && !requete;
+  $("accueil").hidden = !auHall;
+  // Les raccourcis sont reconstruits à chaque retour au hall, et non une
+  // seule fois au chargement : une porte ouverte entre-temps doit apparaître
+  // dans les récentes sans qu'il faille recharger la page.
+  if (auHall) construireRaccourcis();
+  document.body.classList.toggle("dedans", !auHall);
+  majRailActif(requete ? [] : chemin);
 
-  if (requete) { rendreRecherche(cible); return; }
+  // Le titre de la barre du haut suit le niveau, et l'onglet du navigateur
+  // aussi : un onglet parmi douze doit dire où il mène.
+  const titre = requete ? "Recherche" : ici.nom;
+  $("titrePage").textContent = titre;
+  document.title = auHall ? REGLAGES.titre : titre + " - " + REGLAGES.titre;
 
-  $("filAriane").innerHTML = html_filAriane(chemin);
+  if (requete) { $("filAriane").innerHTML = ""; rendreRecherche(cible); return; }
+
+  // Au hall, le fil se réduirait à un maillon sans lien : le bloc d'accueil
+  // dit déjà où l'on est, et bien mieux que lui.
+  $("filAriane").innerHTML = auHall ? "" : html_filAriane(chemin);
 
   if (!chemin.length) {
     const dossiers = dossiersRacine();
@@ -649,25 +741,136 @@ function rendreRecherche(cible) {
 /* ---------------------------------------------------------------------
    BANDEAU D'ACCUEIL
    --------------------------------------------------------------------- */
-function construireHall() {
+function construireAccueil() {
   const ouvertes = PORTES.filter(estCliquable).length;
-  const univers = dossiersRacine().length;
+  const maison = PORTES.filter(o => (o.type || "outil") === "outil").length;
+  const liens = PORTES.length - maison;
+  const preparation = PORTES.length - ouvertes;
 
-  $("hallLogo").innerHTML = logoB27(58);
-  $("hallAccroche").textContent = REGLAGES.accroche || "";
-  $("hallAccroche").hidden = !REGLAGES.accroche;
-  $("hallChapeau").textContent = REGLAGES.chapeau || "";
-  $("hallChapeau").hidden = !REGLAGES.chapeau;
+  $("salut").textContent = salutation() + ".";
+  $("chapeau").textContent = REGLAGES.chapeau || "";
+  $("chapeau").hidden = !REGLAGES.chapeau;
 
-  const enPreparation = PORTES.length - ouvertes;
-  const chiffres = [
-    { n: ouvertes, mot: ouvertes > 1 ? "portes ouvertes" : "porte ouverte", fort: true },
-    { n: univers, mot: univers > 1 ? "dossiers" : "dossier" }
-  ];
-  if (enPreparation > 0) chiffres.push({ n: enPreparation, mot: "en préparation" });
+  // Quatre chiffres, et chacun répond à une question qu'on se pose vraiment
+  // en arrivant : qu'est-ce qui marche, qu'est-ce que nous fabriquons
+  // nous-mêmes, qu'est-ce qui vient d'ailleurs, qu'est-ce qui arrive. Ils
+  // sont calculés, jamais recopiés : ils ne peuvent pas mentir après l'ajout
+  // d'une porte. Une case à zéro disparaît, sauf la première : annoncer
+  // "0 en préparation" attirerait l'oeil sur un vide.
+  const cases = [
+    // Ces teintes ne sont pas celles des tuiles, et l'écart est voulu : une
+    // tuile ne porte qu'un glyphe, seuil 3:1, tandis qu'une carte chiffrée
+    // porte du texte de petite taille, seuil 4,5:1. Le bleu et l'ocre ont donc
+    // été assombris, le #2f6f8f venant de la feuille de B27 Mobility où il est
+    // documenté à 5,54:1.
+    { n: ouvertes,    titre: "Portes ouvertes", detail: "prêtes à l'emploi",   c: "#5f7f1f", ico: "porte" },
+    { n: maison,      titre: "Nos outils",      detail: "fabriqués ici",       c: "#2f6f8f", ico: "calculatrice" },
+    { n: liens,       titre: "Ressources",      detail: "sites de référence",  c: "#6b5ba6", ico: "livre" },
+    { n: preparation, titre: "En préparation",  detail: "bientôt disponibles", c: "#8a6200", ico: "horloge" }
+  ].filter((x, i) => i === 0 || x.n > 0);
 
-  $("hallChiffres").innerHTML = chiffres.map(c =>
-    '<li' + (c.fort ? ' class="fort"' : "") + "><b>" + c.n + "</b> " + ech(c.mot) + "</li>").join("");
+  $("chiffres").innerHTML = cases.map((x, i) =>
+      '<div class="chiffre" style="--c:' + x.c + ';--i:' + i + '">'
+    +   '<span class="chiffre-ico">' + ico(x.ico, 22, 1.7) + "</span>"
+    +   '<span class="chiffre-n">' + x.n + "</span>"
+    +   '<span class="chiffre-titre">' + ech(x.titre) + "</span>"
+    +   '<span class="chiffre-detail">' + ech(x.detail) + "</span>"
+    + "</div>").join("");
+
+  construireRaccourcis();
+}
+
+/* ---------------------------------------------------------------------
+   VOS RACCOURCIS
+
+   La part personnelle du hall, sans compte ni identité : ce que vous avez
+   épinglé, puis ce que vous avez ouvert récemment. Tout vient du navigateur
+   et n'en sort jamais. Tant que rien n'est épinglé, un mot explique à quoi
+   sert l'épingle, plutôt que de laisser un vide sans raison.
+   --------------------------------------------------------------------- */
+function construireRaccourcis() {
+  const mesEpingles = epingles().map(porteParId);
+  // Une porte épinglée n'a pas à réapparaître dans les récentes : elle est
+  // déjà en haut, la répéter ferait du bruit.
+  const mesRecents = recents().map(porteParId).filter(o => !estEpingle(o.id));
+  let h = "";
+
+  if (mesEpingles.length) {
+    h += '<section class="bloc">'
+      +  '<h2><span class="pave" style="--c:#b17e00">' + ico("epingle", 14) + "</span>Vos raccourcis"
+      +    ' <span class="compte">' + mesEpingles.length + "</span></h2>"
+      +  html_grillePortes(mesEpingles)
+      + "</section>";
+  } else {
+    h += '<section class="bloc">'
+      +  '<div class="invite">' + ico("epingle", 16)
+      +    "<span><b>Faites-en votre hall.</b> L'épingle en haut d'une carte la remonte ici, "
+      +    "en tête du hall, à chacune de vos visites. Aucun compte n'est demandé et rien "
+      +    "n'est envoyé : l'épingle reste dans ce navigateur.</span></div>"
+      + "</section>";
+  }
+
+  if (mesRecents.length) {
+    h += '<section class="bloc">'
+      +  '<h2><span class="pave" style="--c:#6e6a63">' + ico("horloge", 14) + "</span>Ouvert récemment"
+      +    ' <span class="compte">' + mesRecents.length + "</span></h2>"
+      +  html_grillePortes(mesRecents)
+      + "</section>";
+  }
+
+  $("raccourcis").innerHTML = h;
+  poserIcones($("raccourcis"));
+}
+
+/* ---------------------------------------------------------------------
+   BARRE LATÉRALE
+
+   Toutes les catégories à un clic, depuis n'importe où. C'est ce qui
+   distingue un hall d'une simple arborescence : on n'a jamais à remonter
+   pour changer de branche.
+   --------------------------------------------------------------------- */
+function construireRail() {
+  $("railLogo").innerHTML = logoB27(24);
+  $("railTitre").textContent = REGLAGES.titre;
+  $("railSousTitre").textContent = REGLAGES.sousTitre;
+
+  const dossiers = dossiersRacine();
+  $("railNav").innerHTML =
+      '<a class="rail-lien" href="#/" data-cle="">'
+    +   '<span class="rail-puce" style="--c:' + COULEUR_REPLI + '">' + ico("maison", 16) + "</span>"
+    +   "<span>Hall</span></a>"
+    + '<p class="rail-titre">Les dossiers</p>'
+    + dossiers.map(d =>
+        '<a class="rail-lien" href="' + adresseDe([d.cle]) + '" data-cle="' + ech(d.cle) + '">'
+      +   '<span class="rail-puce" style="--c:' + couleurSure(d.couleur) + '">' + ico(d.icone, 16) + "</span>"
+      +   "<span>" + ech(d.nom) + "</span>"
+      +   '<span class="rail-compte">' + (d.annuaire ? d.compte : d.portes.length) + "</span></a>").join("");
+
+  $("railPied").innerHTML = REGLAGES.contact
+    ? '<a class="rail-contact" href="mailto:' + ech(REGLAGES.contact) + '">'
+      + ico("courrier", 14) + "<span>Un bug, une idée</span></a>"
+    : "";
+}
+
+// Le lien de la catégorie courante est marqué, pour qu'on sache toujours où
+// l'on se trouve sans avoir à relire le fil d'Ariane.
+function majRailActif(chemin) {
+  const cle = chemin.length ? chemin[0] : "";
+  $("railNav").querySelectorAll(".rail-lien").forEach(a => {
+    const actif = a.dataset.cle === cle;
+    a.classList.toggle("actif", actif);
+    if (actif) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+}
+
+// Sur écran étroit la barre latérale devient un tiroir. Le voile qui
+// l'accompagne sert autant à assombrir la page qu'à donner une grande cible
+// pour refermer.
+function ouvrirRail(ouvert) {
+  document.body.classList.toggle("rail-ouvert", ouvert);
+  $("railVoile").hidden = !ouvert;
+  $("btnRail").setAttribute("aria-expanded", String(ouvert));
 }
 
 /* ---------------------------------------------------------------------
@@ -733,7 +936,9 @@ function remplirApropos() {
      + '<dl class="stats-liste gauche">'
      + ligneStat("Rôle", "Point d'entrée unique vers les outils et les ressources du bureau d'études. Le hub n'héberge rien, il redirige.")
      + ligneStat("Navigation", "Par dossiers. La position est dans l'adresse, le bouton Précédent fonctionne, et le lien d'un dossier précis peut se transmettre tel quel.")
-     + ligneStat("Données", "Aucune. Aucun compte, aucun formulaire, aucun suivi. Seul le choix de thème est retenu dans le navigateur.")
+     + ligneStat("Données", "Aucune ne sort du poste. Aucun compte, aucun formulaire, aucun suivi.")
+     + ligneStat("Ce qui est retenu", "Votre thème, vos épingles et vos six dernières portes ouvertes, dans ce navigateur seulement. Vider les données du site les efface.")
+     + ligneStat("Vos épingles", epingles().length + " porte(s) épinglée(s), " + recents().length + " ouverture(s) récente(s)")
      + "</dl></div>";
 
   h += '<div class="stats-groupe"><h3 data-ico="etiquette" data-ico-taille="13">Ajouter une porte</h3>'
@@ -787,17 +992,25 @@ function initApropos() {
    DÉMARRAGE
    --------------------------------------------------------------------- */
 function init() {
-  document.title = REGLAGES.titre;
-  $("titreHub").textContent = REGLAGES.titre;
-  $("sousTitreHub").textContent = REGLAGES.sousTitre;
-  $("enteteLogo").innerHTML = logoB27(26);
-
   controlerCatalogue();
-  construireHall();
+  construireRail();
+  construireAccueil();
   construireBarre();
   poserIcones();
   initTheme();
   initApropos();
+
+  $("btnRail").innerHTML = ico("menu", 17);
+  $("btnRail").addEventListener("click", () => ouvrirRail(!document.body.classList.contains("rail-ouvert")));
+  $("railVoile").addEventListener("click", () => ouvrirRail(false));
+  // Sur mobile, suivre un lien du tiroir doit le refermer : sans cela, la
+  // page change derrière un tiroir resté ouvert.
+  $("railNav").addEventListener("click", ev => {
+    if (ev.target.closest(".rail-lien")) ouvrirRail(false);
+  });
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "Escape" && document.body.classList.contains("rail-ouvert")) ouvrirRail(false);
+  });
 
   const ouvertes = PORTES.filter(estCliquable).length;
   $("piedCompte").textContent = PORTES.length + " porte" + (PORTES.length > 1 ? "s" : "")
@@ -807,6 +1020,24 @@ function init() {
     $("piedContact").innerHTML = 'Un bug, une idée d\'outil : la pastille en bas à droite, ou <a href="mailto:'
       + ech(REGLAGES.contact) + '">' + ech(REGLAGES.contact) + "</a>";
   }
+
+  // Un seul écouteur pour toute la page plutôt qu'un par carte : les grilles
+  // sont reconstruites à chaque navigation, des écouteurs posés sur les
+  // cartes seraient à reposer à chaque fois.
+  document.addEventListener("click", ev => {
+    const bouton = ev.target.closest("[data-epingler]");
+    if (bouton) {
+      ev.preventDefault();
+      basculerEpingle(bouton.dataset.epingler);
+      rendre();                       // reconstruit les raccourcis au passage
+      return;
+    }
+    // Ouvrir une porte la fait entrer dans les récentes. C'est noté au clic
+    // et non au retour, puisqu'il n'y a pas de retour : la porte s'ouvre
+    // dans un autre onglet.
+    const carte = ev.target.closest("a.carte[data-id]");
+    if (carte) noterOuverture(carte.dataset.id);
+  });
 
   // Une recherche en cours doit être abandonnée si l'on navigue : sinon la
   // page afficherait des résultats sans rapport avec l'adresse.

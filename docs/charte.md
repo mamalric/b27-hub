@@ -52,6 +52,38 @@ Les mêmes valeurs qu'en tête de `hub.css`, redonnées ici pour référence. To
 
 Le sombre n'est pas un simple inversement : les gris y sont légèrement teintés et la primaire est éclaircie, sinon l'olive vire au brun sur fond noir. Le vert de marque, lui, est déjà assez clair pour tenir sur fond sombre et garde sa valeur exacte.
 
+## La disposition
+
+Un tableau de bord : barre latérale permanente à gauche, recherche en haut, contenu au centre.
+
+**La barre latérale ne se replie pas sur écran large.** C'est ce qui distingue un hall d'une simple arborescence : toutes les catégories sont à un clic, depuis n'importe où, on n'a jamais à remonter pour changer de branche. Chaque entrée porte la couleur de sa catégorie, la même que sur sa tuile, et la catégorie courante est teintée de cette couleur plutôt que d'un vert générique.
+
+Sous 960 px elle sort du flux et devient un tiroir, ouvert par le bouton de la barre du haut, refermé par le voile, par Échap, ou en suivant un lien. C'est la même barre, seule sa position change : rien à maintenir en double.
+
+**La recherche est au centre de la barre du haut**, comme sur un tableau de bord : c'est le geste le plus rapide quand on sait déjà ce qu'on cherche. Sous 960 px elle passe sous le titre, où l'on peut encore lire ce qu'on tape.
+
+## Ce qui vous appartient, sans compte
+
+Le hub n'a pas de portail de connexion et n'en aura pas. La personnalisation ne passe donc par aucun compte : elle vit dans le navigateur de chacun, en `localStorage`. C'est personnel sans être identifiant, et cela ne quitte jamais le poste.
+
+**Trois choses seulement sont retenues** : le thème, les portes épinglées, et les six dernières portes ouvertes. Les deux listes sont filtrées contre le catalogue à la lecture, sans quoi une porte retirée y laisserait un fantôme.
+
+**L'épingle ne se montre qu'au survol de la carte, ou si elle est déjà posée.** Une rangée d'épingles grises sur toutes les cartes ferait un bruit permanent pour une action occasionnelle. Au clavier elle reste atteignable, et sur tactile elle est toujours visible faute de survol pour la révéler.
+
+**La carte reste un lien pur.** L'épingle se pose par-dessus, en frère et non en enfant : un bouton à l'intérieur d'un lien serait du HTML invalide, et cliquer sur l'épingle suivrait le lien.
+
+**Tant que rien n'est épinglé, une invite explique à quoi sert l'épingle**, plutôt que de laisser un vide sans raison. Elle disparaît à la première épingle.
+
+**La salutation suit l'heure du poste.** Bonjour, bonsoir, bonne nuit : c'est la seule chose que le hub sait de vous, et il la lit sur l'horloge. Accueillant sans rien demander.
+
+## Les cartes chiffrées
+
+Quatre aplats colorés à l'arrivée, texte blanc, comme sur un tableau de bord. Chacune répond à une question qu'on se pose vraiment en arrivant : qu'est-ce qui marche, qu'est-ce que nous fabriquons nous-mêmes, qu'est-ce qui vient d'ailleurs, qu'est-ce qui arrive. Les chiffres sont calculés, jamais recopiés.
+
+**Leurs teintes sont plus foncées que celles des tuiles, et ce n'est pas une inadvertance.** Une tuile ne porte qu'un glyphe : seuil de contraste 3:1. Une carte chiffrée porte du texte de petite taille : seuil 4,5:1. Le bleu et l'ocre ont donc été assombris, le `#2f6f8f` venant de la feuille de B27 Mobility où il est documenté à 5,54:1.
+
+**Il n'y a pas de graphique**, et il n'y en aura pas. Un hub n'a aucune donnée à tracer : une courbe y serait de la décoration déguisée en information.
+
 ## La navigation par dossiers
 
 Le hall se parcourt comme une armoire. Le premier niveau ne montre que des dossiers ; on en ouvre un, parfois un sous-dossier, et on arrive aux portes. Trois niveaux au maximum, et le troisième n'existe que là où le contenu le justifie.

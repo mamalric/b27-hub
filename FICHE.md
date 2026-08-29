@@ -18,13 +18,15 @@ depot: https://github.com/mamalric/b27-hub    # URL du dépôt git, vide sinon
 Donner un point d'entrée unique, en ligne, vers les outils, les sites et les ressources utiles aux collègues de B27, de façon à ne communiquer qu'un seul lien au lieu d'adresses dispersées. Le hub n'héberge rien : il présente une carte par porte et redirige. La démarche est personnelle et autonome, menée en parallèle du remplacement du GRR conduit avec le service informatique de B27.
 
 ## État actuel
-Version v3 en ligne sur GitHub Pages, publiée depuis `main`. La page est construite à l'exécution à partir de `catalogue.js`, seul fichier à faire vivre : ajouter une porte, c'est y ajouter une fiche, sans toucher au reste du code.
+Version v4 en ligne sur GitHub Pages, publiée depuis `main`. La page est construite à l'exécution à partir de `catalogue.js`, seul fichier à faire vivre : ajouter une porte, c'est y ajouter une fiche, sans toucher au reste du code.
 
-Le hall se parcourt comme une armoire. Le premier niveau montre cinq dossiers carrés, une icône au centre et le nom qui se révèle au survol ; on en ouvre un, parfois un sous-dossier, et on arrive aux portes. La position tient dans l'adresse (`#/ressources/technique`), ce qui rend le bouton Précédent du navigateur fonctionnel et permet d'envoyer le lien d'un dossier précis. Un fil d'Ariane et un bouton de retour ferment la boucle. La recherche, elle, traverse tous les niveaux d'un coup et rappelle pour chaque résultat le dossier d'où il vient.
+Disposition de tableau de bord : barre latérale permanente donnant accès à toutes les catégories depuis n'importe où, recherche au centre de la barre du haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Sous 960 px la barre latérale devient un tiroir.
 
-Dix portes réparties en quatre catégories, dont trois sous-dossiers sous Ressources : la Calculette ECS et Bouclage et le Dimensionnement émetteurs Finimetal, le site b27.fr, B27 Mobility en "à venir", et six ressources métier (Légifrance, RE2020, INIES, ADEME, COSTIC, CSTB Évaluation) rendues en cartes compactes. L'annuaire occupe son propre dossier, avec une seule fiche pour l'instant. Cinq statuts sont prévus, les cartes non cliquables étant rendues en `div` et non en lien.
+Le hall est personnel sans le moindre compte, et il n'y en aura jamais : épingler une porte la remonte en tête des visites suivantes, les six dernières portes ouvertes s'y ajoutent d'elles-mêmes. Thème, épingles et récentes vivent en `localStorage`, dans le navigateur de chacun, et n'en sortent jamais.
 
-Une pastille en bas à droite ouvre un formulaire de signalement : capture de l'écran du problème, titre, description dictable à voix haute, envoi. Le widget `signalement.js` est autonome et se pose sur n'importe quel autre outil B27 en deux lignes. Il fonctionne en mode `mailto`, qui n'exige aucun compte ; deux autres modes d'envoi sont codés et prêts. La dictée n'est possible que sur Chrome et Edge, Opera et Brave n'implémentant pas la reconnaissance vocale ; le widget le dit et propose la saisie vocale de Windows (Win + H) comme sortie de secours.
+En dessous, les dossiers restent des icônes d'application carrées, une couleur par catégorie prise sur les conventions de lot de B27, avec descente vers les sous-dossiers puis les portes. La position tient dans l'adresse (`#/ressources/technique`), donc le bouton Précédent fonctionne et le lien d'un dossier précis se transmet tel quel. La recherche traverse tous les niveaux et rappelle pour chaque résultat le dossier d'où il vient.
+
+Dix portes en quatre catégories, dont trois sous-dossiers sous Ressources. Une pastille en bas à droite ouvre un formulaire de signalement avec capture d'écran et dictée vocale, la dictée n'étant possible que sur Chrome et Edge, avec la saisie vocale de Windows (Win + H) proposée en sortie de secours ailleurs.
 
 Aucune requête externe, aucune donnée collectée, balise `noindex` et `robots.txt`.
 
