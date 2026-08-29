@@ -68,11 +68,15 @@ Un seul champ, centré, qui filtre tout en direct : cartes, rangées, fiches. La
 
 **Un panneau ne surgit pas, il se pose.** L'ouverture des modales — météo détaillée, À propos — est un glissement : le cadre monte de dix-huit pixels en s'opacifiant, le voile d'arrière-plan se floute progressivement, et le contenu suit en cascade, un souffle après le cadre. La fermeture est animée aussi, par `@starting-style` et `transition-behavior: allow-discrete` : un navigateur qui ignore ces règles ouvre d'un coup, comme avant, sans rien casser. `prefers-reduced-motion` coupe tout.
 
-**Les barres de défilement appartiennent à l'interface, pas au système.** Pas de flèches, gouttière transparente, poucier fin au vert discret qui se révèle au survol. Chromium ignore `::-webkit-scrollbar` dès qu'on lui donne `scrollbar-color` : les deux mondes sont séparés — pseudo-éléments pour Chrome et Edge, propriétés standard pour Firefox. `scrollbar-gutter: stable` évite que la page saute quand un panneau verrouille le défilement.
+**La page n'a pas de barre de défilement.** Sa gouttière réservée dessinait un bloc plein — noir en sombre, blanc en clair — à côté du canvas animé, qui ne peut pas passer dessous. Elle est supprimée : la molette, le clavier et la pilule d'ancrage suffisent à une page de cette profondeur. Les barres des panneaux restent : fines, sans flèches, gouttière transparente fondue dans la carte — pseudo-éléments pour Chrome et Edge, propriétés standard pour Firefox, Chromium ignorant `::-webkit-scrollbar` dès qu'on lui donne `scrollbar-color`.
 
-**Un panneau ouvert possède la molette.** Le fond est verrouillé (`body:has(.modale[open])`), et une molette qui tourne hors du corps du panneau — sur le voile, sur l'en-tête — fait quand même défiler le panneau. La modale est une colonne : en-tête fixe, seul le corps défile, une seule barre, qui démarre sous l'en-tête.
+**Un panneau ouvert possède la molette.** Le fond est verrouillé (`body:has(.modale[open])`), et une molette qui tourne hors du corps du panneau — sur le voile, sur l'en-tête — fait quand même défiler le panneau, avec l'inertie du navigateur refaite à la main : une cible que la molette déplace, une position qui la rejoint en s'amortissant. Assigner `scrollTop` cran par cran donnait une navigation saccadée. La modale est une colonne : en-tête fixe, seul le corps défile, une seule barre, qui démarre sous l'en-tête.
 
 **Les cases à cocher sont dessinées dans la charte** : plaque arrondie bordée, fond vert de marque au coché, coche sombre qui se déploie en un cinquième de seconde.
+
+## Les langues
+
+Un bouton monde à côté des réglages ouvre le menu des langues. Seul le français vit ; l'anglais, l'allemand, le chinois, le japonais et l'arabe sont des emplacements posés, visibles et marqués « bientôt » : la promesse d'un portail ouvert à tous se lit déjà dans l'interface, la mécanique de traduction attendra les traductions.
 
 ## Ce qui ne bouge pas
 

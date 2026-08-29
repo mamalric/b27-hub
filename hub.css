@@ -66,7 +66,14 @@
    Firefox, dont les barres fines n'ont de toute façon ni flèches ni fond.
    scrollbar-gutter réserve la place de la barre : ouvrir un panneau, qui
    verrouille le défilement du fond, ne fait plus sauter la page. */
-html{-webkit-text-size-adjust:100%;background:var(--fond);scrollbar-gutter:stable}
+html{-webkit-text-size-adjust:100%;background:var(--fond)}
+/* La barre de la page n'existe pas : sa gouttière réservée dessinait un
+   bloc plein — noir en sombre, blanc en clair — à côté du canvas animé,
+   qui ne peut pas passer dessous. La molette, le clavier et la pilule
+   d'ancrage suffisent à une page de cette profondeur. Les barres des
+   panneaux, elles, restent : fines, sans flèches, gouttière transparente
+   qui se fond dans la carte. */
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 ::-webkit-scrollbar{width:9px;height:9px;background:transparent}
 ::-webkit-scrollbar-button{display:none;width:0;height:0}
 ::-webkit-scrollbar-track{background:transparent}
@@ -77,7 +84,8 @@ html{-webkit-text-size-adjust:100%;background:var(--fond);scrollbar-gutter:stabl
 }
 ::-webkit-scrollbar-thumb:hover{background:var(--barre-vive);background-clip:content-box}
 @supports (-moz-appearance:none){
-  html{scrollbar-width:thin;scrollbar-color:var(--barre) transparent}
+  *{scrollbar-width:thin;scrollbar-color:var(--barre) transparent}
+  html{scrollbar-width:none}
 }
 /* Panneau ouvert : le fond ne défile plus. La molette est redirigée vers
    le corps du panneau par hub.js, où que soit la souris. */
@@ -138,6 +146,34 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
   transition:border-color var(--vitesse),color var(--vitesse),transform var(--vitesse);
 }
 .bouton-icone:hover{border-color:var(--ligne-forte);color:var(--encre);transform:translateY(-1px)}
+
+/* ============================================================ LANGUES ==
+   Un bouton monde à côté des réglages, et un menu de langues. Seul le
+   français vit pour l'instant : les autres sont des emplacements posés,
+   visibles et assumés comme « bientôt ». */
+.menu-langues{
+  position:fixed;top:62px;right:16px;z-index:29;min-width:176px;
+  background:var(--carte-pleine);border:1px solid var(--ligne-forte);
+  border-radius:var(--rayon-m);box-shadow:var(--ombre);padding:6px;
+  opacity:0;transform:translateY(-6px);pointer-events:none;
+  transition:opacity var(--vitesse),transform var(--vitesse);
+}
+.menu-langues.ouvert{opacity:1;transform:none;pointer-events:auto}
+.menu-langues button{
+  display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;
+  background:transparent;border:0;border-radius:9px;cursor:pointer;
+  color:var(--encre);font:inherit;font-size:13.5px;text-align:left;
+}
+.menu-langues button:hover{background:rgba(149,192,61,.09)}
+.menu-langues .coche{display:inline-flex;width:16px;color:var(--accent)}
+[data-theme="light"] .menu-langues .coche{color:#5f7f1f}
+.menu-langues .espace{flex:1}
+.langue-off{color:var(--discret);cursor:default}
+.langue-off:hover{background:transparent}
+.langue-badge{
+  font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--discret);border:1px solid var(--ligne);border-radius:99px;padding:2px 7px;
+}
 
 /* ============================================================ ENTRÉE == */
 .portail{max-width:1080px;margin:0 auto;padding:0 22px 96px}

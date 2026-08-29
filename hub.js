@@ -105,6 +105,7 @@ const TRACES_ICONES = {
   lune: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   engrenage: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
   fermer: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  langue: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
   actualiser: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   courrier: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
@@ -1639,16 +1640,83 @@ function remplirApropos() {
 /* Panneau ouvert, la molette lui appartient : si elle tourne hors du
    corps du panneau — sur le voile, sur l'en-tête —, c'est quand même le
    panneau qui défile, jamais la page derrière, que le CSS a de toute
-   façon verrouillée. */
+   façon verrouillée.
+
+   Et elle défile avec l'inertie du navigateur, pas sans elle : assigner
+   scrollTop cran par cran donnait une navigation saccadée, dépouillée du
+   lissage natif. On le refait donc soi-même — une cible que la molette
+   déplace, une position qui la rejoint en s'amortissant. */
 function initMolettePanneaux() {
+  let corps = null, cible = 0, anime = null;
+
+  function pas() {
+    anime = null;
+    if (!corps) return;
+    const ecart = cible - corps.scrollTop;
+    if (Math.abs(ecart) < 0.6) { corps.scrollTop = cible; return; }
+    corps.scrollTop += ecart * 0.22;
+    anime = requestAnimationFrame(pas);
+  }
+
   document.addEventListener("wheel", ev => {
     const dlg = document.querySelector(".modale[open]");
-    if (!dlg) return;
-    const corps = dlg.querySelector(".modale-corps");
-    if (!corps || corps.contains(ev.target)) return;
-    corps.scrollTop += ev.deltaY;
+    if (!dlg) { corps = null; return; }
+    const c = dlg.querySelector(".modale-corps");
+    if (!c) return;
+    if (c.contains(ev.target)) { corps = null; return; }   // molette native dans le corps
     ev.preventDefault();
+    if (corps !== c) { corps = c; cible = c.scrollTop; }   // resynchronisation
+    cible = Math.max(0, Math.min(c.scrollHeight - c.clientHeight, cible + ev.deltaY));
+    if (!anime) anime = requestAnimationFrame(pas);
   }, { passive: false });
+}
+
+/* Le bouton monde et son menu. Seul le français vit pour l'instant : les
+   autres langues sont des emplacements posés — visibles, désactivés,
+   marqués « bientôt » — pour que la promesse d'un portail ouvert à tous
+   se lise déjà dans l'interface. */
+const LANGUES = [
+  { cle: "fr", nom: "Français", active: true },
+  { cle: "en", nom: "English" },
+  { cle: "de", nom: "Deutsch" },
+  { cle: "zh", nom: "中文" },
+  { cle: "ja", nom: "日本語" },
+  { cle: "ar", nom: "العربية" }
+];
+
+function initLangues() {
+  const menu = $("menuLangues");
+  const btn = $("btnLangue");
+  menu.innerHTML = LANGUES.map(l =>
+      '<button type="button" role="menuitem"' + (l.active ? "" : ' class="langue-off" title="Bientôt disponible"')
+    +   ' data-langue="' + l.cle + '">'
+    +   '<span class="coche">' + (l.active ? ico("valider", 14) : "") + "</span>"
+    +   "<span>" + ech(l.nom) + "</span><span class=\"espace\"></span>"
+    +   (l.active ? "" : '<span class="langue-badge">bientôt</span>')
+    + "</button>").join("");
+
+  function fermer() {
+    menu.classList.remove("ouvert");
+    btn.setAttribute("aria-expanded", "false");
+  }
+  btn.addEventListener("click", ev => {
+    ev.stopPropagation();
+    const ouvert = menu.classList.toggle("ouvert");
+    btn.setAttribute("aria-expanded", String(ouvert));
+  });
+  menu.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-langue]");
+    if (!b) return;
+    // Les langues à venir ne font rien, et c'est voulu : l'emplacement est
+    // posé, la mécanique attendra les traductions.
+    if (b.dataset.langue === "fr") fermer();
+  });
+  document.addEventListener("click", ev => {
+    if (!menu.contains(ev.target) && ev.target !== btn) fermer();
+  });
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "Escape") fermer();
+  });
 }
 
 function initApropos() {
@@ -1679,6 +1747,7 @@ function init() {
   initApropos();
   initDetailMeteo();
   initMolettePanneaux();
+  initLangues();
   chargerMeteo();
   initVeille();
 

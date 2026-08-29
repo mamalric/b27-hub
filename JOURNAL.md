@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, gouttiere supprimee, molette amortie, bouton langues
+
+Le « bloc uni blanc/noir » des barres etait la gouttiere de la barre de page : une bande reservee ou le canvas anime ne peut pas passer, montrant le fond plat a cote du fond vivant. La barre de page est supprimee — molette, clavier et pilule d'ancrage suffisent — et seules les barres des panneaux restent, gouttiere transparente fondue dans la carte.
+
+La molette hors du panneau etait saccadee : assigner scrollTop cran par cran court-circuite le lissage natif du navigateur. L'inertie est refaite a la main, une cible que la molette deplace et une position qui la rejoint en s'amortissant a 22 % par image.
+
+Un bouton monde rejoint les reglages : menu des langues avec le francais actif et cinq emplacements poses — anglais, allemand, chinois, japonais, arabe — marques « bientot », inertes par choix jusqu'aux traductions.
+
 ## 2026-08-29, la mort douce des particules
 
 L'utilisateur suivait un trait de vent du regard et le voyait « depop » : quand la vie d'une particule expirait, elle etait reensemencee ailleurs d'une image a l'autre, toute sa trainee disparaissait d'un coup. Meme chose a la sortie de l'ecran, et lors d'une baisse du nombre de particules ou le surplus etait retire par pop().
