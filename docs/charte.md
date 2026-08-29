@@ -62,27 +62,41 @@ Le hall se parcourt comme une armoire. Le premier niveau ne montre que des dossi
 
 **La recherche traverse tous les niveaux d'un coup.** C'est indispensable dans une navigation en profondeur : chercher "INIES" depuis le hall doit trouver, sans avoir à deviner dans quel dossier c'est rangé. Chaque résultat rappelle son dossier d'origine, sans quoi on trouve la porte mais on ne sait pas d'où elle vient.
 
-## Le dossier
+## Le dossier, une icône d'application
 
-Carré, l'icône au centre, le nom en dessous qui se révèle au survol, et le compte de ce qu'il contient dans le coin.
+Un carré plein coloré, glyphe blanc au centre, le nom posé dessous, hors de la tuile, et le compte en pastille sur le coin. C'est la grammaire d'un écran d'accueil, et elle est reprise telle quelle : **le carré coloré est le dossier**, il ne flotte pas dans une carte. Il n'y a donc aucun cadre autour de lui.
 
-**Un seul cadre par dossier.** L'icône se pose à même la carte, sans pavé teinté autour d'elle, et le compte n'a pas de pastille. Un cadre dans un cadre alourdissait la tuile et faisait lire deux objets là où il n'y en a qu'un : la carte est le dossier, l'icône est son contenu.
+**La couleur ne change pas avec le thème.** Une icône d'application garde sa couleur quel que soit le fond de l'écran d'accueil. La tuile porte un dégradé très court, de `#779c2b` à `#5f7f1f`, entre l'olive des outils et le vert profond de B27 Mobility. Les deux valeurs tiennent au moins 3:1 avec le blanc du glyphe, seuil de contraste des éléments graphiques.
 
-**L'icône occupe la tuile.** Sa largeur est un pourcentage de la carte et non un nombre de pixels : elle suit la grille quelle que soit la taille de l'écran. Environ 55 pour cent de la carte, soit une centaine de pixels sur un écran d'ordinateur.
+**Le rayon vaut 23 pour cent du côté**, proportion des icônes d'application des systèmes courants. Exprimé en pourcentage et non en pixels, il reste juste quelle que soit la taille de la tuile.
 
-**Son trait doit maigrir quand elle grandit.** Les tracés Lucide sont dessinés avec une épaisseur de 2 sur une grille de 24. À 16 px le trait fait 1,3 px à l'écran, ce qui est juste ; à 110 px il en ferait 9 et l'icône virerait au pictogramme épais. Le dossier la demande donc à 1,1, ce qui donne un peu plus de 5 px à l'écran. Règle générale : plus le glyphe est grand, plus son trait doit être proportionnellement fin pour garder la même densité apparente.
+**Le glyphe occupe 54 pour cent de la tuile**, avec un trait de 1,4 au lieu de 2. Les tracés Lucide sont dessinés à 2 sur une grille de 24 : à 16 px cela donne 1,3 px à l'écran, ce qui est juste, mais à 75 px le trait d'origine serait épais et le blanc sur fond coloré supporte mal la surcharge. Règle générale : plus le glyphe est grand, plus son trait doit être proportionnellement fin pour garder la même densité apparente.
 
-**La tuile est en flux normal, pas en positionnement absolu**, dès lors que le nom est affiché en permanence : icône, puis nom dessous, dans une colonne centrée. C'est la seule disposition où le nom ne peut pas venir mordre sur l'icône, quel que soit son nombre de lignes. Là où le nom n'apparaît qu'au survol, il sort du flux et l'icône se centre seule dans toute la tuile.
+**Le compte est une pastille de notification**, sur le coin de la tuile. Fond papier et non rouge : ce n'est pas une alerte, c'est un inventaire.
 
-Deux pièges rencontrés, notés pour ne pas les refaire. Le premier : un nom sur deux lignes chevauchait l'icône quand le nom était positionné en absolu et l'icône simplement décalée, ce qui ne se voyait que sur les intitulés longs. Le second : passer la tuile en `display: grid` avec `place-items: center` semblait équivalent, mais dans une grille dont la colonne est dimensionnée par son contenu, le pourcentage de largeur de l'icône n'a plus de référence stable ; l'icône tombait à 64 px au lieu de 103.
+### Le nom
 
-**Le nom est visible par défaut, et le masquage n'intervient que sous `@media (hover: hover) and (pointer: fine)`.** L'ordre compte : sur tablette et sur téléphone, où le survol n'existe pas, des tuiles muettes seraient indéchiffrables, et c'est aussi le repli si la requête média n'est pas comprise. Le focus clavier révèle le nom au même titre que la souris, sans quoi la navigation au clavier ferait défiler des dossiers anonymes. Le nom est toujours présent dans le code, même invisible, pour les lecteurs d'écran, et le `title` du lien porte le nom et le compte.
+**Il est visible par défaut, et le masquage n'intervient que sous `@media (hover: hover) and (pointer: fine)`.** L'ordre compte : sur tablette et sur téléphone, où le survol n'existe pas, des tuiles muettes seraient indéchiffrables, et c'est aussi le repli si la requête média n'est pas comprise. Le focus clavier révèle le nom au même titre que la souris. Le nom est toujours présent dans le code, même invisible, pour les lecteurs d'écran, et le `title` du lien porte le nom et le compte.
+
+Le nom reste dans le flux même invisible : l'opacité ne change rien à la place occupée, la grille ne bouge donc pas au survol. C'est aussi ce qui rend le chevauchement impossible, quel que soit le nombre de lignes du nom.
 
 Un dossier est un `<a href="#/...">` et non un `<div>` avec un écouteur de clic. On gagne ainsi le clavier, le clic du milieu, le menu contextuel et l'historique sans écrire une ligne de plus.
 
-**Les micro-animations.** Au survol, la carte se soulève de 3 px et sa bordure se teinte, l'icône monte de 16 px, grandit de 4 pour cent et fonce d'un cran, le nom apparaît en montant de 7 px, le compte passe au vert. Les deux verts de l'icône vont chacun dans le sens du contraste : `--primaire` au repos, `--primaire-encre` au survol, ce qui donne plus foncé sur fond clair et plus clair sur fond sombre. À l'apparition d'une grille, chaque élément entre avec un décalage de 26 ms sur le précédent : le regard suit la construction au lieu de recevoir tout d'un bloc. Le remplissage de l'animation est `backwards` et non `both`, détail qui compte : avec `both`, la valeur finale resterait appliquée après la fin et bloquerait le `transform` du survol.
+### Les micro-animations
+
+Au survol, c'est **la tuile entière** qui se soulève de 4 px et grandit de 5 pour cent, son ombre s'approfondissant, pendant que le nom apparaît en montant de 4 px. Le geste est celui d'une icône que l'on vise, pas celui d'un contenu qui bouge à l'intérieur d'un cadre.
+
+À l'apparition d'une grille, chaque élément entre avec un décalage de 26 ms sur le précédent : le regard suit la construction au lieu de recevoir tout d'un bloc. Le remplissage de l'animation est `backwards` et non `both`, détail qui compte : avec `both`, la valeur finale resterait appliquée après la fin et bloquerait le `transform` du survol.
 
 Tout cela disparaît sous `prefers-reduced-motion`.
+
+### Deux pièges rencontrés
+
+Notés pour ne pas les refaire. Le premier, du temps où le nom était positionné en absolu dans une carte : un intitulé sur deux lignes chevauchait l'icône de 7 px, ce qui ne se voyait que sur les noms longs et n'est apparu qu'à la mesure. Le second : passer la tuile en `display: grid` avec `place-items: center` semblait équivalent à une colonne flex, mais dans une grille dont la colonne est dimensionnée par son contenu, un pourcentage de largeur n'a plus de référence stable ; l'icône tombait à 64 px au lieu de 103.
+
+### À l'impression
+
+La tuile garde son aplat vert, avec `print-color-adjust: exact`. Le glyphe étant blanc, une tuile sans fond le ferait disparaître.
 
 ## Les objets du hall
 
@@ -96,7 +110,7 @@ Tout cela disparaît sous `prefers-reduced-motion`.
 
 ## Règles à ne pas casser
 
-**Le vert ne remplit pas les cartes.** Il vit dans le logo, la vignette d'icône, l'état actif d'un filtre et le survol. Une carte reste blanche ou papier sombre. Le jour où trente portes s'affichent, trente aplats verts seraient illisibles.
+**Le vert ne remplit pas les cartes de porte.** Sur une carte de porte, il vit dans la vignette d'icône et le survol ; la carte elle-même reste blanche ou papier sombre. Le jour où trente portes s'affichent, trente aplats verts seraient illisibles. Les tuiles de dossier font exception et l'assument : elles sont des icônes d'application, un objet différent, et elles ne cohabitent jamais avec des cartes de porte sur le même écran.
 
 **Une carte cliquable est un lien, une carte inerte n'en est pas un.** `hub.js` produit un `<a>` pour les statuts `en-ligne` et `beta` pourvus d'une adresse, un `<div class="inerte">` sinon. Un lien qui ne mène nulle part serait annoncé comme un lien par un lecteur d'écran et prendrait le focus au clavier pour rien.
 

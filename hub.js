@@ -370,7 +370,7 @@ function html_dossier(d, chemin, index) {
     + ' style="--i:' + index + '"'
     + ' data-recherche="' + ech(recherche) + '"'
     + ' title="' + ech(d.nom) + " : " + compte + " " + motCompte + '">'
-    +   '<span class="glyphe">' + ico(d.icone, 110, 1.1) + "</span>"
+    +   '<span class="glyphe">' + ico(d.icone, 110, 1.4) + "</span>"
     +   '<span class="nom">' + ech(d.nom) + "</span>"
     +   '<span class="compte" aria-hidden="true">' + compte + "</span>"
     + "</a>";

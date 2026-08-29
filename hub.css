@@ -46,6 +46,15 @@
   --rayon-g:14px;
   --ombre:0 1px 2px rgba(30,34,32,.05), 0 6px 20px rgba(30,34,32,.06);
   --ombre-haute:0 2px 4px rgba(30,34,32,.06), 0 12px 28px rgba(30,34,32,.10);
+  /* Tuile d'icône d'application : un dégradé très court entre l'olive des
+     outils et le vert profond de B27 Mobility. Les deux valeurs tiennent au
+     moins 3:1 avec le blanc du glyphe, seuil des éléments graphiques. Elle ne
+     change pas avec le thème : une icône d'application garde sa couleur, quel
+     que soit le fond de l'écran d'accueil. */
+  --app-haut:#779c2b;
+  --app-bas:#5f7f1f;
+  --ombre-app:0 3px 8px rgba(30,34,32,.16), 0 8px 20px rgba(30,34,32,.10);
+  --ombre-app-haute:0 6px 14px rgba(30,34,32,.20), 0 16px 34px rgba(30,34,32,.16);
   --vitesse:.12s;
   /* Les dossiers ont leur propre allure de mouvement : un peu plus lente et
      décélérée, pour que le nom qui se révèle ait le temps de se lire. */
@@ -80,6 +89,8 @@
   --anneau:rgba(165,204,82,.22);
   --ombre:0 1px 2px rgba(0,0,0,.35), 0 6px 20px rgba(0,0,0,.30);
   --ombre-haute:0 2px 4px rgba(0,0,0,.45), 0 12px 28px rgba(0,0,0,.45);
+  --ombre-app:0 3px 8px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.4);
+  --ombre-app-haute:0 6px 14px rgba(0,0,0,.55), 0 16px 34px rgba(0,0,0,.45);
 }
 @media (prefers-reduced-motion: reduce){
   :root{ --vitesse:0s; --vitesse-dossier:0s }
@@ -222,70 +233,58 @@ body.dedans .wrap{padding-top:20px}
 [data-theme="dark"] .fil-sep{color:var(--encre-2);opacity:.45}
 
 /* ------------------------------------------------------------- dossiers
-   Carrés, l'icône au centre, le nom en dessous qui se révèle au survol.
+   Des icônes d'application. Le carré plein coloré EST le dossier, le nom se
+   pose dessous, hors de la tuile, comme sur un écran d'accueil. Il n'y a donc
+   plus de carte autour : la tuile ne flotte pas dans un cadre, elle est
+   l'objet.
 
    Le nom est visible PAR DÉFAUT, et c'est délibéré : c'est l'état sur
    tablette et téléphone, où le survol n'existe pas et où des tuiles muettes
    seraient indéchiffrables. C'est aussi le repli si la requête média n'est
    pas comprise. Le masquage n'intervient qu'à l'intérieur du bloc
-   (hover:hover), c'est-à-dire uniquement là où il y a une souris pour le
-   révéler. Le focus clavier le révèle aussi, sans quoi la navigation au
-   clavier ferait défiler des dossiers anonymes. */
+   (hover:hover), là où il y a une souris pour le révéler. Le focus clavier le
+   révèle aussi, sans quoi la navigation au clavier ferait défiler des
+   dossiers anonymes.
+
+   Le nom reste dans le flux même invisible : l'opacité ne change rien à la
+   place occupée, la grille ne bouge donc pas au survol. */
 .grille-dossiers{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:14px;
+  grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+  gap:22px 16px;
 }
 @media (min-width:760px){
-  .grille-dossiers{grid-template-columns:repeat(auto-fill,minmax(158px,186px))}
+  .grille-dossiers{grid-template-columns:repeat(auto-fill,minmax(112px,138px))}
 }
 
 .dossier{
-  position:relative;aspect-ratio:1;
-  /* En flux normal : l'icone, puis le nom dessous. Tant que le nom est
-     affiche en permanence (cas tactile), c'est la seule disposition ou il ne
-     peut pas y avoir de chevauchement, quel que soit le nombre de lignes du
-     nom. La version qui revele le nom au survol repasse en grille centree,
-     plus bas, la ou le nom est absent au repos. */
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:9px;padding:14px 11px;
-  background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon-g);
-  box-shadow:var(--ombre);color:var(--encre);text-decoration:none;overflow:hidden;
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:none;border:none;box-shadow:none;padding:0;
+  color:var(--encre);text-decoration:none;
   animation:entree var(--vitesse-dossier) var(--courbe) backwards;
   animation-delay:calc(var(--i, 0) * 26ms);
-  transition:transform var(--vitesse-dossier) var(--courbe),
-             box-shadow var(--vitesse-dossier) var(--courbe),
-             border-color var(--vitesse-dossier) var(--courbe);
 }
 .dossier:hover{text-decoration:none}
 
-/* L'icône se pose à même la carte, sans pavé teinté autour d'elle : un cadre
-   dans un cadre alourdissait la tuile et faisait deux objets là où il n'y en
-   a qu'un. La carte est le dossier, l'icône est son contenu.
-
-   Elle occupe la tuile : sa largeur est un pourcentage de la carte, pas un
-   nombre de pixels, donc elle suit la grille quelle que soit la taille de
-   l'écran. La hauteur découle du viewBox, les tracés étant carrés.
-
-   Son trait est réglé à 1,1 au lieu de 2 dans hub.js. À cette taille, le
-   trait d'origine ferait près de 9 px à l'écran et l'icône virerait au
-   pictogramme épais : plus le glyphe est grand, plus son trait doit être
-   proportionnellement fin pour garder la même densité apparente. */
-/* Deux tailles, et l'écart n'est pas cosmétique. Ici, le nom est affiché en
-   permanence (cas tactile) : l'icône doit lui laisser la place de deux
-   lignes, sinon un intitulé comme "Chauffage et climatisation" vient mordre
-   dessus. Là où il y a une souris, le nom est absent au repos et l'icône peut
-   s'étaler davantage, voir le bloc (hover:hover) plus bas. */
+/* La tuile. Rayon de 23 pour cent du côté, proportion des icônes d'application
+   des systèmes courants : exprimé en pourcentage et non en pixels, il reste
+   juste quelle que soit la taille de la tuile. */
 .dossier .glyphe{
-  /* Le pourcentage se mesure sur la boîte de contenu, donc après le padding
-     de la tuile : 60 pour cent y valent un peu moins que 60 pour cent de la
-     carte. La valeur est réglée sur le rendu, pas sur le calcul. */
-  width:60%;max-width:118px;line-height:0;
-  color:var(--primaire);
+  width:100%;aspect-ratio:1;border-radius:23%;
+  background:linear-gradient(160deg,var(--app-haut),var(--app-bas));
+  color:#fff;
+  display:grid;place-items:center;
+  box-shadow:var(--ombre-app);
   transition:transform var(--vitesse-dossier) var(--courbe),
-             color var(--vitesse-dossier);
+             box-shadow var(--vitesse-dossier) var(--courbe);
 }
-.dossier .glyphe .ico{width:100%;height:auto;display:block;vertical-align:baseline}
+/* Le glyphe occupe un peu plus de la moitié de la tuile, proportion habituelle
+   d'une icône d'application. Son trait est demandé à 1,4 dans hub.js, au lieu
+   de 2 : à cette taille le trait d'origine serait épais, et le blanc sur fond
+   coloré supporte mal la surcharge. */
+.dossier .glyphe .ico{width:54%;height:auto;display:block;vertical-align:baseline}
+
 .dossier .nom{
   text-align:center;font-size:12.5px;font-weight:600;line-height:1.3;
   color:var(--encre);letter-spacing:-.1px;
@@ -293,48 +292,36 @@ body.dedans .wrap{padding-top:20px}
   transition:opacity var(--vitesse-dossier) var(--courbe),
              transform var(--vitesse-dossier) var(--courbe);
 }
-/* Le compte n'a pas de pastille non plus, pour la même raison : un chiffre
-   discret dans l'angle suffit, et n'ajoute pas un troisième contour. */
+
+/* Le compte se pose sur le coin de la tuile, comme la pastille de
+   notification d'une application. Fond papier et non rouge : ce n'est pas une
+   alerte, c'est un inventaire. */
 .dossier .compte{
-  position:absolute;top:11px;right:14px;
-  font-size:11.5px;font-weight:600;color:var(--discret);
-  font-variant-numeric:tabular-nums;
-  transition:color var(--vitesse-dossier);
+  position:absolute;top:-6px;right:-6px;
+  min-width:22px;height:22px;padding:0 6px;border-radius:11px;
+  background:var(--papier);color:var(--primaire-encre);
+  border:1px solid var(--ligne);
+  display:grid;place-items:center;
+  font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+  transition:color var(--vitesse-dossier),border-color var(--vitesse-dossier);
 }
 
 @media (hover:hover) and (pointer:fine){
   /* Il y a une souris : le nom se retire et n'apparaît qu'au survol, comme
-     demandé. L'icône reprend alors sa place au centre. */
-  /* Le nom est absent au repos : il sort du flux et l'icône reste seule,
-     centrée dans toute la tuile. Au survol elle remonte juste ce qu'il faut
-     pour dégager deux lignes de nom, hauteur mesurée et non estimée.
-
-     La disposition en colonne est conservée telle quelle, on retire seulement
-     le padding. Passer en grille centrée avait l'air équivalent mais ne l'est
-     pas : dans une grille dont la colonne est dimensionnée par son contenu,
-     le pourcentage de largeur de l'icône n'a plus de référence stable et
-     l'icône se retrouvait à 64 px au lieu de 103. */
-  .dossier{padding:0}
-  .dossier .nom{
-    position:absolute;left:11px;right:11px;bottom:15px;
-    opacity:0;transform:translateY(7px);
-  }
-  .dossier .glyphe{width:56%}
-  .dossier:hover,.dossier:focus-visible{
-    transform:translateY(-3px);box-shadow:var(--ombre-haute);border-color:var(--primaire-bord);
-  }
-  /* L'icône monte pour laisser place au nom, grandit un peu, et fonce d'un
-     cran. Les deux verts vont chacun dans le sens du contraste : plus foncé
-     sur fond clair, plus clair sur fond sombre. */
+     demandé. C'est la tuile entière qui se soulève, pas un contenu à
+     l'intérieur d'un cadre : le geste est celui d'une icône que l'on vise. */
+  .dossier .nom{opacity:0;transform:translateY(4px)}
   .dossier:hover .glyphe,.dossier:focus-visible .glyphe{
-    transform:translateY(-16px) scale(1.04);
-    color:var(--primaire-encre);
+    transform:translateY(-4px) scale(1.05);
+    box-shadow:var(--ombre-app-haute);
   }
   .dossier:hover .nom,.dossier:focus-visible .nom{opacity:1;transform:none}
-  .dossier:hover .compte,.dossier:focus-visible .compte{color:var(--primaire-encre)}
-  .dossier:active{transform:translateY(-1px)}
+  .dossier:hover .compte,.dossier:focus-visible .compte{border-color:var(--primaire-bord)}
+  .dossier:active .glyphe{transform:translateY(-1px) scale(1.01)}
 }
-.dossier:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
+.dossier:focus-visible{outline:none}
+.dossier:focus-visible .glyphe{outline:2px solid var(--primaire);outline-offset:4px}
 
 /* --------------------------------------------------------------- grilles */
 .grille{
@@ -515,10 +502,14 @@ footer.pied .sep{margin:0 7px;opacity:.5}
   .noprint,.barre,.fil-retour{display:none !important}
   .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
   .grille-dossiers{grid-template-columns:repeat(4,1fr)}
-  .dossier{display:flex;flex-direction:column;align-items:center;justify-content:center;
-           gap:9px;padding:14px 11px}
-  .dossier .nom{position:static;opacity:1;transform:none}
-  .dossier .glyphe{transform:none;width:52%}
+  /* Le nom redevient visible, et la tuile garde son aplat vert : le glyphe
+     est blanc, sur du papier sans fond il disparaîtrait. D'où l'impression
+     forcée des couleurs de fond pour cette tuile seulement. */
+  .dossier .nom{opacity:1;transform:none}
+  .dossier .glyphe{
+    transform:none;box-shadow:none;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
   .carte,.fiche,.dossier{break-inside:avoid;box-shadow:none}
   .carte .sortie{display:none}
   a.carte[href]::after{
