@@ -34,7 +34,7 @@ python tests/verifier_catalogue.py
 | `docs/signalement.md` | Fonctionnement du signalement et modes d'envoi. |
 | `docs/bandeau.md` | Photo du bandeau : clé Unsplash, quota, traitement des couleurs. |
 
-HTML, CSS et JavaScript sans framework et sans étape de build. Aucune requête externe : la page s'ouvre aussi bien en ligne que par un double-clic sur `index.html`.
+HTML, CSS et JavaScript sans framework et sans étape de build. Tout est dans le dépôt, à une exception près : la photo du bandeau d'accueil, facultative et décorative. Sans elle la page s'ouvre aussi bien en ligne que par un double-clic sur `index.html`.
 
 La position dans l'arborescence tient dans l'adresse (`#/ressources/technique`) : le bouton Précédent du navigateur fonctionne, et le lien d'un dossier précis se transmet tel quel.
 

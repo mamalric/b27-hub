@@ -201,7 +201,9 @@ La tuile garde son aplat vert, avec `print-color-adjust: exact`. Le glyphe étan
 
 **Les chiffres du bandeau sont calculés, jamais écrits.** Portes ouvertes, univers, portes en préparation : tout vient du catalogue à l'affichage. Un chiffre recopié à la main finit toujours par mentir.
 
-**Aucune requête externe.** Pas de Google Fonts, pas de CDN, pas d'icône chargée à la volée. La pile de polices commence par Inter et retombe sur Segoe UI, présente sur les postes B27. Les icônes sont des tracés Lucide inlinés dans `TRACES_ICONES`. C'est ce qui permet d'ouvrir la page depuis le disque, et de ne rien envoyer à un tiers.
+**Les ressources sont dans le dépôt, par défaut et non par règle.** Pas de CDN, pas d'icône chargée à la volée : les icônes sont des tracés Lucide inlinés dans `TRACES_ICONES`. C'est ce qui permet d'ouvrir la page depuis le disque. Ce n'est pas une contrainte posée par le projet, c'est un choix par défaut, et il se discute au cas par cas : le bandeau d'accueil y déroge déjà pour aller chercher sa photo.
+
+**La police, elle, n'est pas conforme à ce qu'annonçait cette charte.** La pile commence par Inter, mais rien ne charge Inter : ni `@font-face`, ni feuille distante. Les postes B27 affichent donc du Segoe UI. Le défaut n'a pas été causé par le choix ci-dessus — Inter est sous licence SIL Open Font, elle peut être embarquée dans le dépôt et servie sans aucune requête. Le sujet a simplement été laissé de côté.
 
 **La barre de recherche n'apparaît qu'au-delà de `REGLAGES.seuilFiltres` portes** (6 par défaut). En dessous elle occuperait plus de place que le contenu qu'elle filtre. Au-dessus, elle apparaît sans qu'il y ait rien à faire.
 

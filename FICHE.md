@@ -40,7 +40,7 @@ Puis trancher le mode d'envoi du signalement. Le mode `mailto` en place demande 
 Ensuite : remplir l'annuaire, qui n'a qu'une fiche. Publier les outils web B27 encore non déployés (RefriSelect, Calculette résistance thermique, Calculette confort d'été, Désenfumage, Arbitrage carbone ACV, RTex Tool, Livre d'or REX) et ajouter leur fiche au fur et à mesure : les catégories Ventilation, Thermique, Sécurité incendie, Carbone et Électricité sont déjà déclarées et attendent leur première porte. Enfin, passer le lien à quelques collègues pour un premier retour avant diffusion large.
 
 ## Utilisation
-En ligne : https://mamalric.github.io/b27-hub/ (GitHub Pages, publié depuis `main`). Hors ligne : ouvrir `index.html` dans un navigateur, la page est autonome et ne fait aucune requête externe, mais les portes qu'elle pointe demandent une connexion.
+En ligne : https://mamalric.github.io/b27-hub/ (GitHub Pages, publié depuis `main`). Hors ligne : ouvrir `index.html` dans un navigateur, la page se construit entièrement en local, seule la photo du bandeau manque à l'appel. Les portes qu'elle pointe demandent en revanche une connexion.
 
 Pour ajouter une porte : modifier `catalogue.js`, copier une fiche existante et la remplir, le gabarit, les deux types de carte et les statuts sont documentés en tête du fichier. Lancer ensuite `python tests/verifier_catalogue.py` pour vérifier que le catalogue est cohérent (identifiants uniques, catégories, statuts et types connus, icônes déclarées, adresses présentes pour les statuts cliquables, fiches d'annuaire joignables, réglages du signalement cohérents), puis pousser sur `main`.
 
