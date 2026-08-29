@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, epuration
+
+L'utilisateur ne trouve pas le resultat convaincant et commence par faire de la place. Retires : le lien de contact en pied de barre laterale, et tout le pied de page (compte des portes, phrase sur ce que le hub ne collecte pas, adresse de contact). Le code mort qui les alimentait est parti avec, dans les trois fichiers, plutot que de laisser des elements orphelins.
+
+Le contact reste joignable par la pastille de signalement et par le panneau A propos : rien n'est devenu inatteignable. La marge basse que le pied assurait est reportee sur le contenu, et la navigation laterale respire en bas au lieu de finir collee au bord.
+
+Iteration en cours, l'utilisateur dira la suite.
+
 ## 2026-08-29, bandeau de charpente
 
 L'utilisateur envoie une image de charpente métallique, moitié photo moitié filaire, et demande de la vectoriser en simplifiant pour en faire un bandeau d'accueil. Il a raison sur le manque : il manquait quelque chose qui dise le métier.

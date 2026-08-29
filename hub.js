@@ -847,11 +847,6 @@ function construireRail() {
       +   '<span class="rail-puce" style="--c:' + couleurSure(d.couleur) + '">' + ico(d.icone, 16) + "</span>"
       +   "<span>" + ech(d.nom) + "</span>"
       +   '<span class="rail-compte">' + (d.annuaire ? d.compte : d.portes.length) + "</span></a>").join("");
-
-  $("railPied").innerHTML = REGLAGES.contact
-    ? '<a class="rail-contact" href="mailto:' + ech(REGLAGES.contact) + '">'
-      + ico("courrier", 14) + "<span>Un bug, une idée</span></a>"
-    : "";
 }
 
 // Le lien de la catégorie courante est marqué, pour qu'on sache toujours où
@@ -1013,15 +1008,6 @@ function init() {
   document.addEventListener("keydown", ev => {
     if (ev.key === "Escape" && document.body.classList.contains("rail-ouvert")) ouvrirRail(false);
   });
-
-  const ouvertes = PORTES.filter(estCliquable).length;
-  $("piedCompte").textContent = PORTES.length + " porte" + (PORTES.length > 1 ? "s" : "")
-    + " référencée" + (PORTES.length > 1 ? "s" : "") + ", " + ouvertes + " ouverte" + (ouvertes > 1 ? "s" : "");
-
-  if (REGLAGES.contact) {
-    $("piedContact").innerHTML = 'Un bug, une idée d\'outil : la pastille en bas à droite, ou <a href="mailto:'
-      + ech(REGLAGES.contact) + '">' + ech(REGLAGES.contact) + "</a>";
-  }
 
   // Un seul écouteur pour toute la page plutôt qu'un par carte : les grilles
   // sont reconstruites à chaque navigation, des écouteurs posés sur les

@@ -135,7 +135,7 @@ a:hover{text-decoration:underline}
 .rail-nom b{font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
 .rail-nom small{font-size:11.5px;color:var(--discret);line-height:1.3}
 
-.rail-nav{flex:1;overflow-y:auto;padding:12px 10px}
+.rail-nav{flex:1;overflow-y:auto;padding:12px 10px 20px}
 .rail-titre{
   margin:14px 0 6px;padding:0 8px;
   font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
@@ -166,9 +166,6 @@ a:hover{text-decoration:underline}
   font-size:11px;font-weight:600;color:var(--discret);
   font-variant-numeric:tabular-nums;flex:none;
 }
-.rail-pied{padding:12px 14px 16px;border-top:1px solid var(--ligne-2)}
-.rail-contact{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--discret)}
-.rail-contact:hover{color:var(--primaire-encre);text-decoration:none}
 
 .rail-voile{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:19}
 
@@ -193,9 +190,7 @@ a:hover{text-decoration:underline}
 }
 .bouton-icone:hover{background:var(--papier-2);color:var(--encre)}
 
-.wrap{padding:26px;flex:1;max-width:1360px;width:100%}
-.pied{padding:10px 26px 34px;max-width:1360px;font-size:12px;color:var(--discret);line-height:1.7}
-.pied .sep{margin:0 7px;opacity:.5}
+.wrap{padding:26px 26px 44px;flex:1;max-width:1360px;width:100%}
 
 /* ------------------------------------------------------------ recherche
    Au centre de la barre du haut, comme sur un tableau de bord : c'est le
@@ -629,8 +624,7 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
   /* La recherche passe sous le titre : à cette largeur, la garder sur la
      même ligne la réduirait à un champ où l'on ne lit plus ce qu'on tape. */
   .barre-recherche{order:9;flex-basis:100%;max-width:none}
-  .wrap{padding:20px 16px}
-  .pied{padding:8px 16px 30px}
+  .wrap{padding:20px 16px 34px}
   .salut{font-size:22px}
   .banniere{min-height:152px}
   .banniere-txt{padding:24px 22px}
