@@ -101,10 +101,16 @@ const TRACES_ICONES = {
   retour: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>'
 };
 
-function ico(nom, taille) {
+// L'épaisseur de trait est réglable, et il faut s'en servir dès qu'on agrandit
+// une icône. Les tracés Lucide sont dessinés à 2 sur une grille de 24 : à
+// 16 px le trait fait 1,3 px à l'écran, mais à 110 px il en ferait 9, et
+// l'icône vire au pictogramme épais. Un grand glyphe demande un trait
+// proportionnellement plus fin pour garder la même densité apparente.
+function ico(nom, taille, epaisseur) {
   const traces = TRACES_ICONES[nom] || TRACES_ICONES.info;
   return '<svg class="ico" width="' + (taille || 16) + '" height="' + (taille || 16) + '" viewBox="0 0 24 24"'
-    + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+    + ' fill="none" stroke="currentColor" stroke-width="' + (epaisseur || 2) + '"'
+    + ' stroke-linecap="round" stroke-linejoin="round"'
     + ' aria-hidden="true">' + traces + '</svg>';
 }
 
@@ -364,7 +370,7 @@ function html_dossier(d, chemin, index) {
     + ' style="--i:' + index + '"'
     + ' data-recherche="' + ech(recherche) + '"'
     + ' title="' + ech(d.nom) + " : " + compte + " " + motCompte + '">'
-    +   '<span class="glyphe">' + ico(d.icone, 46) + "</span>"
+    +   '<span class="glyphe">' + ico(d.icone, 110, 1.1) + "</span>"
     +   '<span class="nom">' + ech(d.nom) + "</span>"
     +   '<span class="compte" aria-hidden="true">' + compte + "</span>"
     + "</a>";

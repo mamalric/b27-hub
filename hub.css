@@ -242,7 +242,13 @@ body.dedans .wrap{padding-top:20px}
 
 .dossier{
   position:relative;aspect-ratio:1;
-  display:grid;place-items:center;
+  /* En flux normal : l'icone, puis le nom dessous. Tant que le nom est
+     affiche en permanence (cas tactile), c'est la seule disposition ou il ne
+     peut pas y avoir de chevauchement, quel que soit le nombre de lignes du
+     nom. La version qui revele le nom au survol repasse en grille centree,
+     plus bas, la ou le nom est absent au repos. */
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:9px;padding:14px 11px;
   background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon-g);
   box-shadow:var(--ombre);color:var(--encre);text-decoration:none;overflow:hidden;
   animation:entree var(--vitesse-dossier) var(--courbe) backwards;
@@ -255,17 +261,32 @@ body.dedans .wrap{padding-top:20px}
 
 /* L'icône se pose à même la carte, sans pavé teinté autour d'elle : un cadre
    dans un cadre alourdissait la tuile et faisait deux objets là où il n'y en
-   a qu'un. La carte est le dossier, l'icône est son contenu. Débarrassée de
-   sa boîte, l'icône peut aussi être dessinée plus grand. */
+   a qu'un. La carte est le dossier, l'icône est son contenu.
+
+   Elle occupe la tuile : sa largeur est un pourcentage de la carte, pas un
+   nombre de pixels, donc elle suit la grille quelle que soit la taille de
+   l'écran. La hauteur découle du viewBox, les tracés étant carrés.
+
+   Son trait est réglé à 1,1 au lieu de 2 dans hub.js. À cette taille, le
+   trait d'origine ferait près de 9 px à l'écran et l'icône virerait au
+   pictogramme épais : plus le glyphe est grand, plus son trait doit être
+   proportionnellement fin pour garder la même densité apparente. */
+/* Deux tailles, et l'écart n'est pas cosmétique. Ici, le nom est affiché en
+   permanence (cas tactile) : l'icône doit lui laisser la place de deux
+   lignes, sinon un intitulé comme "Chauffage et climatisation" vient mordre
+   dessus. Là où il y a une souris, le nom est absent au repos et l'icône peut
+   s'étaler davantage, voir le bloc (hover:hover) plus bas. */
 .dossier .glyphe{
-  display:grid;place-items:center;
+  /* Le pourcentage se mesure sur la boîte de contenu, donc après le padding
+     de la tuile : 60 pour cent y valent un peu moins que 60 pour cent de la
+     carte. La valeur est réglée sur le rendu, pas sur le calcul. */
+  width:60%;max-width:118px;line-height:0;
   color:var(--primaire);
-  transform:translateY(-13px);
   transition:transform var(--vitesse-dossier) var(--courbe),
              color var(--vitesse-dossier);
 }
+.dossier .glyphe .ico{width:100%;height:auto;display:block;vertical-align:baseline}
 .dossier .nom{
-  position:absolute;left:11px;right:11px;bottom:15px;
   text-align:center;font-size:12.5px;font-weight:600;line-height:1.3;
   color:var(--encre);letter-spacing:-.1px;
   opacity:1;transform:none;
@@ -284,8 +305,21 @@ body.dedans .wrap{padding-top:20px}
 @media (hover:hover) and (pointer:fine){
   /* Il y a une souris : le nom se retire et n'apparaît qu'au survol, comme
      demandé. L'icône reprend alors sa place au centre. */
-  .dossier .nom{opacity:0;transform:translateY(7px)}
-  .dossier .glyphe{transform:none}
+  /* Le nom est absent au repos : il sort du flux et l'icône reste seule,
+     centrée dans toute la tuile. Au survol elle remonte juste ce qu'il faut
+     pour dégager deux lignes de nom, hauteur mesurée et non estimée.
+
+     La disposition en colonne est conservée telle quelle, on retire seulement
+     le padding. Passer en grille centrée avait l'air équivalent mais ne l'est
+     pas : dans une grille dont la colonne est dimensionnée par son contenu,
+     le pourcentage de largeur de l'icône n'a plus de référence stable et
+     l'icône se retrouvait à 64 px au lieu de 103. */
+  .dossier{padding:0}
+  .dossier .nom{
+    position:absolute;left:11px;right:11px;bottom:15px;
+    opacity:0;transform:translateY(7px);
+  }
+  .dossier .glyphe{width:56%}
   .dossier:hover,.dossier:focus-visible{
     transform:translateY(-3px);box-shadow:var(--ombre-haute);border-color:var(--primaire-bord);
   }
@@ -293,7 +327,7 @@ body.dedans .wrap{padding-top:20px}
      cran. Les deux verts vont chacun dans le sens du contraste : plus foncé
      sur fond clair, plus clair sur fond sombre. */
   .dossier:hover .glyphe,.dossier:focus-visible .glyphe{
-    transform:translateY(-13px) scale(1.07);
+    transform:translateY(-16px) scale(1.04);
     color:var(--primaire-encre);
   }
   .dossier:hover .nom,.dossier:focus-visible .nom{opacity:1;transform:none}
@@ -481,8 +515,10 @@ footer.pied .sep{margin:0 7px;opacity:.5}
   .noprint,.barre,.fil-retour{display:none !important}
   .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
   .grille-dossiers{grid-template-columns:repeat(4,1fr)}
-  .dossier .nom{opacity:1;transform:none}
-  .dossier .glyphe{transform:translateY(-13px)}
+  .dossier{display:flex;flex-direction:column;align-items:center;justify-content:center;
+           gap:9px;padding:14px 11px}
+  .dossier .nom{position:static;opacity:1;transform:none}
+  .dossier .glyphe{transform:none;width:52%}
   .carte,.fiche,.dossier{break-inside:avoid;box-shadow:none}
   .carte .sortie{display:none}
   a.carte[href]::after{
