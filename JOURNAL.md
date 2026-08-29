@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, la dictée sur Opera
+
+L'utilisateur signale que la dictée marche sur Chrome mais pas sur Opera, capture d'écran à l'appui : micro autorisé, six entrées audio, et l'état bloqué sur "Démarrage de la dictée".
+
+**La cause.** Opera n'implémente pas la reconnaissance vocale, alors qu'il est fondé sur Chromium. Confirmé sur les forums Opera et les tables de compatibilité : l'API n'est prise en charge sur aucune version. Le piège est que l'objet `webkitSpeechRecognition` existe bel et bien, donc la détection par simple présence du constructeur le croyait capable. `start()` réussit, puis plus aucun événement n'arrive, ni `onstart`, ni `onerror`, ni `onend`. Le correctif précédent finissait par trancher au bout de six secondes grâce à la veille, mais sans rien expliquer : c'est long, et l'utilisateur n'apprenait rien. Brave est dans le même cas, avec une erreur réseau systématique.
+
+**Corrigé.** Un contrôle de support rendu à la construction du panneau, et non au clic. Opera et Brave sont nommés explicitement, puisque le constructeur ne les trahit pas. Sur ces navigateurs, le bouton Dicter est grisé d'emblée, accompagné de la raison et de la marche à suivre, dans un encadré neutre et non ambre : une fonction absente n'est pas une panne, et l'encadré ambre alarmerait sur quelque chose qui ne se réparera pas. Firefox reçoit le même traitement, avec le message correspondant. `Signalement.diagnostic()` rapporte désormais aussi `dicteeUtilisable`, avec la cause quand la réponse est non.
+
+**Vérifications.** Les quatre cas exercés en simulant chaque navigateur : Opera et Brave donnent leur message propre, l'absence de moteur donne le message générique, et Chrome garde le bouton actif avec l'avertissement habituel sur la transcription non locale.
+
+**À noter.** Le reste du signalement, capture d'écran comprise, fonctionne normalement sur Opera. Seule la dictée manque, et c'est désormais dit.
+
 ## 2026-08-29, correctif de la dictée
 
 Retour de l'utilisateur : la dictée ne marche pas. Elle n'avait pas pu être exercée à la livraison, le microphone étant bloqué dans le navigateur d'essai. La relecture du code a montré que ce n'était pas seulement l'environnement.

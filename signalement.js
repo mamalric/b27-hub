@@ -237,6 +237,13 @@ const Signalement = (function () {
   background:var(--sg-ambre-fond);border:1px solid var(--sg-ambre-bord);
   border-radius:7px;padding:7px 10px;color:var(--sg-encre-2);
 }
+/* Navigateur qui ne sait pas transcrire : ce n'est pas une panne, c'est une
+   fonction absente. Encadre neutre plutot qu'ambre, pour ne pas alarmer sur
+   quelque chose qui ne se reparera pas. */
+.sg-dictee .sg-etat.sg-indispo{
+  background:var(--sg-papier-2);border:1px solid var(--sg-ligne);
+  border-radius:7px;padding:7px 10px;color:var(--sg-encre-2);
+}
 .sg-btn.sg-enregistre{
   background:var(--sg-rouge);border-color:var(--sg-rouge);color:#fff;
   animation:sg-battement 1.4s ease-in-out infinite;
@@ -449,6 +456,33 @@ const Signalement = (function () {
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   }
 
+  // Tester la seule présence du constructeur ne suffit pas, et c'est le piège
+  // de cette API. Opera et Brave, tous deux fondés sur Chromium, exposent bien
+  // webkitSpeechRecognition mais ne l'implémentent pas : chez Opera, start()
+  // réussit et plus aucun événement n'arrive jamais, ni onstart, ni onerror,
+  // ni onend ; chez Brave, une erreur réseau tombe systématiquement. Il faut
+  // donc les nommer, sans quoi le bouton reste sur "Démarrage de la dictée"
+  // jusqu'à ce que la veille de six secondes tranche, ce qui est long et
+  // n'explique rien.
+  function supportDictee() {
+    if (!MoteurDictee()) {
+      return { ok: false, cause: "moteur-absent",
+        raison: "Ce navigateur n'a pas de moteur de dictée. Le champ reste saisissable au clavier, "
+          + "ou ouvrez le hub dans Chrome ou Edge pour dicter." };
+    }
+    if (window.opr || / OPR\//.test(navigator.userAgent)) {
+      return { ok: false, cause: "opera",
+        raison: "Opera n'implémente pas la transcription vocale, malgré son moteur Chromium : "
+          + "le bouton resterait sans effet. Ouvrez le hub dans Chrome ou Edge pour dicter." };
+    }
+    if (navigator.brave) {
+      return { ok: false, cause: "brave",
+        raison: "Brave n'implémente pas la transcription vocale. Ouvrez le hub dans Chrome ou "
+          + "Edge pour dicter." };
+    }
+    return { ok: true, cause: "" };
+  }
+
   // Tous les codes d'erreur prévus par la spécification, plus ceux que Chrome
   // et Edge émettent en pratique. Les laisser sans message était le défaut de
   // la première version : sur une erreur non traitée, l'état restait bloqué
@@ -505,8 +539,9 @@ const Signalement = (function () {
   }
 
   async function demarrerDictee() {
+    const support = supportDictee();
+    if (!support.ok) { echecDictee(support.raison); return; }
     const Moteur = MoteurDictee();
-    if (!Moteur) { echecDictee("Ce navigateur n'a pas de moteur de dictée."); return; }
 
     // Ouvert par un double-clic sur le fichier, le hub n'est pas en https et
     // le micro sera refusé sans explication. Autant le dire tout de suite.
@@ -799,7 +834,20 @@ const Signalement = (function () {
      ------------------------------------------------------------------ */
   function construirePanneau() {
     const c = contexte();
-    const avecDictee = cfg.dictee && !!MoteurDictee();
+    // Le verdict est rendu à la construction du panneau, pas au clic : sur un
+    // navigateur qui ne sait pas transcrire, mieux vaut le dire avant que
+    // l'utilisateur appuie sur un bouton qui ne fera rien.
+    const support = cfg.dictee ? supportDictee() : { ok: false, raison: null };
+    const blocDictee = !cfg.dictee ? ""
+      : support.ok
+        ? '<div class="sg-dictee">'
+          + '<button type="button" class="sg-btn sg-sec" data-sg="dictee">' + ico("micro", 15) + "Dicter</button>"
+          + '<span class="sg-etat">' + texteAvertissementDictee() + "</span>"
+          + "</div>"
+        : '<div class="sg-dictee">'
+          + '<button type="button" class="sg-btn sg-sec" data-sg="dictee" disabled>' + ico("micro", 15) + "Dicter</button>"
+          + '<span class="sg-etat sg-indispo">' + ech(support.raison) + "</span>"
+          + "</div>";
 
     // Ce texte est écrit avant qu'on sache si une capture sera jointe : il ne
     // promet donc rien sur le collage. Le message affiché après l'envoi, lui,
@@ -827,12 +875,7 @@ const Signalement = (function () {
       +       '<label for="sg-description">Qu\'est-ce qui ne va pas ?</label>'
       +       '<textarea id="sg-description" placeholder="Ce que vous faisiez, ce que vous attendiez, ce qui est arrivé. Ou dictez-le."></textarea>'
       +     "</div>"
-      +     (avecDictee
-          ? '<div class="sg-dictee">'
-            +   '<button type="button" class="sg-btn sg-sec" data-sg="dictee">' + ico("micro", 15) + "Dicter</button>"
-            +   '<span class="sg-etat">' + texteAvertissementDictee() + "</span>"
-            + "</div>"
-          : "")
+      +     blocDictee
       +     '<p class="sg-contexte">Joint automatiquement : ' + ech(c.titrePage) + ", "
       +       ech(c.navigateur) + ", fenêtre " + ech(c.ecran) + ", " + ech(c.date) + ".</p>"
       +   "</div>"
@@ -988,6 +1031,7 @@ const Signalement = (function () {
       enLigne: navigator.onLine,
       langue: navigator.language,
       moteurDictee: Moteur ? (window.SpeechRecognition ? "SpeechRecognition" : "webkitSpeechRecognition") : "absent",
+      dicteeUtilisable: supportDictee().ok ? "oui" : "non (" + supportDictee().cause + ")",
       autorisationMicro: permission,
       entreesAudio: micros,
       captureEcran: captureSupportee() ? "disponible" : "absente",

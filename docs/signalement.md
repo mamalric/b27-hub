@@ -109,7 +109,21 @@ Le bouton Dicter écrit le texte au fur et à mesure de la parole, sans attendre
 
 **La transcription n'est pas locale.** Sur Chrome et Edge, la voix est envoyée au service de transcription de l'éditeur du navigateur. C'est la seule chose, dans tout ce dispositif, qui sorte du poste. Le panneau l'écrit à côté du bouton, avant le premier enregistrement.
 
-Firefox n'implémente pas cette interface : le bouton ne s'affiche pas, le champ reste saisissable au clavier.
+### Quels navigateurs savent dicter
+
+| Navigateur | Dictée | Ce qui s'affiche |
+|---|---|---|
+| Chrome | Oui | Bouton actif. |
+| Edge | Oui | Bouton actif. |
+| **Opera** | **Non** | Bouton grisé, avec la raison et la marche à suivre. |
+| **Brave** | **Non** | Bouton grisé, avec la raison. |
+| Firefox | Non | Bouton grisé, le champ reste saisissable au clavier. |
+
+Le cas d'Opera est le piège de cette API, et il a coûté une correction. Opera est fondé sur Chromium et **expose bien l'objet `webkitSpeechRecognition`**, si bien qu'une détection par simple présence du constructeur le croit capable. Mais l'interface n'est pas implémentée : `start()` réussit, et plus aucun événement n'arrive jamais, ni `onstart`, ni `onerror`, ni `onend`. Le panneau restait donc sur "Démarrage de la dictée" jusqu'à ce que la veille de six secondes finisse par trancher, sans rien expliquer.
+
+Tester la présence du constructeur ne suffit donc pas : Opera et Brave sont nommés explicitement, et le bouton est grisé d'emblée avec la raison, plutôt que de laisser quelqu'un appuyer sur un bouton qui ne fera rien.
+
+Le reste de l'application, capture d'écran comprise, fonctionne normalement sur Opera comme sur Brave. Seule la dictée manque.
 
 ### Quand la dictée ne marche pas
 
