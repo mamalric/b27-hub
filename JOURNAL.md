@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, le ciel devient lisible
+
+Retour de l'utilisateur, a Dijon sous un ciel couvert : le fond n'a pas change, toujours le meme vent leger qui fait des loopings. Il a raison, et le diagnostic est instructif : mes ambiances calme, couvert et soleil ne differaient que par la vitesse et l'opacite — techniquement actives, perceptivement identiques. Une differenciation que personne ne voit n'existe pas.
+
+**Chaque temps recoit un decor reconnaissable au premier regard.** Couvert et brouillard : de grandes nappes floues, degrades radiaux tres doux qui derivent a peine au-dessus du flux. Orage : les memes nappes, plus profondes, sous un champ turbulent. Soleil : un halo dore fixe en haut de page — fixe, parce qu'un halo qui pulse cesse d'etre apaisant — et la pointe claire de la palette qui se dore. Les nappes survivent aux changements d'ambiance, seul leur nombre s'ajuste : le ciel glisse, il ne bascule pas.
+
+**La ville retrouve son nom.** « Votre position » etait un pis-aller : le geocodage inverse de l'API Adresse de l'Etat (api-adresse.data.gouv.fr, sans cle ni compte) le remplace par le nom de la commune. Une position enregistree avant cette version se fait nommer au chargement suivant. Hors de France ou en cas d'echec, le pis-aller reste.
+
+**Un bouton actualise le releve** sans attendre l'expiration du cache, avec une fleche qui tourne le temps de la reponse, succes ou echec.
+
+Troisieme requete externe du portail, donc, toutes facultatives : Open-Meteo, la geolocalisation si demandee, et le geocodage qui la nomme.
+
 ## 2026-08-29, la meteo veille
 
 Question de l'utilisateur : la meteo ne se met pas a jour automatiquement ? Non, et c'etait un manque : elle ne se chargeait qu'a l'ouverture de la page, un onglet laisse ouvert toute la journee affichait le releve du matin, fige.

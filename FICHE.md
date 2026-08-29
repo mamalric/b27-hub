@@ -18,7 +18,7 @@ depot: https://github.com/mamalric/b27-hub    # URL du dépôt git, vide sinon
 Donner un point d'entrée unique, en ligne, vers les outils, les sites et les ressources utiles aux collègues de B27, de façon à ne communiquer qu'un seul lien au lieu d'adresses dispersées. Le hub n'héberge rien : il présente une carte par porte et redirige. La démarche est personnelle et autonome, menée en parallèle du remplacement du GRR conduit avec le service informatique de B27.
 
 ## État actuel
-Version v8 en ligne sur GitHub Pages, publiée depuis `main` : le portail dont le fond vit avec le ciel. Tout est centré sous le logo — emblème sur plaque de verre avec aura, titre en dégradé, accroche, recherche filtrante (raccourci `/`), compteurs. Un champ d'écoulement animé, calculé en local, occupe le fond de page et suit la météo affichée (stries de pluie inclinées par le vent mesuré, flocons, brouillard figé, turbulence d'orage sans jamais d'éclair) ainsi que la saison, qui teinte la palette ; il s'immobilise si le poste demande moins d'animations. Au défilement, tuiles, logo et titre s'ancrent : pastilles compactes à gauche, pilule centrale qui ramène en haut. Sombre par défaut, thème clair mémorisé par navigateur.
+Version v8 en ligne sur GitHub Pages, publiée depuis `main` : le portail dont le fond vit avec le ciel. Tout est centré sous le logo — emblème sur plaque de verre avec aura, titre en dégradé, accroche, recherche filtrante (raccourci `/`), compteurs. Un champ d'écoulement animé, calculé en local, occupe le fond de page et suit la météo affichée (stries de pluie inclinées par le vent mesuré, flocons, nappes nuageuses du couvert et du brouillard, halo doré du soleil, turbulence d'orage sans jamais d'éclair) ainsi que la saison, qui teinte la palette ; il s'immobilise si le poste demande moins d'animations. Au défilement, tuiles, logo et titre s'ancrent : pastilles compactes à gauche, pilule centrale qui ramène en haut. Sombre par défaut, thème clair mémorisé par navigateur.
 
 Deux tuiles vivantes, en colonne dans le coin haut gauche sur grand écran et sous la recherche en dessous de 1240 px : la météo en données réelles Open-Meteo (sans clé ni compte, lieu par défaut Dijon, bouton « ma position », relevé en cache vingt minutes et reverifié toutes les dix minutes ainsi qu'au retour sur l'onglet, tuile absente sans réseau) et un calendrier en semaines ISO, semaines sur l'axe vertical, week-ends teintés, jour et semaine courants marqués, navigation de mois en mois.
 
@@ -26,7 +26,7 @@ Le catalogue se lit en deux rayons — Nos outils en cartes, Ressources en rang�
 
 La page est construite à l'exécution à partir de `catalogue.js`, seul fichier à faire vivre. La pastille de signalement, conservée telle quelle, ouvre un formulaire avec capture d'écran et dictée vocale (Chrome et Edge ; Win + H proposé ailleurs).
 
-Aucune donnée collectée, balise `noindex` et `robots.txt`. Deux requêtes externes facultatives : la météo, et la géolocalisation si le visiteur la demande.
+Aucune donnée collectée, balise `noindex` et `robots.txt`. Trois requêtes externes facultatives : la météo Open-Meteo, la géolocalisation si le visiteur la demande, et le géocodage inverse de l'API Adresse de l'État qui donne son nom à la ville.
 
 ## Prochaine étape
 La v7 est validée par l'utilisateur (« beaucoup mieux, j'adore ») et retouchée dans la foulée : tuiles en coin haut gauche, emblème opaque, traînées à expiration ferme. Continuer d'itérer sur ses retours.

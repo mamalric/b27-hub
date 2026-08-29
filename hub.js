@@ -103,6 +103,7 @@ const TRACES_ICONES = {
   lune: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   engrenage: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
   fermer: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  actualiser: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   courrier: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
   telephone: '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>',
@@ -365,6 +366,14 @@ const FONDS_SAISON = {
   clair:  { hiver: "#f0f4f5", printemps: "#f3f5f0", ete: "#f5f5ec", automne: "#f5f3ec" }
 };
 
+// Sous le soleil, la pointe claire de la palette se dore, quelle que soit
+// la saison : c'est elle que le halo fait chanter.
+function sombre_ete_traits(cle, saison) {
+  const base = PALETTES_SAISON[cle][saison].slice();
+  base[2] = cle === "sombre" ? "230,212,128" : "160,140,60";
+  return base;
+}
+
 function calculerAmbiance() {
   const sombre = document.documentElement.dataset.theme !== "light";
   const cle = sombre ? "sombre" : "clair";
@@ -375,6 +384,7 @@ function calculerAmbiance() {
   const vent = FOND.meteo ? Math.min(1, Math.max(0, FOND.meteo.vent / 40)) : 0.15;
 
   const a = {
+    groupe: groupe,
     fond: FONDS_SAISON[cle][saison],
     traits: PALETTES_SAISON[cle][saison],
     precip: PALETTES_PRECIP[cle][groupe] || PALETTES_PRECIP[cle].pluie,
@@ -385,28 +395,51 @@ function calculerAmbiance() {
     alpha: 1,           // facteur sur l'opacité des traits
     biaisX: 0.1,        // dérive horizontale commune, poussée par le vent
     biaisY: 0,          // dérive verticale : négative, le flux monte
-    trainee: DUREE_TRAINEE
+    trainee: DUREE_TRAINEE,
+    // Les décors : de grandes nappes floues qui dérivent (nuages), un halo
+    // fixe (soleil). C'est ce qui rend chaque temps reconnaissable au
+    // premier regard : la vitesse et l'opacité seules, personne ne les
+    // voit — c'est l'erreur qu'a corrigée cette version.
+    nuages: 0, teinteNuage: "126,138,118", alphaNuage: 0.085,
+    halo: false
   };
 
   if (groupe === "soleil") {
-    // Courants thermiques : lents, longs, légèrement ascendants.
-    a.vitesse = 0.85; a.trainee = 70; a.biaisY = -0.06; a.nb = 75;
+    // Courants thermiques lents, légèrement ascendants, et un halo doré
+    // fixe en haut de page. Fixe : un halo qui bouge cesse d'être calme.
+    a.vitesse = 0.85; a.trainee = 70; a.biaisY = -0.06; a.nb = 70;
+    a.halo = true;
+    a.traits = sombre_ete_traits(cle, saison);
   } else if (groupe === "couvert") {
-    a.vitesse = 0.75; a.alpha = 0.85; a.nb = 80;
+    // Le ciel se voit : des nappes grises qui dérivent au-dessus d'un flux
+    // ralenti, dans une palette assourdie.
+    a.vitesse = 0.7; a.alpha = 0.8; a.nb = 65;
+    a.nuages = 7;
+    a.traits = cle === "sombre"
+      ? ["118,132,112", "84,96,80", "150,162,140"]
+      : ["96,108,90", "112,124,104", "130,142,120"];
   } else if (groupe === "brouillard") {
-    // Presque immobile : traits courts, pâles, à peine poussés.
-    a.vitesse = 0.45; a.alpha = 0.55; a.trainee = 34; a.nb = 70;
+    // Presque immobile : traits courts et pâles, et des nappes très
+    // larges, très diffuses, qui noient le bas de page.
+    a.vitesse = 0.4; a.alpha = 0.5; a.trainee = 30; a.nb = 55;
+    a.nuages = 9;
+    a.teinteNuage = cle === "sombre" ? "140,150,136" : "150,158,146";
+    a.alphaNuage = 0.075;
   } else if (groupe === "pluie") {
-    a.genres = { ligne: 0.4, goutte: 0.6, flocon: 0 };
-    a.nb = 110; a.vitesse = 0.85; a.alpha = 0.9;
+    a.genres = { ligne: 0.35, goutte: 0.65, flocon: 0 };
+    a.nb = 115; a.vitesse = 0.85; a.alpha = 0.9;
+    a.nuages = 4;
   } else if (groupe === "neige") {
     a.genres = { ligne: 0.3, goutte: 0, flocon: 0.7 };
     a.nb = 120; a.vitesse = 0.7;
   } else if (groupe === "orage") {
-    // La turbulence dit l'orage, jamais la lumière : pas d'éclair, pas de
-    // flash, c'est la règle. Sous 95 à 99 avec grêle, quelques flocons
-    // clairs s'y mêlent.
-    a.turbulence = 1.4; a.vitesse = 1.2; a.nb = 105;
+    // La turbulence et des nappes profondes disent l'orage, jamais la
+    // lumière : pas d'éclair, pas de flash, c'est la règle. Sous 96 et 99,
+    // la grêle mêle quelques flocons clairs.
+    a.turbulence = 1.4; a.vitesse = 1.2; a.nb = 100;
+    a.nuages = 6;
+    a.teinteNuage = cle === "sombre" ? "70,104,92" : "80,104,94";
+    a.alphaNuage = 0.09;
     a.traits = [a.precip, PALETTES_SAISON[cle][saison][1], PALETTES_SAISON[cle][saison][2]];
     const code = FOND.meteo && FOND.meteo.code;
     if (code === 96 || code === 99) a.genres = { ligne: 0.85, goutte: 0, flocon: 0.15 };
@@ -425,6 +458,11 @@ function calculerAmbiance() {
 // ambiance et renaissent dans la nouvelle : la transition est un glissement.
 function fondAmbiance() {
   FOND.amb = calculerAmbiance();
+  // Les nappes existantes survivent au changement d'ambiance, on ajuste
+  // seulement leur nombre : le ciel glisse, il ne bascule pas.
+  FOND.nuages = FOND.nuages || [];
+  while (FOND.nuages.length < FOND.amb.nuages) FOND.nuages.push(graineNuage());
+  FOND.nuages.length = FOND.amb.nuages;
   if (FOND.statique && FOND.ctx) {
     FOND.ctx.fillStyle = FOND.amb.fond;
     FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
@@ -436,6 +474,46 @@ function fondAngle(x, y, t) {
   return (Math.sin(x * 0.0016 + t * 0.0009)
         + Math.cos(y * 0.0021 - t * 0.0007)
         + Math.sin((x + y) * 0.0008 + t * 0.0004)) * Math.PI * 0.75;
+}
+
+function graineNuage() {
+  return {
+    x: Math.random() * (FOND.L || 1200),
+    y: (0.05 + Math.random() * 0.5) * (FOND.H || 700),
+    r: 180 + Math.random() * 220,
+    v: 0.06 + Math.random() * 0.1,
+    k: 0.7 + Math.random() * 0.6   // pondère l'opacité, nappe par nappe
+  };
+}
+
+// Une nappe est un dégradé radial très doux qui dérive à peine : vue de
+// loin, une masse nuageuse. Dessinée sous les lignes, elle teinte sans
+// masquer.
+function peindreNuages(ctx) {
+  const amb = FOND.amb;
+  for (const n of FOND.nuages) {
+    n.x += n.v * (1 + amb.biaisX);
+    if (n.x - n.r > FOND.L) n.x = -n.r;
+    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+    g.addColorStop(0, "rgba(" + amb.teinteNuage + "," + (amb.alphaNuage * n.k) + ")");
+    g.addColorStop(1, "rgba(" + amb.teinteNuage + ",0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(n.x - n.r, n.y - n.r, n.r * 2, n.r * 2);
+  }
+}
+
+// Le halo du soleil : un seul dégradé, fixe, en haut de page. Il ne bouge
+// pas et ne respire pas — un halo qui pulse cesse d'être apaisant.
+function peindreHalo(ctx) {
+  const sombre = document.documentElement.dataset.theme !== "light";
+  const teinte = sombre ? "222,202,116" : "214,192,96";
+  const alpha = sombre ? 0.08 : 0.12;
+  const cx = FOND.L * 0.72, cy = FOND.H * 0.12, r = Math.max(FOND.L, FOND.H) * 0.42;
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+  g.addColorStop(0, "rgba(" + teinte + "," + alpha + ")");
+  g.addColorStop(1, "rgba(" + teinte + ",0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
 }
 
 function fondGraine(p, L, H) {
@@ -497,6 +575,8 @@ function fondPas() {
   FOND.t += 0.5;
   ctx.fillStyle = amb.fond;
   ctx.fillRect(0, 0, L, H);   // effacement complet : rien ne survit au délai
+  if (amb.halo) peindreHalo(ctx);
+  if (FOND.nuages && FOND.nuages.length) peindreNuages(ctx);
 
   for (const p of parts) {
     if (p.genre === "flocon") {
@@ -552,6 +632,8 @@ function fondTheme() {
 function fondStatique() {
   const { ctx, L, H } = FOND;
   const amb = FOND.amb;
+  if (amb.halo) peindreHalo(ctx);
+  if (FOND.nuages && FOND.nuages.length) peindreNuages(ctx);
   for (let i = 0; i < 60; i++) {
     const p = fondGraine({}, L, H);
     if (p.genre === "flocon") {
@@ -584,6 +666,7 @@ function initFond() {
   FOND.ctx = ctx;
   FOND.statique = matchMedia("(prefers-reduced-motion: reduce)").matches;
   FOND.amb = calculerAmbiance();
+  FOND.nuages = Array.from({ length: FOND.amb.nuages }, graineNuage);
 
   function taille() {
     const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
@@ -694,6 +777,8 @@ function peindreMeteo(mesure, lieu, quand) {
     +   "<b>" + Math.round(mesure.temperature_2m) + "°</b></div>"
     + '<div class="tv-plein">'
     + '<div class="tv-tete"><h3>Météo</h3><span class="espace"></span>'
+    +   '<button type="button" class="btn-position" id="btnMeteoMaj" title="Actualiser le relevé" aria-label="Actualiser le relevé">'
+    +     ico("actualiser", 12) + "</button>"
     +   '<button type="button" class="btn-position" id="btnPosition" title="Utiliser ma position">'
     +     ico("position", 12) + " ma position</button></div>"
     + '<div class="meteo-corps">'
@@ -716,6 +801,11 @@ function peindreMeteo(mesure, lieu, quand) {
     + "</div>";
   $("tuileMeteo").hidden = false;
   $("btnPosition").addEventListener("click", demanderPosition);
+  // Actualiser force le relevé, sans attendre l'expiration du cache.
+  $("btnMeteoMaj").addEventListener("click", () => {
+    $("btnMeteoMaj").classList.add("tourne");
+    chargerMeteo(true);
+  });
 }
 
 function chargerMeteo(force) {
@@ -737,6 +827,10 @@ function chargerMeteo(force) {
     } catch (e) { /* cache illisible : on redemande */ }
   }
 
+  // Une position enregistrée avant que le géocodage n'existe est restée
+  // sans nom : on la nomme à l'occasion.
+  if (lieu.nom === "Votre position") nommerLieu(lieu);
+
   tirerMeteo(lieu).then(mesure => {
     const quand = Date.now();
     try {
@@ -749,6 +843,9 @@ function chargerMeteo(force) {
   }).catch(() => {
     // Sans réseau, derrière un proxy, service en panne : la tuile
     // n'apparaît pas, et le portail n'a pas l'air cassé pour autant.
+  }).finally(() => {
+    const b = $("btnMeteoMaj");
+    if (b) b.classList.remove("tourne");
   });
 }
 
@@ -782,6 +879,32 @@ function initVeille() {
   });
 }
 
+// Donne son nom à une position : géocodage inverse par l'API Adresse de
+// l'État (api-adresse.data.gouv.fr), sans clé ni compte. « Votre
+// position » est un pis-aller, pas un nom de ville. Hors de France ou en
+// cas d'échec, le pis-aller reste.
+function nommerLieu(lieu) {
+  const url = "https://api-adresse.data.gouv.fr/reverse/?lon=" + lieu.lon
+    + "&lat=" + lieu.lat + "&limit=1";
+  const options = {};
+  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
+    options.signal = AbortSignal.timeout(6000);
+  }
+  return fetch(url, options)
+    .then(rep => rep.ok ? rep.json() : Promise.reject(new Error("HTTP " + rep.status)))
+    .then(d => {
+      const ville = d && d.features && d.features[0] && d.features[0].properties
+        && d.features[0].properties.city;
+      if (ville) {
+        lieu.nom = ville;
+        try { localStorage.setItem(CLE_LIEU, JSON.stringify(lieu)); } catch (e) { /* tant pis */ }
+        const el = document.querySelector(".meteo-lieu");
+        if (el) el.textContent = ville;
+      }
+    })
+    .catch(() => { /* le pis-aller reste, et c'est déjà juste */ });
+}
+
 function demanderPosition() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(p => {
@@ -790,6 +913,7 @@ function demanderPosition() {
                    lon: Math.round(p.coords.longitude * 1000) / 1000 };
     try { localStorage.setItem(CLE_LIEU, JSON.stringify(lieu)); } catch (e) { /* non mémorisé */ }
     chargerMeteo(true);
+    nommerLieu(lieu);
   }, () => { /* refusée ou impossible : on reste sur le lieu du catalogue */ },
   { timeout: 8000 });
 }

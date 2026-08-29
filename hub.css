@@ -241,6 +241,8 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
   transition:color var(--vitesse),border-color var(--vitesse);
 }
 .btn-position:hover{color:var(--encre);border-color:var(--ligne-forte)}
+@keyframes tourner{to{transform:rotate(360deg)}}
+.btn-position.tourne .ico{animation:tourner 1s linear infinite}
 
 /* ---- calendrier. Les semaines ISO sur l'axe vertical : c'est la monnaie
    du bureau d'études, on se donne rendez-vous en semaine 38, pas le 14. */
