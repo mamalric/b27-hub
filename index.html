@@ -31,6 +31,13 @@
      demande moins d'animations. -->
 <canvas id="fond" aria-hidden="true"></canvas>
 
+<!-- La pilule d'ancrage : le logo et le titre s'y posent au défilement.
+     Cliquer ramène en haut. -->
+<button type="button" class="ancre noprint" id="ancre" aria-label="Revenir en haut de la page">
+  <span class="ancre-logo" id="ancreLogo"></span>
+  <b id="ancreTitre">Outils B27</b>
+</button>
+
 <div class="haut noprint">
   <button type="button" class="bouton-icone" id="btnTheme" aria-label="Changer de thème"></button>
   <button type="button" class="bouton-icone" id="btnApropos" data-ico="engrenage" aria-label="À propos du portail" title="À propos du portail"></button>

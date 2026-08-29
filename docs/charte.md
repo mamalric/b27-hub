@@ -22,7 +22,11 @@ Le champ est une somme de sinus déphasés dans le temps, pas du vrai bruit de P
 
 Les traînées ont un délai d'expiration ferme, et c'est une leçon payée deux fois. La première version estompait par voile translucide : trop dense, elle virait à la paille, et surtout l'estompage est asymptotique — l'arrondi 8 bits fait qu'un pixel sombre n'atteint jamais tout à fait le fond, les traînées ne mouraient jamais et s'accumulaient en toile. Désormais le fond est repeint en entier à chaque image et chaque particule ne garde que ses cinquante-cinq dernières positions : l'expiration est garantie, pas approchée.
 
-Si le poste demande moins d'animations (`prefers-reduced-motion`), le champ est dessiné une fois, immobile : moins d'animations, pas moins de dessin. Un onglet caché suspend le tracé.
+**Le fond vit avec le ciel et les saisons.** La mesure Open-Meteo qui remplit la tuile règle aussi le champ : bruine et pluie descendent en fines stries obliques, la neige dérive en flocons qui oscillent, le brouillard fige presque tout, le soleil étire des courants lents et légèrement ascendants, et le vent mesuré incline et allonge les traînées — plafonné à l'équivalent de 40 km/h, au-delà suivre la réalité rendrait le fond nerveux. La saison teinte la palette : hiver froid, printemps vert franc, été doré, automne ambré, et le fond lui-même glisse de quelques niveaux avec elle.
+
+**L'orage se dit par la turbulence, jamais par la lumière.** Pas d'éclair, pas de flash, aucune variation brutale de luminosité : la règle « apaisant, jamais épileptique » domine tout le reste. Un changement de météo ne bascule rien d'un coup : chaque particule adopte la nouvelle ambiance à sa renaissance, le fond glisse d'un état à l'autre en quelques secondes.
+
+Si le poste demande moins d'animations (`prefers-reduced-motion`), le champ est dessiné une fois, immobile, dans l'ambiance du moment : moins d'animations, pas moins de dessin. Un onglet caché suspend le tracé.
 
 ## L'emblème
 
@@ -30,11 +34,15 @@ Le monogramme B27 n'est pas redessiné : c'est la marque, elle appartient à l'e
 
 ## Les tuiles vivantes
 
-Deux tuiles qui font du portail autre chose qu'une liste de liens. Sur grand écran elles occupent le coin haut gauche en colonne, la météo puis le calendrier, en version réduite ; sous 1240 px elles reprennent leur place sous la recherche. Elles sont positionnées dans la page, pas fixées : elles appartiennent à l'entrée du portail et n'ont pas à suivre le lecteur dans les rayons.
+Deux tuiles qui font du portail autre chose qu'une liste de liens. Sur grand écran elles occupent le coin haut gauche en colonne, la météo puis le calendrier, et y restent ancrées au défilement — mais repliées en pastilles étroites, la température d'un côté, le numéro de semaine de l'autre : la colonne entière chevaucherait les rayons, la pastille ne chevauche rien. Cliquer une pastille ramène en haut, là où la tuile entière est lisible. Sous 1240 px, les tuiles reprennent leur place sous la recherche.
 
 **La météo** affiche des données réelles, Open-Meteo, sans clé ni compte. Les mesures secondaires — pression au dixième d'hectopascal, ressenti au dixième de degré — sont là pour la précision qu'elles suggèrent, et ce sont pourtant de vraies mesures : le service les fournit à ce pas. Le lieu par défaut vient du catalogue ; « ma position » l'affine, et ce choix reste dans le navigateur du visiteur. Sans réseau, la tuile n'apparaît pas : rien ne clignote, rien ne s'excuse.
 
 **Le calendrier** met les semaines ISO sur l'axe vertical, les jours en tête, les week-ends teintés, le jour courant en aplat vert, la semaine courante surlignée. C'est la monnaie du bureau d'études : tout s'y planifie en numéro de semaine. Entièrement calculé en local.
+
+## L'ancrage au défilement
+
+L'entrée du portail ne disparaît pas quand on déroule : elle se transforme. L'emblème et le titre du héros s'effacent en reculant, proportionnellement au défilement, pendant qu'une pilule fixe portant le logo et le nom glisse en haut au centre — l'oeil lit une transformation, pas une disparition. La pilule ramène en haut d'un clic. Tout est en glissement, et `prefers-reduced-motion` coupe l'effacement progressif.
 
 ## Les rayons
 

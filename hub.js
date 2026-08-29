@@ -20,6 +20,8 @@
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v8", date: "2026-08-29", titre: "Le fond vit avec le ciel",
+    texte: "Le champ d'écoulement suit désormais la météo affichée : bruine et pluie en fines stries inclinées par le vent mesuré, neige en flocons qui oscillent, brouillard presque immobile, orage en turbulence — jamais en éclairs, le calme est la règle. La saison teinte la palette, hiver froid, été doré. Au défilement, tout s'ancre : la météo et le calendrier se replient en pastilles, le logo et le titre se posent dans une pilule centrale qui ramène en haut." },
   { v: "v7", date: "2026-08-29", titre: "Le portail",
     texte: "Refonte complète : tout est centré sous le logo, un champ d'écoulement animé calculé en local occupe le fond, la météo affiche des données réelles Open-Meteo, un calendrier donne les semaines ISO. Le catalogue se lit en deux rayons, nos outils et les ressources, et la métaphore des portes disparaît. Sombre par défaut. La pastille de signalement est conservée telle quelle." },
   { v: "v6", date: "2026-08-29", titre: "Bandeau photo, épuré",
@@ -285,7 +287,7 @@ function initTheme() {
    calcul tient en une ligne. Si le poste demande moins d'animations, le
    champ est dessiné une fois, immobile, et rien ne bouge.
    --------------------------------------------------------------------- */
-const FOND = { ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0 };
+const FOND = { ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0, meteo: null, amb: null };
 
 // Le délai maximal d'une traînée, en images : au-delà, le tracé expire et
 // disparaît, sans exception. La première version estompait par voile
@@ -296,13 +298,138 @@ const FOND = { ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0 };
 // garde que ses dernières positions : l'expiration est ferme, pas approchée.
 const DUREE_TRAINEE = 55;
 
-function fondCouleurs() {
+/* Le fond vit avec le ciel et les saisons. La mesure Open-Meteo qui remplit
+   la tuile règle aussi le champ : la pluie fait descendre de fines stries
+   obliques, la neige des flocons qui oscillent, le brouillard fige presque
+   tout, l'orage rend le champ turbulent, le vent mesuré incline et allonge
+   les traînées. La saison teinte la palette : hiver froid, printemps vert
+   franc, été doré, automne ambré.
+
+   Une règle domine tout le reste : apaisant, jamais épileptique. Donc pas
+   d'éclair, pas de flash, aucune variation brutale de luminosité — l'orage
+   se dit par la turbulence et la profondeur des verts, pas par la lumière.
+   Les vitesses sont plafonnées bas, et un changement de météo ne bascule
+   rien d'un coup : chaque particule adopte la nouvelle ambiance à sa
+   renaissance, le fond glisse d'un état à l'autre en quelques secondes. */
+
+function saisonCourante() {
+  const m = new Date().getMonth() + 1;
+  if (m === 12 || m <= 2) return "hiver";
+  if (m <= 5) return "printemps";
+  if (m <= 8) return "ete";
+  return "automne";
+}
+
+// Regroupe les codes temps de l'OMM en familles d'ambiance. Sans mesure
+// (pas de réseau, tuile absente), le fond vit sur "calme" et la saison.
+function groupeMeteo(code) {
+  if (code == null || !isFinite(code)) return "calme";
+  if (code === 0) return "soleil";
+  if (code <= 2) return "calme";
+  if (code === 3) return "couvert";
+  if (code <= 48) return "brouillard";
+  if (code <= 67 || (code >= 80 && code <= 82)) return "pluie";
+  if (code <= 77 || code === 85 || code === 86) return "neige";
+  return "orage";   // 95-99, grêle comprise
+}
+
+// Palettes de lignes par saison. Triplets "r,g,b" : l'alpha est ajouté au
+// tracé. La troisième teinte est la claire, tirée rarement.
+const PALETTES_SAISON = {
+  sombre: {
+    hiver:     ["108,156,128", "66,104,92",  "182,214,198"],
+    printemps: ["149,192,61",  "95,127,31",  "201,232,138"],
+    ete:       ["168,188,66",  "116,128,38", "224,214,132"],
+    automne:   ["172,148,62",  "124,100,42", "216,188,118"]
+  },
+  clair: {
+    hiver:     ["74,118,100",  "96,138,122", "120,160,146"],
+    printemps: ["95,127,31",   "85,122,58",  "149,192,61"],
+    ete:       ["116,128,38",  "134,142,58", "168,178,70"],
+    automne:   ["124,100,42",  "144,120,58", "172,148,72"]
+  }
+};
+
+// Teintes des précipitations, indépendantes de la saison : la neige est
+// blanche en janvier comme en avril.
+const PALETTES_PRECIP = {
+  sombre: { pluie: "126,168,178", neige: "208,220,214", brouillard: "142,152,138", orage: "84,146,126" },
+  clair:  { pluie: "88,128,138",  neige: "150,166,160", brouillard: "128,138,124", orage: "62,110,94"  }
+};
+
+// Le fond lui-même respire à peine avec la saison : un écart de quelques
+// niveaux, en dessous de ce que l'oeil nomme, mais l'hiver est plus froid
+// que l'été. Le thème garde la main sur la clarté générale.
+const FONDS_SAISON = {
+  sombre: { hiver: "#090c0d", printemps: "#0a0d08", ete: "#0b0d07", automne: "#0c0c07" },
+  clair:  { hiver: "#f0f4f5", printemps: "#f3f5f0", ete: "#f5f5ec", automne: "#f5f3ec" }
+};
+
+function calculerAmbiance() {
   const sombre = document.documentElement.dataset.theme !== "light";
-  return sombre
-    ? { fond: "#0a0d08",
-        traits: ["rgba(149,192,61,", "rgba(95,127,31,", "rgba(201,232,138,"] }
-    : { fond: "#f3f5f0",
-        traits: ["rgba(95,127,31,", "rgba(85,122,58,", "rgba(149,192,61,"] };
+  const cle = sombre ? "sombre" : "clair";
+  const saison = saisonCourante();
+  const groupe = groupeMeteo(FOND.meteo && FOND.meteo.code);
+  // Le vent mesuré, ramené entre 0 et 1. 40 km/h et plus valent 1 : au-delà,
+  // suivre la réalité rendrait le fond nerveux, ce qui est interdit ici.
+  const vent = FOND.meteo ? Math.min(1, Math.max(0, FOND.meteo.vent / 40)) : 0.15;
+
+  const a = {
+    fond: FONDS_SAISON[cle][saison],
+    traits: PALETTES_SAISON[cle][saison],
+    precip: PALETTES_PRECIP[cle][groupe] || PALETTES_PRECIP[cle].pluie,
+    genres: { ligne: 1, goutte: 0, flocon: 0 },
+    nb: 90,             // particules au total
+    vitesse: 1,         // facteur sur la vitesse des lignes
+    turbulence: 1,      // facteur sur l'amplitude du champ
+    alpha: 1,           // facteur sur l'opacité des traits
+    biaisX: 0.1,        // dérive horizontale commune, poussée par le vent
+    biaisY: 0,          // dérive verticale : négative, le flux monte
+    trainee: DUREE_TRAINEE
+  };
+
+  if (groupe === "soleil") {
+    // Courants thermiques : lents, longs, légèrement ascendants.
+    a.vitesse = 0.85; a.trainee = 70; a.biaisY = -0.06; a.nb = 75;
+  } else if (groupe === "couvert") {
+    a.vitesse = 0.75; a.alpha = 0.85; a.nb = 80;
+  } else if (groupe === "brouillard") {
+    // Presque immobile : traits courts, pâles, à peine poussés.
+    a.vitesse = 0.45; a.alpha = 0.55; a.trainee = 34; a.nb = 70;
+  } else if (groupe === "pluie") {
+    a.genres = { ligne: 0.4, goutte: 0.6, flocon: 0 };
+    a.nb = 110; a.vitesse = 0.85; a.alpha = 0.9;
+  } else if (groupe === "neige") {
+    a.genres = { ligne: 0.3, goutte: 0, flocon: 0.7 };
+    a.nb = 120; a.vitesse = 0.7;
+  } else if (groupe === "orage") {
+    // La turbulence dit l'orage, jamais la lumière : pas d'éclair, pas de
+    // flash, c'est la règle. Sous 95 à 99 avec grêle, quelques flocons
+    // clairs s'y mêlent.
+    a.turbulence = 1.4; a.vitesse = 1.2; a.nb = 105;
+    a.traits = [a.precip, PALETTES_SAISON[cle][saison][1], PALETTES_SAISON[cle][saison][2]];
+    const code = FOND.meteo && FOND.meteo.code;
+    if (code === 96 || code === 99) a.genres = { ligne: 0.85, goutte: 0, flocon: 0.15 };
+  }
+
+  // Le vent incline et allonge, pour tous les genres, dans la limite du
+  // calme : au maximum, les lignes vont un tiers plus vite.
+  a.biaisX += vent * 0.8;
+  a.vitesse *= 1 + vent * 0.35;
+  a.trainee = Math.min(85, Math.round(a.trainee * (1 + vent * 0.4)));
+  return a;
+}
+
+// Recalcule l'ambiance : à l'arrivée d'une mesure météo, au changement de
+// thème. Les particules vivantes finissent leur vie dans l'ancienne
+// ambiance et renaissent dans la nouvelle : la transition est un glissement.
+function fondAmbiance() {
+  FOND.amb = calculerAmbiance();
+  if (FOND.statique && FOND.ctx) {
+    FOND.ctx.fillStyle = FOND.amb.fond;
+    FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
+    fondStatique();
+  }
 }
 
 function fondAngle(x, y, t) {
@@ -312,16 +439,42 @@ function fondAngle(x, y, t) {
 }
 
 function fondGraine(p, L, H) {
+  const amb = FOND.amb;
   p.x = Math.random() * L;
   p.y = Math.random() * H;
   p.vie = 120 + Math.random() * 260;
-  p.v = 0.55 + Math.random() * 0.85;
-  // Le vert clair reste rare : équiprobable, l'ensemble vire à la paille.
+
   const r = Math.random();
-  p.c = r < 0.14 ? 2 : (r < 0.6 ? 0 : 1);
-  p.a = 0.1 + Math.random() * 0.1;
-  p.e = 0.6 + Math.random() * 0.7;
-  p.pts = [[p.x, p.y]];
+  p.genre = r < amb.genres.flocon ? "flocon"
+    : r < amb.genres.flocon + amb.genres.goutte ? "goutte" : "ligne";
+
+  if (p.genre === "flocon") {
+    // Un flocon descend lentement en oscillant. Il naît souvent en haut.
+    p.y = Math.random() < 0.5 ? Math.random() * H : -Math.random() * 40;
+    p.vy = (0.22 + Math.random() * 0.3) * amb.vitesse;
+    p.ph = Math.random() * Math.PI * 2;
+    p.sw = 0.3 + Math.random() * 0.7;
+    p.r = 0.8 + Math.random() * 1.5;
+    p.a = 0.16 + Math.random() * 0.18;
+  } else if (p.genre === "goutte") {
+    // Une strie de bruine, oblique, presque verticale, inclinée par le
+    // vent. Lente : c'est du crachin apaisé, pas une averse.
+    p.y = Math.random() < 0.5 ? Math.random() * H : -Math.random() * 60;
+    p.dir = Math.PI * 0.56 + amb.biaisX * 0.22 + (Math.random() - 0.5) * 0.05;
+    p.v = (0.9 + Math.random() * 0.6) * amb.vitesse;
+    p.a = 0.08 + Math.random() * 0.07;
+    p.e = 0.5 + Math.random() * 0.5;
+    p.pts = [[p.x, p.y]];
+    p.long = 10 + Math.round(Math.random() * 8);
+  } else {
+    p.v = (0.55 + Math.random() * 0.85) * amb.vitesse;
+    // Le vert clair reste rare : équiprobable, l'ensemble vire à la paille.
+    const q = Math.random();
+    p.c = q < 0.14 ? 2 : (q < 0.6 ? 0 : 1);
+    p.a = (0.1 + Math.random() * 0.1) * amb.alpha;
+    p.e = 0.6 + Math.random() * 0.7;
+    p.pts = [[p.x, p.y]];
+  }
   return p;
 }
 
@@ -330,7 +483,7 @@ function fondGraine(p, L, H) {
 // un trait par segment.
 function fondTracer(ctx, pts, de, jusque, couleur, a, e) {
   if (jusque - de < 1) return;
-  ctx.strokeStyle = couleur + a + ")";
+  ctx.strokeStyle = "rgba(" + couleur + "," + a + ")";
   ctx.lineWidth = e;
   ctx.beginPath();
   ctx.moveTo(pts[de][0], pts[de][1]);
@@ -340,52 +493,87 @@ function fondTracer(ctx, pts, de, jusque, couleur, a, e) {
 
 function fondPas() {
   const { ctx, parts, L, H } = FOND;
+  const amb = FOND.amb;
   FOND.t += 0.5;
-  const c = fondCouleurs();
-  ctx.fillStyle = c.fond;
+  ctx.fillStyle = amb.fond;
   ctx.fillRect(0, 0, L, H);   // effacement complet : rien ne survit au délai
+
   for (const p of parts) {
-    const a = fondAngle(p.x, p.y, FOND.t);
-    p.x += Math.cos(a) * p.v;
-    p.y += Math.sin(a) * p.v * 0.72;   // aplati : le flux file à l'horizontale
-    p.pts.push([p.x, p.y]);
-    if (p.pts.length > DUREE_TRAINEE) p.pts.shift();
-    const mi = Math.floor(p.pts.length / 2);
-    fondTracer(ctx, p.pts, 0, mi, c.traits[p.c], p.a * 0.35, p.e);
-    fondTracer(ctx, p.pts, mi, p.pts.length - 1, c.traits[p.c], p.a, p.e);
+    if (p.genre === "flocon") {
+      p.ph += 0.012;
+      p.x += Math.sin(p.ph) * p.sw + amb.biaisX * 0.5;
+      p.y += p.vy;
+      ctx.fillStyle = "rgba(" + amb.precip + "," + p.a + ")";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.genre === "goutte") {
+      p.x += Math.cos(p.dir) * p.v;
+      p.y += Math.sin(p.dir) * p.v;
+      p.pts.push([p.x, p.y]);
+      if (p.pts.length > p.long) p.pts.shift();
+      fondTracer(ctx, p.pts, 0, p.pts.length - 1, amb.precip, p.a, p.e);
+    } else {
+      const a = fondAngle(p.x, p.y, FOND.t) * amb.turbulence;
+      p.x += Math.cos(a) * p.v + amb.biaisX;
+      p.y += Math.sin(a) * p.v * 0.72 + amb.biaisY;
+      p.pts.push([p.x, p.y]);
+      if (p.pts.length > amb.trainee) p.pts.shift();
+      const mi = Math.floor(p.pts.length / 2);
+      fondTracer(ctx, p.pts, 0, mi, amb.traits[p.c], p.a * 0.35, p.e);
+      fondTracer(ctx, p.pts, mi, p.pts.length - 1, amb.traits[p.c], p.a, p.e);
+    }
     p.vie--;
-    if (p.vie < 0 || p.x < -9 || p.y < -9 || p.x > L + 9 || p.y > H + 9) {
+    if (p.vie < 0 || p.x < -12 || p.y < -70 || p.x > L + 12 || p.y > H + 12) {
       fondGraine(p, L, H);
     }
   }
+
+  // Le nombre de particules suit l'ambiance en douceur : une de plus ou de
+  // moins par image, jamais un peloton d'un coup.
+  if (parts.length < amb.nb) parts.push(fondGraine({}, L, H));
+  else if (parts.length > amb.nb) parts.pop();
+
   FOND.anime = requestAnimationFrame(fondPas);
 }
 
 function fondTheme() {
-  // Au changement de thème, repeindre le fond tout de suite : la prochaine
-  // image le referait, mais la version immobile n'en a pas.
+  // Au changement de thème, l'ambiance change de palette : recalcul, et la
+  // version immobile se redessine tout de suite.
   if (!FOND.ctx) return;
-  FOND.ctx.fillStyle = fondCouleurs().fond;
+  fondAmbiance();
+  FOND.ctx.fillStyle = FOND.amb.fond;
   FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
-  if (FOND.statique) fondStatique();
 }
 
-// La version immobile : les mêmes lignes de flux, dessinées une fois. Le
-// poste a demandé moins d'animations, pas moins de dessin.
+// La version immobile : la même ambiance, dessinée une fois. Le poste a
+// demandé moins d'animations, pas moins de dessin — la pluie y est des
+// stries figées, la neige des flocons posés.
 function fondStatique() {
   const { ctx, L, H } = FOND;
-  const c = fondCouleurs();
+  const amb = FOND.amb;
   for (let i = 0; i < 60; i++) {
     const p = fondGraine({}, L, H);
-    ctx.strokeStyle = c.traits[p.c] + (p.a * 0.5) + ")";
-    ctx.lineWidth = p.e;
-    ctx.beginPath(); ctx.moveTo(p.x, p.y);
-    for (let k = 0; k < 160; k++) {
-      const a = fondAngle(p.x, p.y, 0);
-      p.x += Math.cos(a) * 1.4; p.y += Math.sin(a) * 1.0;
-      ctx.lineTo(p.x, p.y);
+    if (p.genre === "flocon") {
+      ctx.fillStyle = "rgba(" + amb.precip + "," + p.a + ")";
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    } else if (p.genre === "goutte") {
+      ctx.strokeStyle = "rgba(" + amb.precip + "," + p.a + ")";
+      ctx.lineWidth = p.e;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + Math.cos(p.dir) * 14, p.y + Math.sin(p.dir) * 14);
+      ctx.stroke();
+    } else {
+      ctx.strokeStyle = "rgba(" + amb.traits[p.c] + "," + (p.a * 0.5) + ")";
+      ctx.lineWidth = p.e;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y);
+      for (let k = 0; k < 160; k++) {
+        const a = fondAngle(p.x, p.y, 0) * amb.turbulence;
+        p.x += Math.cos(a) * 1.4; p.y += Math.sin(a) * 1.0;
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
     }
-    ctx.stroke();
   }
 }
 
@@ -395,13 +583,14 @@ function initFond() {
   const ctx = cv.getContext("2d", { alpha: false });
   FOND.ctx = ctx;
   FOND.statique = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  FOND.amb = calculerAmbiance();
 
   function taille() {
     const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
     FOND.L = window.innerWidth; FOND.H = window.innerHeight;
     cv.width = FOND.L * dpr; cv.height = FOND.H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = fondCouleurs().fond;
+    ctx.fillStyle = FOND.amb.fond;
     ctx.fillRect(0, 0, FOND.L, FOND.H);
     if (FOND.statique) fondStatique();
   }
@@ -410,7 +599,7 @@ function initFond() {
 
   if (FOND.statique) return;
 
-  FOND.parts = Array.from({ length: 90 }, () => fondGraine({}, FOND.L, FOND.H));
+  FOND.parts = Array.from({ length: FOND.amb.nb }, () => fondGraine({}, FOND.L, FOND.H));
   FOND.anime = requestAnimationFrame(fondPas);
 
   // Un onglet caché n'a pas besoin de brûler la carte graphique.
@@ -501,7 +690,10 @@ function peindreMeteo(mesure, lieu, quand) {
   const heure = new Date(quand);
   const hhmm = String(heure.getHours()).padStart(2, "0") + ":" + String(heure.getMinutes()).padStart(2, "0");
   $("tuileMeteo").innerHTML =
-      '<div class="tv-tete"><h3>Météo</h3><span class="espace"></span>'
+      '<div class="tv-chip" aria-hidden="true">' + ico(t.icone, 18)
+    +   "<b>" + Math.round(mesure.temperature_2m) + "°</b></div>"
+    + '<div class="tv-plein">'
+    + '<div class="tv-tete"><h3>Météo</h3><span class="espace"></span>'
     +   '<button type="button" class="btn-position" id="btnPosition" title="Utiliser ma position">'
     +     ico("position", 12) + " ma position</button></div>"
     + '<div class="meteo-corps">'
@@ -520,7 +712,8 @@ function peindreMeteo(mesure, lieu, quand) {
     +   "<div><dt>Pression</dt><dd>" + ech(virgule(mesure.surface_pressure)) + "&nbsp;hPa</dd></div>"
     + "</dl>"
     + '<p class="meteo-pied"><span>Relevé ' + hhmm + "</span>"
-    +   '<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">données Open-Meteo</a></p>';
+    +   '<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">données Open-Meteo</a></p>'
+    + "</div>";
   $("tuileMeteo").hidden = false;
   $("btnPosition").addEventListener("click", demanderPosition);
 }
@@ -537,6 +730,8 @@ function chargerMeteo(force) {
           && Date.now() - cache.quand < FRAICHEUR_METEO
           && cache.lat === lieu.lat && cache.lon === lieu.lon) {
         peindreMeteo(cache.mesure, lieu, cache.quand);
+        FOND.meteo = { code: cache.mesure.weather_code, vent: cache.mesure.wind_speed_10m };
+        fondAmbiance();
         return;
       }
     } catch (e) { /* cache illisible : on redemande */ }
@@ -549,6 +744,8 @@ function chargerMeteo(force) {
         JSON.stringify({ quand, lat: lieu.lat, lon: lieu.lon, mesure }));
     } catch (e) { /* stockage plein : le relevé vivra le temps de la visite */ }
     peindreMeteo(mesure, lieu, quand);
+    FOND.meteo = { code: mesure.weather_code, vent: mesure.wind_speed_10m };
+    fondAmbiance();
   }).catch(() => {
     // Sans réseau, derrière un proxy, service en panne : la tuile
     // n'apparaît pas, et le portail n'a pas l'air cassé pour autant.
@@ -599,7 +796,10 @@ function peindreCalendrier() {
 
   const semaineAuj = semaineISO(auj);
 
-  let h = '<div class="tv-tete"><h3>Calendrier</h3><span class="espace"></span>'
+  let h = '<div class="tv-chip" aria-hidden="true"><span class="tv-chip-s">S</span><b>'
+    + semaineISO(auj) + "</b></div>"
+    + '<div class="tv-plein">'
+    + '<div class="tv-tete"><h3>Calendrier</h3><span class="espace"></span>'
     + '<span class="cal-semaine">Semaine ' + semaineISO(auj) + "</span>"
     + '<span class="cal-nav">'
     +   '<button type="button" id="calPrec" aria-label="Mois précédent">' + ico("chevron_g", 13) + "</button>"
@@ -633,7 +833,7 @@ function peindreCalendrier() {
       d.setDate(d.getDate() + 1);
     }
   }
-  h += "</div>";
+  h += "</div></div>";
 
   $("tuileCalendrier").innerHTML = h;
   $("calPrec").addEventListener("click", () => { calDecalage--; peindreCalendrier(); });
@@ -830,6 +1030,57 @@ function initReflets() {
 }
 
 /* ---------------------------------------------------------------------
+   L'ANCRE
+
+   Au défilement, l'entrée du portail ne disparaît pas : elle se transforme.
+   Le logo et le titre viennent se poser dans une pilule fixe en haut au
+   centre, l'emblème du héros s'efface en s'éloignant, et les tuiles
+   vivantes, ancrées, se replient en pastilles — la température d'un côté,
+   le numéro de semaine de l'autre. Cliquer sur la pilule ou une pastille
+   ramène en haut.
+
+   Tout est en glissement : une classe sur body, des transitions CSS, et un
+   effacement progressif calé sur la position de défilement. Rien ne
+   clignote, rien ne saute — la règle du calme s'applique ici aussi.
+   --------------------------------------------------------------------- */
+const SEUIL_ANCRE = 260;   // px de défilement avant que la pilule se pose
+
+function initAncre() {
+  $("ancreLogo").innerHTML = logoB27(17);
+  $("ancreTitre").textContent = REGLAGES.titre;
+
+  const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const embleme = $("embleme");
+  const titre = $("titrePortail");
+
+  let prevu = false;
+  function surDefilement() {
+    prevu = false;
+    const y = window.scrollY;
+    document.body.classList.toggle("defile", y > SEUIL_ANCRE);
+    if (reduit) return;
+    // L'emblème et le titre s'effacent en reculant, proportionnellement au
+    // défilement : ils partent pendant que la pilule arrive, et l'oeil lit
+    // une transformation, pas une disparition.
+    const p = Math.min(1, y / 300);
+    const forme = "translateY(" + Math.round(p * 16) + "px) scale(" + (1 - p * 0.1).toFixed(3) + ")";
+    embleme.style.opacity = titre.style.opacity = String(1 - p * 0.9);
+    embleme.style.transform = titre.style.transform = forme;
+  }
+  window.addEventListener("scroll", () => {
+    if (!prevu) { prevu = true; requestAnimationFrame(surDefilement); }
+  }, { passive: true });
+  surDefilement();
+
+  const remonter = () => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });
+  $("ancre").addEventListener("click", remonter);
+  // Une pastille repliée ramène en haut, là où la tuile entière est lisible.
+  $("tuilesVives").addEventListener("click", ev => {
+    if (document.body.classList.contains("defile") && ev.target.closest(".tuile-vive")) remonter();
+  });
+}
+
+/* ---------------------------------------------------------------------
    À PROPOS
    --------------------------------------------------------------------- */
 function ligneStat(dt, dd) {
@@ -897,6 +1148,7 @@ function init() {
   initFond();
   initRecherche();
   initReflets();
+  initAncre();
   initApropos();
   chargerMeteo();
 

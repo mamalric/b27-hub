@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, le fond vit avec le ciel (v8)
+
+Idée de l'utilisateur : rendre le fond dynamique selon la météo affichée — orage, vent, soleil, nuageux, neige, grêle — et selon les saisons, avec une règle impérative : apaisant, relaxant, jamais épileptique ou stressant.
+
+**La règle du calme est prise comme contrainte dure.** Pas d'éclair d'orage, pas de flash, aucune variation brutale de luminosité : l'orage se dit par la turbulence du champ et une palette plus profonde. Les vitesses sont plafonnées, le vent mesuré est écrêté à 40 km/h, et un changement de météo ne bascule rien d'un coup : chaque particule adopte la nouvelle ambiance à sa renaissance, la transition est un glissement de quelques secondes.
+
+**Les ambiances** : soleil en courants lents ascendants, bruine et pluie en stries obliques inclinées par le vent réel, neige et grêle en flocons qui oscillent, brouillard presque figé, couvert assourdi. Les palettes suivent les saisons météorologiques — hiver froid, printemps vert B27 franc, été doré, automne ambré — et le fond lui-même glisse de quelques niveaux. Sans réseau, le fond vit sur « calme » et la saison seule.
+
+**L'ancrage au défilement**, demandé dans la foulée : la météo et le calendrier restent ancrés mais se replient en pastilles de 64 px (température, numéro de semaine) pour ne pas chevaucher les rayons ; l'emblème et le titre s'effacent en reculant pendant qu'une pilule fixe portant logo et nom se pose en haut au centre. Pilule et pastilles ramènent en haut d'un clic.
+
+Vérification en aperçu : le rAF du panneau étant gelé, les images ont été pompées à la main pour contrôler neige et bruine ; les positions et états ancrés ont été validés au DOM. Sur un navigateur réel, tout est animé normalement.
+
 ## 2026-08-29, v7 validee, trois retouches
 
 « Beaucoup mieux, j'adore. » La direction portail est la bonne. Trois retouches dans la foulee.
