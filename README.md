@@ -2,7 +2,7 @@
 
 Le hall d'entrée des outils du bureau d'études B27. Un seul lien à transmettre.
 
-Une barre latérale donne accès à toutes les catégories depuis n'importe où ; le hall s'ouvre sur des dossiers, on en ouvre un, parfois un sous-dossier, et on arrive aux outils, aux sites de l'entreprise, aux ressources métier ou à l'annuaire.
+Le hall s'ouvre sur des dossiers : on en ouvre un, parfois un sous-dossier, et on arrive aux outils, aux sites de l'entreprise, aux ressources métier ou à l'annuaire. Le fil d'Ariane et la marque, en haut à gauche, ramènent au hall.
 
 **Le hall est personnel sans le moindre compte.** Épinglez une porte, elle remonte en tête à chacune de vos visites ; les dernières portes ouvertes s'y ajoutent. Tout vit dans votre navigateur et n'en sort jamais.
 

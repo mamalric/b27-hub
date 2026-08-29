@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, retrait de la barre laterale
+
+Suite et fin de l'epuration : la barre laterale disparait. Avec elle partent le bouton hamburger, le voile du tiroir, les fonctions `construireRail`, `majRailActif` et `ouvrirRail`, leurs quatre ecouteurs, tout le bloc CSS correspondant, la variable `--rail` et l'icone `menu`.
+
+**Une decision prise seule, a signaler.** Le logo B27 vivait dans cette barre : la supprimer telle quelle aurait fait disparaitre la marque de la page, ce qui contredit la demande initiale de la mettre en avant. Le logo et le nom sont donc remontes dans la barre du haut, ou ils tiennent lieu de retour au hall. C'est desormais le seul lien de navigation permanent.
+
+**Ce que cela coute.** Changer de categorie depuis l'interieur d'un dossier demande maintenant de repasser par le hall, soit un clic de plus. Le fil d'Ariane et la marque le permettent tous les deux ; c'est la contrepartie assumee de la page epuree.
+
+**Le titre du niveau ne s'affiche qu'en profondeur.** Au hall il touchait la marque et repetait la meme information : « Outils B27 » puis « Hall ».
+
+**Le seuil du voile du bandeau a bouge.** Le bandeau occupe desormais toute la fenetre, les 250 px du rail lui revenant : le chapeau ne deborde plus la moitie du plateau qu'en dessous de 960 px de fenetre, contre 1210 auparavant. Seuil ramene de 1240 a 1024 px, puis verifie a 1040 px, le point le plus serre : le texte s'arrete a 42 % et le contraste tient a 4,88:1.
+
 ## 2026-08-29, epuration du panneau A propos
 
 Suite de l'epuration. Retires du panneau ouvert par l'engrenage : le bloc « Un bug, une idee d'outil », le groupe « Ce que fait le hub » (role, navigation, donnees, ce qui est retenu, vos epingles) et le groupe « Ajouter une porte ». Restent les chiffres du hall, le journal des versions, et les anomalies du catalogue quand il y en a.

@@ -104,7 +104,6 @@ const TRACES_ICONES = {
   maison: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   chevron: '<path d="m9 18 6-6-6-6"/>',
   retour: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
-  menu: '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>',
   epingle: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
   etincelle: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>'
 };
@@ -676,7 +675,6 @@ function rendre() {
   // dans les récentes sans qu'il faille recharger la page.
   if (auHall) construireRaccourcis();
   document.body.classList.toggle("dedans", !auHall);
-  majRailActif(requete ? [] : chemin);
 
   // Le titre de la barre du haut suit le niveau, et l'onglet du navigateur
   // aussi : un onglet parmi douze doit dire où il mène.
@@ -827,49 +825,17 @@ function construireRaccourcis() {
 }
 
 /* ---------------------------------------------------------------------
-   BARRE LATÉRALE
+   MARQUE
 
-   Toutes les catégories à un clic, depuis n'importe où. C'est ce qui
-   distingue un hall d'une simple arborescence : on n'a jamais à remonter
-   pour changer de branche.
+   Depuis le retrait de la barre latérale, c'est le seul lien de navigation
+   permanent : le logo et le nom ramènent au hall depuis n'importe quelle
+   profondeur. Le reste du déplacement passe par le fil d'Ariane et par les
+   dossiers eux-mêmes.
    --------------------------------------------------------------------- */
-function construireRail() {
-  $("railLogo").innerHTML = logoB27(24);
-  $("railTitre").textContent = REGLAGES.titre;
-  $("railSousTitre").textContent = REGLAGES.sousTitre;
-
-  const dossiers = dossiersRacine();
-  $("railNav").innerHTML =
-      '<a class="rail-lien" href="#/" data-cle="">'
-    +   '<span class="rail-puce" style="--c:' + COULEUR_REPLI + '">' + ico("maison", 16) + "</span>"
-    +   "<span>Hall</span></a>"
-    + '<p class="rail-titre">Les dossiers</p>'
-    + dossiers.map(d =>
-        '<a class="rail-lien" href="' + adresseDe([d.cle]) + '" data-cle="' + ech(d.cle) + '">'
-      +   '<span class="rail-puce" style="--c:' + couleurSure(d.couleur) + '">' + ico(d.icone, 16) + "</span>"
-      +   "<span>" + ech(d.nom) + "</span>"
-      +   '<span class="rail-compte">' + (d.annuaire ? d.compte : d.portes.length) + "</span></a>").join("");
-}
-
-// Le lien de la catégorie courante est marqué, pour qu'on sache toujours où
-// l'on se trouve sans avoir à relire le fil d'Ariane.
-function majRailActif(chemin) {
-  const cle = chemin.length ? chemin[0] : "";
-  $("railNav").querySelectorAll(".rail-lien").forEach(a => {
-    const actif = a.dataset.cle === cle;
-    a.classList.toggle("actif", actif);
-    if (actif) a.setAttribute("aria-current", "page");
-    else a.removeAttribute("aria-current");
-  });
-}
-
-// Sur écran étroit la barre latérale devient un tiroir. Le voile qui
-// l'accompagne sert autant à assombrir la page qu'à donner une grande cible
-// pour refermer.
-function ouvrirRail(ouvert) {
-  document.body.classList.toggle("rail-ouvert", ouvert);
-  $("railVoile").hidden = !ouvert;
-  $("btnRail").setAttribute("aria-expanded", String(ouvert));
+function construireMarque() {
+  $("marqueLogo").innerHTML = logoB27(22);
+  $("marqueTitre").textContent = REGLAGES.titre;
+  $("marqueSousTitre").textContent = REGLAGES.sousTitre;
 }
 
 /* ---------------------------------------------------------------------
@@ -1144,7 +1110,7 @@ function chargerBandeau() {
 
 function init() {
   controlerCatalogue();
-  construireRail();
+  construireMarque();
   construireAccueil();
   construireBarre();
   poserIcones();
@@ -1152,17 +1118,6 @@ function init() {
   initApropos();
   chargerBandeau();
 
-  $("btnRail").innerHTML = ico("menu", 17);
-  $("btnRail").addEventListener("click", () => ouvrirRail(!document.body.classList.contains("rail-ouvert")));
-  $("railVoile").addEventListener("click", () => ouvrirRail(false));
-  // Sur mobile, suivre un lien du tiroir doit le refermer : sans cela, la
-  // page change derrière un tiroir resté ouvert.
-  $("railNav").addEventListener("click", ev => {
-    if (ev.target.closest(".rail-lien")) ouvrirRail(false);
-  });
-  document.addEventListener("keydown", ev => {
-    if (ev.key === "Escape" && document.body.classList.contains("rail-ouvert")) ouvrirRail(false);
-  });
 
   // Un seul écouteur pour toute la page plutôt qu'un par carte : les grilles
   // sont reconstruites à chaque navigation, des écouteurs posés sur les

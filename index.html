@@ -26,27 +26,18 @@
 
 <body>
 
-<!-- Barre latérale : toutes les catégories accessibles d'un clic, depuis
-     n'importe où. Sur mobile elle se rétracte et s'ouvre par le bouton de la
-     barre du haut. Son contenu est construit par hub.js. -->
-<aside class="rail" id="rail" aria-label="Navigation principale">
-  <div class="rail-marque">
-    <span class="rail-logo" id="railLogo"></span>
-    <span class="rail-nom">
-      <b id="railTitre">Outils B27</b>
-      <small id="railSousTitre"></small>
-    </span>
-  </div>
-  <nav class="rail-nav" id="railNav"></nav>
-</aside>
-
-<!-- Voile d'assombrissement du tiroir sur mobile. -->
-<div class="rail-voile" id="railVoile" hidden></div>
-
 <div class="page">
 
   <header class="barre-haute">
-    <button type="button" class="bouton-icone noprint" id="btnRail" aria-label="Ouvrir la navigation" aria-expanded="false"></button>
+    <!-- La marque tient lieu de retour au hall : c'est le seul lien de
+         navigation permanent depuis que la barre latérale a été retirée. -->
+    <a class="marque" href="#/" aria-label="Revenir au hall">
+      <span class="marque-logo" id="marqueLogo"></span>
+      <span class="marque-nom">
+        <b id="marqueTitre">Outils B27</b>
+        <small id="marqueSousTitre"></small>
+      </span>
+    </a>
     <h1 id="titrePage">Hall</h1>
     <div class="barre-recherche noprint" id="barre"></div>
     <span class="espace"></span>

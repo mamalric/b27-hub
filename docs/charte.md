@@ -54,11 +54,15 @@ Le sombre n'est pas un simple inversement : les gris y sont légèrement teinté
 
 ## La disposition
 
-Un tableau de bord : barre latérale permanente à gauche, recherche en haut, contenu au centre.
+Une barre du haut, puis le contenu pleine largeur. La marque à gauche, le niveau courant, la recherche, le thème et les réglages.
 
-**La barre latérale ne se replie pas sur écran large.** C'est ce qui distingue un hall d'une simple arborescence : toutes les catégories sont à un clic, depuis n'importe où, on n'a jamais à remonter pour changer de branche. Chaque entrée porte la couleur de sa catégorie, la même que sur sa tuile, et la catégorie courante est teintée de cette couleur plutôt que d'un vert générique.
+**Il n'y a pas de barre latérale.** Il y en a eu une, permanente, qui donnait toutes les catégories à un clic depuis n'importe où. Elle a été retirée à la demande, dans le mouvement d'épuration qui a aussi emporté le pied de page et la moitié du panneau de réglages. Changer de branche demande désormais de repasser par le hall : un clic de plus, par le fil d'Ariane ou par la marque.
 
-Sous 960 px elle sort du flux et devient un tiroir, ouvert par le bouton de la barre du haut, refermé par le voile, par Échap, ou en suivant un lien. C'est la même barre, seule sa position change : rien à maintenir en double.
+**La marque est le seul lien de navigation permanent.** Logo et nom, en haut à gauche, ramènent au hall depuis n'importe quelle profondeur. C'est ce qui a justifié de la remonter dans la barre du haut plutôt que de la supprimer avec la barre latérale : sans elle il ne resterait aucun retour fixe, et le logo B27 disparaîtrait de la page.
+
+**Le titre du niveau ne s'affiche qu'une fois entré quelque part.** Au hall il répéterait la marque qu'il touche, « Outils B27 » puis « Hall », deux fois la même information à trois centimètres d'intervalle.
+
+Sous 960 px, le sous-titre de la marque s'efface : il pousserait la recherche hors de la ligne pour une phrase que le bandeau d'accueil redit deux centimètres plus bas.
 
 **La recherche est au centre de la barre du haut**, comme sur un tableau de bord : c'est le geste le plus rapide quand on sait déjà ce qu'on cherche. Sous 960 px elle passe sous le titre, où l'on peut encore lire ce qu'on tape.
 

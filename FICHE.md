@@ -22,7 +22,7 @@ Version v6 en ligne sur GitHub Pages, publiée depuis `main`. La page est constr
 
 Le hall s'ouvre sur un bandeau pleine largeur portant une photo de chantier tirée au sort chez Unsplash, qui change d'une visite à l'autre. Elle passe en noir et blanc, puis en sépia, puis prend le vert de B27 : la chaîne de filtres est calculée par `src/bandeau_teinte.py` pour tenir la teinte du logo, 79,4 degrés et 52 % de saturation, du noir au blanc. Tant qu'aucune clé d'accès n'est renseignée, le bandeau garde son dégradé vert et n'émet aucune requête.
 
-Disposition de tableau de bord : barre latérale permanente donnant accès à toutes les catégories depuis n'importe où, recherche au centre de la barre du haut, quatre cartes chiffrées à l'arrivée, salutation selon l'heure. Sous 960 px la barre latérale devient un tiroir.
+Une seule barre, en haut : la marque à gauche qui ramène au hall, le niveau courant, la recherche, le thème et les réglages. La barre latérale a été retirée, ainsi que le pied de page et la plus grande partie du panneau de réglages : il ne reste dans celui-ci que les chiffres du hall et le journal des versions. Sous la barre, quatre cartes chiffrées à l'arrivée et une salutation selon l'heure.
 
 Le hall est personnel sans le moindre compte, et il n'y en aura jamais : épingler une porte la remonte en tête des visites suivantes, les six dernières portes ouvertes s'y ajoutent d'elles-mêmes. Thème, épingles et récentes vivent en `localStorage`, dans le navigateur de chacun, et n'en sortent jamais.
 

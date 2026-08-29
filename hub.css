@@ -59,7 +59,6 @@
   --vitesse:.12s;
   --vitesse-dossier:.22s;
   --courbe:cubic-bezier(.2,.7,.3,1);
-  --rail:250px;
 }
 [data-theme="dark"]{
   color-scheme: dark;
@@ -102,7 +101,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   font-family:Inter,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   margin:0;color:var(--encre);background:var(--fond);font-size:14px;line-height:1.5;
-  display:flex;min-height:100vh;
+  min-height:100vh;
   transition:background-color var(--vitesse),color var(--vitesse);
 }
 a{color:var(--lien);text-decoration:none}
@@ -116,61 +115,9 @@ a:hover{text-decoration:underline}
   to{opacity:1;transform:none}
 }
 
-/* ==================================================== BARRE LATÉRALE ==
-   Elle reste en place, la page défile à côté. Sur écran étroit elle sort du
-   flux et devient un tiroir, ouvert par le bouton de la barre du haut. */
-.rail{
-  width:var(--rail);flex:none;
-  position:sticky;top:0;height:100vh;
-  display:flex;flex-direction:column;
-  background:var(--papier);border-right:1px solid var(--ligne);
-  z-index:20;
-}
-.rail-marque{
-  display:flex;align-items:center;gap:11px;
-  padding:18px 18px 16px;border-bottom:1px solid var(--ligne-2);
-}
-.rail-logo{color:var(--marque);flex:none;line-height:0}
-.rail-nom{display:flex;flex-direction:column;min-width:0;gap:1px}
-.rail-nom b{font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
-.rail-nom small{font-size:11.5px;color:var(--discret);line-height:1.3}
-
-.rail-nav{flex:1;overflow-y:auto;padding:12px 10px 20px}
-.rail-titre{
-  margin:14px 0 6px;padding:0 8px;
-  font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
-  color:var(--discret);
-}
-.rail-lien{
-  display:flex;align-items:center;gap:11px;
-  padding:8px 9px;border-radius:var(--rayon-s);margin-bottom:2px;
-  color:var(--encre-2);font-size:13.5px;font-weight:600;
-  transition:background-color var(--vitesse),color var(--vitesse);
-}
-.rail-lien:hover{background:var(--papier-2);color:var(--encre);text-decoration:none}
-/* La catégorie courante est teintée de sa propre couleur, pas d'un vert
-   générique : c'est le même repère que sur sa tuile. */
-.rail-lien.actif{
-  background:color-mix(in srgb, var(--c,var(--primaire)) 13%, transparent);
-  color:var(--encre);
-}
-.rail-lien > span:not(.rail-puce):not(.rail-compte){
-  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.rail-puce{
-  width:28px;height:28px;flex:none;border-radius:8px;
-  display:grid;place-items:center;color:#fff;
-  background:var(--c,var(--primaire));
-}
-.rail-compte{
-  font-size:11px;font-weight:600;color:var(--discret);
-  font-variant-numeric:tabular-nums;flex:none;
-}
-
-.rail-voile{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:19}
 
 /* ============================================================= PAGE == */
-.page{flex:1;min-width:0;display:flex;flex-direction:column}
+.page{min-width:0;display:flex;flex-direction:column;min-height:100vh}
 
 .barre-haute{
   display:flex;align-items:center;gap:12px;flex-wrap:wrap;
@@ -180,9 +127,34 @@ a:hover{text-decoration:underline}
 .barre-haute h1{
   margin:0;font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--encre);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:34%;
+  padding-left:13px;border-left:1px solid var(--ligne);
 }
 .barre-haute .espace{flex:1}
-#btnRail{display:none}
+/* La marque, à gauche de la barre du haut. Depuis le retrait de la barre
+   latérale, c'est le seul lien de navigation permanent : elle ramène au hall
+   depuis n'importe quelle profondeur. */
+.marque{
+  display:flex;align-items:center;gap:9px;flex:none;min-width:0;
+  color:var(--encre);text-decoration:none;
+}
+.marque:hover{text-decoration:none}
+.marque:hover .marque-nom b{color:var(--primaire)}
+.marque-logo{color:var(--marque);flex:none;line-height:0}
+.marque-nom{display:flex;flex-direction:column;min-width:0;gap:1px}
+.marque-nom b{
+  font-size:15px;font-weight:800;letter-spacing:-.3px;line-height:1.2;
+  transition:color var(--vitesse);
+}
+.marque-nom small{
+  font-size:11.5px;color:var(--discret);line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* Au hall, le titre répéterait la marque qu'il touche : « Outils B27 » puis
+   « Hall », deux fois la même information à trois centimètres d'intervalle.
+   Il n'apparaît qu'une fois qu'on est entré quelque part, où il dit alors
+   quelque chose que la marque ne dit pas. */
+.barre-haute h1{display:none}
+body.dedans .barre-haute h1{display:block}
 .bouton-icone{
   background:transparent;border:1px solid var(--ligne);color:var(--encre-2);border-radius:var(--rayon-s);
   width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
@@ -646,20 +618,13 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 .changelog .cl-txt{color:var(--encre-2);line-height:1.5}
 
 /* ============================================================ ÉTROIT ==
-   Sous 960 px, la barre latérale sort du flux et devient un tiroir. Elle
-   reste la même barre, seule sa position change : rien à maintenir en
-   double. */
+   La barre du haut se resserre et le sous-titre de la marque s'efface : à
+   cette largeur il pousserait la recherche hors de la ligne pour une phrase
+   que le bandeau d'accueil redit deux centimètres plus bas. */
 @media (max-width:960px){
-  .rail{
-    position:fixed;left:0;top:0;bottom:0;height:100%;
-    transform:translateX(-100%);
-    transition:transform var(--vitesse-dossier) var(--courbe);
-    box-shadow:0 0 40px rgba(0,0,0,.25);
-  }
-  body.rail-ouvert .rail{transform:none}
-  #btnRail{display:inline-flex}
   .barre-haute{padding:12px 16px;gap:10px}
-  .barre-haute h1{max-width:none;flex:1}
+  .barre-haute h1{max-width:none;flex:1;padding-left:11px}
+  .marque-nom small{display:none}
   /* La recherche passe sous le titre : à cette largeur, la garder sur la
      même ligne la réduirait à un champ où l'on ne lit plus ce qu'on tape. */
   .barre-recherche{order:9;flex-basis:100%;max-width:none}
@@ -670,11 +635,12 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 }
 /* En dessous de cette largeur, le chapeau déborde la moitié du bandeau : à
    62 caractères il mesure environ 480 px, et il dépasse les 50 % du plateau
-   dès que le bandeau descend sous 960 px, soit une fenêtre de 1210 px une
-   fois le rail déduit. Le voile couvre alors toute la largeur, aux mêmes
-   opacités : la photo se voit moins, mais le texte reste lisible, et c'est
-   dans cet ordre que ça se décide. */
-@media (max-width:1240px){
+   dès que le bandeau descend sous 960 px. Le bandeau occupant désormais toute
+   la fenêtre, la barre latérale n'étant plus là pour lui en prendre 250 px,
+   le seuil se lit directement sur la fenêtre. Le voile couvre alors toute la
+   largeur, aux mêmes opacités : la photo se voit moins, mais le texte reste
+   lisible, et c'est dans cet ordre que ça se décide. */
+@media (max-width:1024px){
   .banniere::after{
     background:linear-gradient(100deg,
       rgba(26,33,11,.62) 0%, rgba(26,33,11,.55) 60%, rgba(26,33,11,.52) 100%);
@@ -701,7 +667,7 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
     --ombre:none;--ombre-haute:none;--ombre-app:none;
   }
   body{display:block;background:#fff}
-  .rail,.rail-voile,.noprint,.barre-recherche,.fil-retour,.epingle{display:none !important}
+  .noprint,.barre-recherche,.fil-retour,.epingle{display:none !important}
   .barre-haute{position:static;border-bottom:1px solid var(--ligne)}
   .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
   .grille-dossiers{grid-template-columns:repeat(4,1fr)}
