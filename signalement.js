@@ -55,9 +55,14 @@ const Signalement = (function () {
   let captureUrl = null;         // URL d'aperçu à révoquer
   let captureRefusee = false;    // l'utilisateur a dit non : ne plus insister
   let reco = null;               // instance de reconnaissance vocale
-  let dicteeActive = false;
+  let dicteeActive = false;      // l'utilisateur a demandé la dictée
+  let dicteeDemarre = false;     // le moteur a confirmé son démarrage
   let dicteeSocle = "";          // texte présent avant le début de la dictée
   let dicteeAcquis = "";         // segments déjà validés par la reconnaissance
+  let dicteeAEntendu = false;    // au moins un résultat reçu depuis le début
+  let dicteeRelances = 0;        // relances consécutives sans rien avoir reçu
+  let dicteeDepuis = 0;          // horodatage du dernier démarrage
+  let dicteeVeille = null;       // minuteur de surveillance du démarrage
 
   /* ------------------------------------------------------------------
      Icônes : mêmes tracés Lucide que le reste des outils B27, réinlinés
@@ -226,6 +231,12 @@ const Signalement = (function () {
    soit visible sans avoir à y penser. */
 .sg-dictee{display:flex;align-items:center;gap:9px;margin:-6px 0 14px}
 .sg-dictee .sg-etat{font-size:12px;color:var(--sg-discret);line-height:1.4}
+/* Un echec de dictee sort du gris : en petit texte discret, il passait
+   inapercu et l'utilisateur concluait que le bouton ne marchait pas. */
+.sg-dictee .sg-etat.sg-souci{
+  background:var(--sg-ambre-fond);border:1px solid var(--sg-ambre-bord);
+  border-radius:7px;padding:7px 10px;color:var(--sg-encre-2);
+}
 .sg-btn.sg-enregistre{
   background:var(--sg-rouge);border-color:var(--sg-rouge);color:#fff;
   animation:sg-battement 1.4s ease-in-out infinite;
@@ -438,29 +449,101 @@ const Signalement = (function () {
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   }
 
-  function majEtatDictee(txt, enCours) {
+  // Tous les codes d'erreur prévus par la spécification, plus ceux que Chrome
+  // et Edge émettent en pratique. Les laisser sans message était le défaut de
+  // la première version : sur une erreur non traitée, l'état restait bloqué
+  // sur "Écoute en cours" pendant que onend relançait le moteur en boucle,
+  // sans que rien n'arrive jamais dans le champ.
+  const ERREURS_DICTEE = {
+    "not-allowed": "Le micro a été refusé. Cliquez sur l'icône de cadenas ou de caméra dans la barre d'adresse, autorisez le microphone, puis réessayez.",
+    "service-not-allowed": "Le service de transcription a été refusé, par le navigateur ou par une stratégie d'entreprise. La dictée ne peut pas fonctionner ici.",
+    "audio-capture": "Aucun micro n'a été trouvé. Vérifiez qu'un microphone est branché et sélectionné dans les réglages son de Windows.",
+    "network": "La transcription n'a pas pu joindre son service. Elle passe par internet : un pare-feu ou un proxy peut la bloquer.",
+    "language-not-supported": "Le français n'est pas pris en charge par la transcription de ce navigateur.",
+    "bad-grammar": "La transcription a refusé sa configuration. Écrivez le texte à la main.",
+    "aborted": null              // c'est nous qui avons arrêté : rien à dire
+  };
+
+  // Trace de mise au point, lisible dans la console (touche F12). La dictée
+  // dépend du micro, du réseau et du navigateur : quand elle ne marche pas,
+  // il faut pouvoir dire lequel des trois est en cause.
+  function journalDictee(msg) {
+    try { console.info("Signalement/dictée : " + msg); } catch (e) { /* sans console */ }
+  }
+
+  function majEtatDictee(txt, enCours, souci) {
     const b = $('[data-sg="dictee"]');
     const e = $(".sg-dictee .sg-etat");
     if (!b) return;
     b.classList.toggle("sg-enregistre", !!enCours);
     b.innerHTML = (enCours ? ico("arret", 15) + "Arrêter" : ico("micro", 15) + "Dicter");
-    if (e) e.innerHTML = txt;
+    if (e) {
+      e.innerHTML = txt;
+      // Un échec de dictée doit se voir. En petit gris à côté du bouton, il
+      // passait inaperçu et l'utilisateur concluait que le bouton ne marchait
+      // pas, sans jamais lire pourquoi.
+      e.classList.toggle("sg-souci", !!souci);
+    }
   }
 
-  function demarrerDictee() {
+  function echecDictee(raison) {
+    journalDictee("échec : " + raison);
+    arreterDictee(true);
+    majEtatDictee(ech(raison), false, true);
+  }
+
+  async function microRefuseDavance() {
+    // L'API des permissions n'existe pas partout, et "microphone" n'y est pas
+    // toujours connu : son absence n'est pas une réponse, on tente alors.
+    try {
+      if (!navigator.permissions || !navigator.permissions.query) return false;
+      const p = await navigator.permissions.query({ name: "microphone" });
+      return p.state === "denied";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function demarrerDictee() {
     const Moteur = MoteurDictee();
-    if (!Moteur) return;
+    if (!Moteur) { echecDictee("Ce navigateur n'a pas de moteur de dictée."); return; }
+
+    // Ouvert par un double-clic sur le fichier, le hub n'est pas en https et
+    // le micro sera refusé sans explication. Autant le dire tout de suite.
+    if (!window.isSecureContext) {
+      echecDictee("La dictée exige une page en https. Ouvrez le hub en ligne plutôt que le fichier local.");
+      return;
+    }
+    if (await microRefuseDavance()) {
+      echecDictee(ERREURS_DICTEE["not-allowed"]);
+      return;
+    }
 
     const zone = $("#sg-description");
     dicteeSocle = zone.value ? zone.value.replace(/\s*$/, "") + " " : "";
     dicteeAcquis = "";
+    dicteeAEntendu = false;
+    dicteeRelances = 0;
+    dicteeDemarre = false;
 
     reco = new Moteur();
     reco.lang = "fr-FR";
     reco.continuous = true;
     reco.interimResults = true;    // le texte s'écrit pendant qu'on parle
 
+    reco.onstart = () => {
+      // C'est ici, et pas après l'appel à start(), que l'écoute commence
+      // vraiment. Annoncer "Écoute en cours" plus tôt revenait à mentir quand
+      // le moteur ne démarrait jamais.
+      dicteeDemarre = true;
+      clearTimeout(dicteeVeille);
+      journalDictee("moteur démarré");
+      majEtatDictee("Écoute en cours, parlez normalement. Le texte s'écrit au fur et à mesure.", true);
+    };
+
     reco.onresult = ev => {
+      dicteeAEntendu = true;
+      dicteeRelances = 0;
       let provisoire = "";
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const bout = ev.results[i][0].transcript;
@@ -473,41 +556,81 @@ const Signalement = (function () {
     };
 
     reco.onerror = ev => {
-      if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
-        arreterDictee();
-        majEtatDictee("Micro refusé. Autorisez le microphone dans la barre d'adresse, puis réessayez.", false);
-      } else if (ev.error === "no-speech") {
-        majEtatDictee("Rien n'a été entendu. Parlez, l'écoute continue.", true);
-      } else if (ev.error === "network") {
-        arreterDictee();
-        majEtatDictee("La transcription n'a pas pu joindre son service. Écrivez le texte à la main.", false);
+      journalDictee("erreur " + ev.error);
+      if (ev.error === "no-speech") {
+        // Chrome coupe après quelques secondes de silence. Ce n'est pas une
+        // panne : onend relancera, l'écoute se poursuit.
+        majEtatDictee("Rien n'a été entendu pour l'instant. Parlez, l'écoute continue.", true);
+        return;
       }
+      if (!(ev.error in ERREURS_DICTEE)) {
+        echecDictee("La dictée s'est interrompue (" + ev.error + ").");
+        return;
+      }
+      const msg = ERREURS_DICTEE[ev.error];
+      if (msg) echecDictee(msg);       // aborted vaut null : arrêt volontaire
     };
 
     // Chrome coupe l'écoute de lui-même après un silence, même en mode
-    // continu. Tant que l'utilisateur n'a pas cliqué sur Arrêter, on relance.
+    // continu : on relance. Mais si le moteur se termine aussitôt après avoir
+    // démarré, sans avoir rien entendu, relancer sans fin ferait tourner la
+    // page à vide en laissant croire qu'elle écoute. Au bout de trois fois,
+    // on s'arrête et on le dit.
     reco.onend = () => {
-      if (dicteeActive) {
-        try { reco.start(); } catch (e) { /* déjà relancé */ }
+      if (!dicteeActive) return;
+      const aussitot = Date.now() - dicteeDepuis < 1200;
+      journalDictee("moteur arrêté" + (aussitot ? " aussitôt" : "")
+        + (dicteeAEntendu ? ", du texte a été reçu" : ", rien reçu"));
+      if (aussitot && !dicteeAEntendu) {
+        dicteeRelances++;
+        if (dicteeRelances >= 3) {
+          echecDictee("Le moteur de dictée s'arrête dès qu'il démarre. C'est en général un micro "
+            + "indisponible, ou le service de transcription qui n'est pas joignable depuis ce réseau.");
+          return;
+        }
+      } else {
+        dicteeRelances = 0;
       }
+      setTimeout(() => {
+        if (!dicteeActive) return;
+        try { dicteeDepuis = Date.now(); reco.start(); }
+        catch (e) { echecDictee("La dictée n'a pas pu reprendre (" + (e.name || e) + ")."); }
+      }, aussitot ? 400 : 0);
     };
 
     try {
+      dicteeDepuis = Date.now();
       reco.start();
       dicteeActive = true;
-      majEtatDictee("Écoute en cours, parlez normalement. Le texte s'écrit au fur et à mesure.", true);
+      majEtatDictee("Démarrage de la dictée...", true);
+      // Veille : si onstart n'arrive jamais, le bouton resterait sur "Arrêter"
+      // sans que rien n'écoute. Au bout de six secondes, on tranche.
+      clearTimeout(dicteeVeille);
+      dicteeVeille = setTimeout(() => {
+        if (dicteeActive && !dicteeDemarre) {
+          echecDictee("Le moteur de dictée n'a pas démarré. Vérifiez l'autorisation du micro "
+            + "dans la barre d'adresse.");
+        }
+      }, 6000);
     } catch (e) {
-      majEtatDictee("La dictée n'a pas pu démarrer.", false);
+      echecDictee("La dictée n'a pas pu démarrer (" + (e.name || e) + ").");
     }
   }
 
-  function arreterDictee() {
+  function arreterDictee(silencieux) {
     dicteeActive = false;
+    dicteeDemarre = false;
+    clearTimeout(dicteeVeille);
     if (reco) {
+      // On coupe les rappels avant d'arrêter : sinon onend relancerait le
+      // moteur que l'on vient d'éteindre, et onerror afficherait "aborted".
+      reco.onend = null;
+      reco.onerror = null;
+      reco.onstart = null;
       try { reco.stop(); } catch (e) { /* déjà arrêtée */ }
       reco = null;
     }
-    majEtatDictee(texteAvertissementDictee(), false);
+    if (!silencieux) majEtatDictee(texteAvertissementDictee(), false);
   }
 
   function texteAvertissementDictee() {
@@ -820,5 +943,66 @@ const Signalement = (function () {
     racine.querySelector(".sg-pastille").addEventListener("click", ouvrir);
   }
 
-  return { init: init };
+  /* ------------------------------------------------------------------
+     Diagnostic
+
+     La dictée dépend de trois choses hors de notre portée : le navigateur,
+     l'autorisation du micro et l'accès au service de transcription. Quand
+     elle ne marche pas, il faut pouvoir dire laquelle des trois manque
+     plutôt que de deviner. Depuis la console (touche F12) :
+
+         Signalement.diagnostic()
+
+     Le résultat s'affiche et se copie tel quel.
+     ------------------------------------------------------------------ */
+  async function diagnostic() {
+    const Moteur = MoteurDictee();
+    let permission = "inconnue";
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        permission = (await navigator.permissions.query({ name: "microphone" })).state;
+      } else {
+        permission = "API des permissions absente";
+      }
+    } catch (e) {
+      permission = "non interrogeable (" + (e.name || e) + ")";
+    }
+
+    let micros = "non énumérables";
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        const l = await navigator.mediaDevices.enumerateDevices();
+        const entrees = l.filter(d => d.kind === "audioinput");
+        // Sans autorisation accordée, les libellés sont vides mais le nombre
+        // reste juste : c'est ce qui nous intéresse ici.
+        micros = entrees.length + " entrée(s) audio";
+      }
+    } catch (e) {
+      micros = "erreur (" + (e.name || e) + ")";
+    }
+
+    const d = {
+      page: location.href,
+      contexteSecurise: window.isSecureContext,
+      navigateur: navigateurCourt(),
+      enLigne: navigator.onLine,
+      langue: navigator.language,
+      moteurDictee: Moteur ? (window.SpeechRecognition ? "SpeechRecognition" : "webkitSpeechRecognition") : "absent",
+      autorisationMicro: permission,
+      entreesAudio: micros,
+      captureEcran: captureSupportee() ? "disponible" : "absente",
+      pressePapiersImage: !!(navigator.clipboard && window.ClipboardItem) ? "disponible" : "absent",
+      transport: cfg ? cfg.transport : "widget non initialisé",
+      destinataire: cfg ? cfg.destinataire : ""
+    };
+
+    try {
+      console.log("=== Diagnostic du signalement B27 ===");
+      Object.keys(d).forEach(k => console.log("  " + k + " : " + d[k]));
+      console.log("=== copiez ce bloc pour le transmettre ===");
+    } catch (e) { /* sans console */ }
+    return d;
+  }
+
+  return { init: init, diagnostic: diagnostic };
 })();

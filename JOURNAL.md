@@ -2,6 +2,22 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, correctif de la dictée
+
+Retour de l'utilisateur : la dictée ne marche pas. Elle n'avait pas pu être exercée à la livraison, le microphone étant bloqué dans le navigateur d'essai. La relecture du code a montré que ce n'était pas seulement l'environnement.
+
+**Le défaut principal.** `onerror` ne traitait que trois codes sur sept. Sur tout autre code, rien ne s'affichait, `dicteeActive` restait vrai, et `onend` relançait le moteur indéfiniment : le bouton restait sur "Arrêter" et l'état sur "Écoute en cours" pendant que la page tournait à vide. De l'extérieur, cela donne exactement "la dictée ne marche pas", sans le moindre indice.
+
+**Corrigé.** Table complète des codes d'erreur, chacun avec son message en français et sa cause probable, plus un message générique pour un code inédit. `onstart` sert désormais de poignée de main : l'état n'annonce l'écoute qu'une fois le moteur réellement démarré, et une veille de six secondes tranche s'il ne démarre jamais. La relance après silence est conservée, mais plafonnée : trois arrêts immédiats sans le moindre résultat et on s'arrête en expliquant les deux causes probables, micro indisponible ou service injoignable. `arreterDictee` détache les rappels avant d'arrêter, sinon `onend` relançait le moteur qu'on venait d'éteindre et `onerror` affichait un "aborted" inquiétant. Contrôle préalable de l'autorisation micro et du contexte sécurisé, pour le cas fréquent du hub ouvert par double-clic sur le fichier, où le micro sera refusé sans explication.
+
+**Rendu visible.** L'échec passait en petit gris à côté du bouton, là où personne ne le lit. Il s'affiche maintenant dans un encadré ambre.
+
+**Diagnostic.** `Signalement.diagnostic()` en console rapporte la page, le contexte sécurisé, le navigateur, la présence du moteur, l'état de l'autorisation micro, le nombre d'entrées audio, la capture et le presse-papiers. La dictée trace aussi ses étapes en console, préfixées `Signalement/dictée :`. Sans cela, il n'y a aucun moyen de dire lequel des trois maillons manque.
+
+**Vérifications.** Le micro restant bloqué ici, les chemins ont été exercés contre des moteurs simulés : dictée qui aboutit (provisoire puis définitif, ajout après un texte déjà saisi sans l'effacer), moteur qui s'arrête aussitôt (trois tentatives comptées puis arrêt), et cinq codes d'erreur dont un inédit, chacun produisant son message et rendant le bouton au repos. Le diagnostic rapporte bien `autorisationMicro: denied` dans l'environnement d'essai, ce qui est la cause réelle de l'échec observé ici.
+
+**Reste à faire.** Essayer sur un poste B27 avec un vrai micro, et lancer `Signalement.diagnostic()` si cela ne marche toujours pas : le résultat dira si c'est le micro, le navigateur ou le réseau. Sur un poste d'entreprise, le service de transcription bloqué par un proxy est un candidat sérieux.
+
 ## 2026-08-29, deuxième session
 
 Le hub v1 était juste, mais vide : deux cartes sur une page blanche, sans B27 nulle part. Retour de l'utilisateur : ce qu'il veut, c'est un hall d'entrée, avec toutes les portes, et un moyen simple de signaler un problème. Cette session livre les deux.

@@ -105,13 +105,41 @@ La capture est réduite à 1600 px de large et encodée en PNG. Elle peut être 
 
 ## La dictée vocale
 
-Le bouton Dicter écrit le texte au fur et à mesure de la parole, sans attendre la fin de la phrase. Sur Chrome, l'écoute s'arrête d'elle-même après un silence : le widget la relance tant que l'utilisateur n'a pas cliqué sur Arrêter.
+Le bouton Dicter écrit le texte au fur et à mesure de la parole, sans attendre la fin de la phrase. Le texte dicté s'ajoute à ce qui a déjà été saisi au clavier, il ne l'efface pas. Sur Chrome, l'écoute s'arrête d'elle-même après un silence : le widget la relance tant que l'utilisateur n'a pas cliqué sur Arrêter.
 
 **La transcription n'est pas locale.** Sur Chrome et Edge, la voix est envoyée au service de transcription de l'éditeur du navigateur. C'est la seule chose, dans tout ce dispositif, qui sorte du poste. Le panneau l'écrit à côté du bouton, avant le premier enregistrement.
 
 Firefox n'implémente pas cette interface : le bouton ne s'affiche pas, le champ reste saisissable au clavier.
 
-Si le microphone est refusé, le message indique comment l'autoriser depuis la barre d'adresse.
+### Quand la dictée ne marche pas
+
+Elle dépend de trois choses hors de notre portée : le navigateur, l'autorisation du microphone, et l'accès au service de transcription qui passe par internet. N'importe laquelle des trois peut manquer, et sur un poste d'entreprise la troisième est un candidat sérieux : un pare-feu ou un proxy suffit à la bloquer.
+
+Le widget dit lequel des trois manque, dans un encadré ambre à côté du bouton :
+
+| Cause | Ce qui s'affiche |
+|---|---|
+| Micro refusé | Comment l'autoriser depuis la barre d'adresse. |
+| Aucun micro branché | Vérifier le matériel et les réglages son de Windows. |
+| Service injoignable | La transcription passe par internet, un pare-feu peut la bloquer. |
+| Service refusé par une stratégie d'entreprise | La dictée ne peut pas fonctionner sur ce poste. |
+| Français non pris en charge | Le navigateur ne sait pas transcrire le français. |
+| Page ouverte en local, pas en https | Ouvrir le hub en ligne plutôt que le fichier. |
+| Le moteur démarre puis s'arrête aussitôt | Signalé après trois tentatives, avec les deux causes probables. |
+
+Ce dernier cas mérite une explication. Le moteur qui se termine à la seconde où il démarre, sans rien avoir entendu, est le symptôme d'un micro indisponible ou d'un service injoignable. La première version relançait indéfiniment dans ce cas, en affichant "Écoute en cours" : la page paraissait écouter alors qu'elle tournait à vide. Elle compte désormais trois tentatives, puis s'arrête et le dit.
+
+### Le diagnostic
+
+Pour savoir ce qui manque exactement, ouvrir la console du navigateur (touche `F12`, onglet Console) et taper :
+
+```
+Signalement.diagnostic()
+```
+
+Le résultat liste la page, le contexte sécurisé, le navigateur, la présence du moteur de dictée, l'état de l'autorisation micro, le nombre d'entrées audio détectées, et la disponibilité de la capture et du presse-papiers. Il se copie tel quel.
+
+La dictée trace aussi ce qu'elle fait dans la console, préfixé `Signalement/dictée :` : démarrage du moteur, arrêts, codes d'erreur. C'est ce qu'il faut regarder en premier quand le bouton semble ne rien faire.
 
 ## Vérifié le 29/08/2026
 
@@ -125,4 +153,12 @@ Dans le navigateur, sur le hub :
 - Microphone : confirmé qu'aucune demande n'est faite tant que l'utilisateur ne clique pas sur Dicter. Refus du micro géré, message explicite, bouton rendu à son état de repos.
 - Composition du brouillon `mailto` contrôlée par relecture de l'URL : accents, esperluettes et chevrons intacts après encodage.
 
-Deux choses n'ont pas pu être exercées dans cet environnement et restent à essayer sur un poste réel : la dictée qui aboutit, le microphone étant bloqué dans le navigateur d'essai, et l'ouverture effective du client de messagerie, volontairement non déclenchée pour ne pas faire surgir une fenêtre de brouillon sur le poste.
+Reprise du 29/08/2026, la dictée ne fonctionnant pas. Le micro étant bloqué dans le navigateur d'essai, les chemins ont été exercés contre des moteurs de reconnaissance simulés, ce qui permet de contrôler ce que le vrai moteur ne laisse pas reproduire à volonté :
+
+- Dictée qui aboutit : le résultat provisoire s'écrit pendant la parole, le résultat définitif le remplace, et le texte dicté s'ajoute bien après une note déjà saisie au clavier sans l'effacer.
+- Moteur qui s'arrête aussitôt : trois tentatives comptées, puis arrêt et message. Plus de relance sans fin.
+- Codes d'erreur `network`, `audio-capture`, `service-not-allowed`, `language-not-supported` et un code inédit : chacun produit son message et rend le bouton à son état de repos. C'est le cas du code inédit qui était le défaut principal, il ne produisait rien du tout.
+- Contrôle préalable de l'autorisation micro : sur un refus déjà enregistré, la dictée le dit sans même démarrer le moteur.
+- `Signalement.diagnostic()` contrôlé : il rapporte bien `autorisationMicro: denied` dans l'environnement d'essai, ce qui est la cause réelle de l'échec observé ici.
+
+Restent non exercés sur un poste réel : la transcription par le vrai service, et l'ouverture effective du client de messagerie, volontairement non déclenchée pour ne pas faire surgir une fenêtre de brouillon sur le poste.
