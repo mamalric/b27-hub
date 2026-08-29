@@ -105,7 +105,7 @@ const TRACES_ICONES = {
   lune: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   engrenage: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
   fermer: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
-  langue: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  langue: '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>',
   actualiser: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   courrier: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
@@ -571,8 +571,7 @@ function fondGraine(p, L, H) {
   const amb = FOND.amb;
   p.x = Math.random() * L;
   p.y = Math.random() * H;
-  p.vie = 120 + Math.random() * 260;
-  p.mourant = false;
+  p.condamne = false;
   p.retirer = false;
 
   const r = Math.random();
@@ -622,15 +621,19 @@ function fondTracer(ctx, pts, de, jusque, couleur, a, e) {
   ctx.stroke();
 }
 
-/* La mort d'une particule est douce, jamais sèche. Une version antérieure
-   réensemençait ailleurs dès que la vie expirait : la traînée qu'on
-   suivait du regard disparaissait d'une image à l'autre — frustrant,
-   littéralement. Désormais un trait qui meurt continue de voler pendant
-   que sa queue se résorbe plus vite que la tête n'avance : il se dissout
-   en vol, comme une rafale qui s'éteint, et renaît ailleurs en repartant
-   d'un point. Un flocon, lui, naît et meurt en fondu. Le surplus après un
-   changement d'ambiance suit le même chemin : prié de mourir, jamais
-   retiré d'un coup. */
+/* La mort n'existe qu'hors champ. Une version faisait expirer les
+   particules au milieu de l'écran — d'abord sèchement, puis en se
+   dissolvant en vol — et dans les deux cas le regard qui suivait un trait
+   le perdait. Désormais un trait vit tant qu'il est visible : la dérive
+   du vent, toujours positive, garantit que chacun finit par sortir du
+   cadre, sa traînée le suit dehors, et c'est une fois le dernier point
+   sorti qu'il renaît ailleurs. Le surplus d'un changement d'ambiance est
+   condamné, pas exécuté : il vole normalement jusqu'à sa sortie
+   naturelle, et n'est retiré que là. */
+function fondHors(x, y, L, H) {
+  return x < -24 || x > L + 24 || y < -90 || y > H + 24;
+}
+
 function fondPas() {
   const { ctx, parts, L, H } = FOND;
   const amb = FOND.amb;
@@ -643,50 +646,48 @@ function fondPas() {
   if (parts.length < amb.nb) {
     parts.push(fondGraine({}, L, H));
   } else if (parts.length > amb.nb) {
-    const surplus = parts.find(q => !q.mourant);
-    if (surplus) surplus.mourant = true;
+    const surplus = parts.find(q => !q.condamne);
+    if (surplus) surplus.condamne = true;
   }
 
   let retraits = false;
   for (const p of parts) {
+    let sorti;
     if (p.genre === "flocon") {
       p.ph += 0.012;
       p.x += Math.sin(p.ph) * p.sw + amb.biaisX * 0.5;
       p.y += p.vy;
-      p.fondu = Math.max(0, Math.min(1, (p.fondu || 0) + (p.mourant ? -0.03 : 0.03)));
+      // Le fondu de naissance seul : un flocon apparaît en douceur au
+      // milieu de l'écran, mais il n'y meurt jamais — il tombe dehors.
+      p.fondu = Math.min(1, (p.fondu || 0) + 0.03);
       ctx.fillStyle = "rgba(" + amb.precip + "," + (p.a * p.fondu) + ")";
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
+      sorti = fondHors(p.x, p.y, L, H);
     } else if (p.genre === "goutte") {
       p.x += Math.cos(p.dir) * p.v;
       p.y += Math.sin(p.dir) * p.v;
       p.pts.push([p.x, p.y]);
-      if (p.mourant) { p.pts.shift(); p.pts.shift(); p.pts.shift(); }
-      else if (p.pts.length > p.long) p.pts.shift();
-      if (p.pts.length >= 2) fondTracer(ctx, p.pts, 0, p.pts.length - 1, amb.precip, p.a, p.e);
+      if (p.pts.length > p.long) p.pts.shift();
+      fondTracer(ctx, p.pts, 0, p.pts.length - 1, amb.precip, p.a, p.e);
+      // La tête sort la première, la queue la suit : la strie n'a fini de
+      // vivre que quand son dernier point a quitté l'écran.
+      sorti = fondHors(p.x, p.y, L, H) && fondHors(p.pts[0][0], p.pts[0][1], L, H);
     } else {
       const a = fondAngle(p.x, p.y, FOND.t) * amb.turbulence;
       p.x += Math.cos(a) * p.v + amb.biaisX;
       p.y += Math.sin(a) * p.v * 0.72 + amb.biaisY;
       p.pts.push([p.x, p.y]);
-      if (p.mourant) { p.pts.shift(); p.pts.shift(); p.pts.shift(); }
-      else if (p.pts.length > amb.trainee) p.pts.shift();
-      if (p.pts.length >= 2) {
-        const mi = Math.floor(p.pts.length / 2);
-        fondTracer(ctx, p.pts, 0, mi, amb.traits[p.c], p.a * 0.35, p.e);
-        fondTracer(ctx, p.pts, mi, p.pts.length - 1, amb.traits[p.c], p.a, p.e);
-      }
+      if (p.pts.length > amb.trainee) p.pts.shift();
+      const mi = Math.floor(p.pts.length / 2);
+      fondTracer(ctx, p.pts, 0, mi, amb.traits[p.c], p.a * 0.35, p.e);
+      fondTracer(ctx, p.pts, mi, p.pts.length - 1, amb.traits[p.c], p.a, p.e);
+      sorti = fondHors(p.x, p.y, L, H) && fondHors(p.pts[0][0], p.pts[0][1], L, H);
     }
 
-    p.vie--;
-    if (!p.mourant && (p.vie < 0
-        || p.x < -12 || p.y < -70 || p.x > L + 12 || p.y > H + 12)) {
-      p.mourant = true;
-    }
-    const eteint = p.genre === "flocon" ? p.fondu <= 0 : p.pts.length < 2;
-    if (p.mourant && eteint) {
-      if (parts.length > amb.nb) { p.retirer = true; retraits = true; }
+    if (sorti) {
+      if (p.condamne || parts.length > amb.nb) { p.retirer = true; retraits = true; }
       else fondGraine(p, L, H);
     }
   }

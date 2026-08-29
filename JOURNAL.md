@@ -2,6 +2,16 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, la mort n'existe qu'hors champ
+
+La dissolution en vol de la veille ne convenait pas : c'etait toujours une disparition sous les yeux, juste maquillee. L'utilisateur a tranche — la fin de vie doit se produire hors de l'ecran.
+
+Le compte a rebours de vie disparait donc entierement. Un trait vit tant qu'il est visible ; la derive du vent, toujours superieure a 0,1 pixel par image vers la droite, garantit que chacun finit par sortir du cadre. Sa trainee le suit dehors, et le reensemencement n'a lieu qu'une fois le dernier point sorti. Les flocons gardent leur fondu de naissance mais ne meurent plus en fondu : ils tombent dehors. Le surplus d'un changement d'ambiance est condamne, pas execute : il vole normalement jusqu'a sa sortie naturelle et n'est retire que la.
+
+Verification : douze traits suivis pendant six cents images, zero renaissance visible ; une particule condamnee et teleportee hors champ est retiree a l'image suivante.
+
+L'icone du bouton langues passe au trace Lucide « languages » fourni par l'utilisateur, l'ideogramme et le A, plus parlant que le globe.
+
 ## 2026-08-29, gouttiere supprimee, molette amortie, bouton langues
 
 Le « bloc uni blanc/noir » des barres etait la gouttiere de la barre de page : une bande reservee ou le canvas anime ne peut pas passer, montrant le fond plat a cote du fond vivant. La barre de page est supprimee — molette, clavier et pilule d'ancrage suffisent — et seules les barres des panneaux restent, gouttiere transparente fondue dans la carte.
