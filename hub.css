@@ -1,19 +1,20 @@
 /* =====================================================================
-   hub.css : habillage du hub d'accueil des outils B27.
+   hub.css : habillage du hall d'entrée des outils B27.
    =====================================================================
 
    La palette, les rayons, les ombres et la pile de polices sont repris tels
    quels du Sélectionneur de radiateurs et de la Calculette ECS et Bouclage,
    pour qu'un collègue qui passe du hub à un outil ne change pas d'univers.
-   Primaire olive #7da32f sur des surfaces neutres papier et encre, clair par
-   défaut, sombre via [data-theme="dark"] ou le réglage du système.
 
-   Le vert #7da32f est la déclinaison "outils" du vert de marque B27 (#95BE4E,
-   variante lisible en texte #5F7F2E). Les deux outils déjà publiés portent
-   l'olive : c'est lui qui fait la continuité visuelle, pas le vert du site.
+   Deux verts, et ils ne font pas le même travail :
+     --marque    #95c03d, le vert exact du logo B27. Il ne sert qu'au logo.
+     --primaire  #7da32f, sa variante assombrie, pour tout ce qui porte du
+                 texte ou doit tenir un contraste : vignettes, filtres
+                 actifs, survols. C'est le vert des deux outils déjà
+                 publiés, et c'est lui qui fait la continuité visuelle.
 
-   Aucune requête externe : pas de Google Fonts, pas de CDN. Segoe UI prend le
-   relais d'Inter sur Windows, où travaillent les postes B27.
+   Aucune requête externe : pas de Google Fonts, pas de CDN. Segoe UI prend
+   le relais d'Inter sur Windows, où travaillent les postes B27.
    ===================================================================== */
 
 :root{
@@ -27,6 +28,8 @@
   --discret:#676e69;
   --ligne:#dde0dc;
   --ligne-2:#ebeee9;
+  --marque:#95c03d;
+  --marque-lavis:rgba(149,192,61,.13);
   --primaire:#7da32f;
   --primaire-fond:#eaf3d8;
   --primaire-bord:#c3daa0;
@@ -59,6 +62,10 @@
   --discret:#929991;
   --ligne:#343a36;
   --ligne-2:#272c29;
+  /* Le vert du logo est déjà clair : sur fond sombre il tient largement le
+     contraste, il garde donc sa valeur exacte de marque. */
+  --marque:#95c03d;
+  --marque-lavis:rgba(149,192,61,.10);
   --primaire:#a5cc52;
   --primaire-fond:#2b3a17;
   --primaire-bord:#4a6626;
@@ -91,6 +98,7 @@ a{color:var(--lien);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--primaire);outline-offset:2px;border-radius:4px}
 .ico{vertical-align:-3px;flex:none}
+.logo-b27{display:block}
 
 /* ---------------------------------------------------------------- en-tête */
 header{
@@ -98,10 +106,9 @@ header{
   padding:12px 22px;background:var(--papier);border-bottom:1px solid var(--ligne);
   position:sticky;top:0;z-index:6;box-shadow:0 1px 3px rgba(0,0,0,.05);
 }
-header .logo{
-  width:30px;height:30px;border-radius:var(--rayon-s);background:var(--primaire);color:var(--sur-primaire);
-  display:inline-flex;align-items:center;justify-content:center;flex:none;
-}
+/* Le logo se pose directement sur le fond, sans plaque : le monogramme est
+   déjà une marque, l'enfermer dans un carré vert ferait doublon. */
+header .logo{color:var(--marque);flex:none;display:inline-flex;align-items:center}
 header .titre{display:flex;flex-direction:column;gap:1px;min-width:0;flex:0 1 auto}
 header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.3px;color:var(--encre);line-height:1.2}
 header .sub{font-size:12.5px;color:var(--discret);font-weight:400}
@@ -113,7 +120,43 @@ header .espace{flex:1}
 }
 .bouton-icone:hover{background:var(--papier-3);transform:rotate(15deg)}
 
-.wrap{padding:22px 22px 20px;max-width:1200px;margin:0 auto}
+/* ------------------------------------------------------ bandeau d'accueil
+   Le hall proprement dit. Bandeau pleine largeur plutôt que carte : c'est
+   ce qui lui donne son rôle de seuil, avant les portes. Le lavis vert est
+   posé au radial-gradient en haut à gauche, très dilué : il réchauffe le
+   blanc sans devenir un fond décoratif ni un dégradé de bandeau marketing. */
+.hall{
+  background-color:var(--papier);
+  background-image:radial-gradient(56rem 22rem at 5% -45%, var(--marque-lavis), transparent 68%);
+  border-bottom:1px solid var(--ligne);
+}
+.hall-dedans{
+  max-width:1200px;margin:0 auto;padding:34px 22px 28px;
+  display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;
+}
+.hall-logo{color:var(--marque);flex:none;line-height:0;padding-top:2px}
+.hall-mots{flex:1 1 420px;min-width:0}
+.hall-accroche{
+  margin:0 0 9px;font-size:27px;font-weight:800;letter-spacing:-.7px;
+  line-height:1.15;color:var(--encre);
+}
+.hall-chapeau{margin:0;font-size:14px;color:var(--encre-2);line-height:1.6;max-width:62ch}
+
+/* Les chiffres sont calculés à l'affichage : ils disent l'état réel du hall,
+   pas une promesse. Sur leur propre ligne, ils font socle sous l'accroche. */
+.hall-chiffres{
+  list-style:none;margin:20px 0 0;padding:0;flex-basis:100%;
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.hall-chiffres li{
+  font-size:12.5px;color:var(--discret);background:var(--papier-2);
+  border:1px solid var(--ligne);border-radius:999px;padding:4px 13px;
+}
+.hall-chiffres li b{color:var(--encre);font-weight:700;font-variant-numeric:tabular-nums}
+.hall-chiffres li.fort{background:var(--primaire-fond);border-color:var(--primaire-bord);color:var(--primaire-encre)}
+.hall-chiffres li.fort b{color:var(--primaire-encre)}
+
+.wrap{padding:24px 22px 20px;max-width:1200px;margin:0 auto}
 
 /* Sur un téléphone, les marges latérales de 22 px prennent une part sensible
    de la largeur utile : la carte y gagne à être plus large que la marge. */
@@ -124,22 +167,16 @@ header .espace{flex:1}
      et le sous-titre passe sur deux lignes, boutons à droite. */
   header{padding:10px 16px;gap:6px 12px;flex-wrap:nowrap}
   header h1{font-size:17px}
-  .wrap{padding:18px 16px 16px}
+  .hall-dedans{padding:24px 16px 22px;gap:16px}
+  .hall-accroche{font-size:22px;letter-spacing:-.5px}
+  .wrap{padding:20px 16px 16px}
   footer.pied{padding:6px 16px 30px}
 }
 
-/* ------------------------------------------------------- phrase d'accueil
-   Elle s'adresse à quelqu'un qui découvre le lien : mesurée en ch, pour tenir
-   la longueur de ligne confortable quelle que soit la largeur de l'écran. */
-.chapeau{
-  margin:0 0 18px;max-width:64ch;
-  font-size:13.5px;color:var(--encre-2);line-height:1.6;
-}
-
 /* ------------------------------------------ barre de recherche et de filtres
-   Cette barre n'est rendue qu'à partir de REGLAGES.seuilFiltres outils, voir
-   hub.js. Le style est donc écrit pour un hub déjà fourni, pas pour deux cartes. */
-.barre{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 18px}
+   Cette barre n'est rendue qu'à partir de REGLAGES.seuilFiltres portes, voir
+   hub.js. Le style est donc écrit pour un hall déjà fourni. */
+.barre{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 20px}
 .recherche{position:relative;flex:1 1 260px;max-width:380px}
 .recherche .ico{
   position:absolute;left:10px;top:50%;transform:translateY(-50%);
@@ -179,32 +216,43 @@ header .espace{flex:1}
   background:var(--primaire-fond);color:var(--primaire-encre);border-color:var(--primaire-bord);
 }
 
-/* ---------------------------------------------------------------- sections */
-.section{margin:0 0 26px}
+/* -------------------------------------------------------- titres de section
+   Une catégorie est un groupe de portes : son titre mérite d'être un vrai
+   titre, avec son pavé d'icône et son compte, et non la micro-étiquette
+   grise en capitales qui servait quand il n'y avait que deux cartes. */
+.section{margin:0 0 30px}
 .section:last-child{margin-bottom:0}
-.section > h2{
-  margin:0 0 12px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  color:var(--discret);display:flex;align-items:center;gap:7px;
+.section > h2, #annuaire > h2{
+  margin:0 0 13px;font-size:14.5px;font-weight:700;letter-spacing:-.2px;
+  color:var(--encre);display:flex;align-items:center;gap:10px;
 }
-.section > h2 .compte{
-  font-weight:600;letter-spacing:0;text-transform:none;font-size:11.5px;
-  color:var(--discret);opacity:.75;
+.section > h2 .pave, #annuaire > h2 .pave{
+  width:27px;height:27px;border-radius:var(--rayon-s);flex:none;
+  background:var(--papier-3);color:var(--encre-2);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.section > h2 .compte, #annuaire > h2 .compte{
+  font-size:11.5px;font-weight:600;color:var(--discret);
+  background:var(--papier-2);border:1px solid var(--ligne-2);
+  border-radius:999px;padding:1px 8px;
 }
 
 /* ------------------------------------------------------------------ grille
-   auto-fill et non auto-fit : avec deux outils, auto-fit étirerait chaque carte
-   sur la moitié de l'écran et le hub aurait l'air d'une page mal remplie.
-   auto-fill garde les cartes à leur largeur de lecture et laisse le vide à
-   droite, ce qui est aussi ce qui se passera quand la liste grandira. */
+   auto-fill et non auto-fit : auto-fit étirerait deux cartes isolées sur la
+   moitié de l'écran. auto-fill les garde à leur largeur de lecture et laisse
+   le vide à droite, ce qui reste juste quand la liste grandit. */
 .grille{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(300px,340px));
   gap:14px;
 }
-@media (max-width:700px){ .grille{grid-template-columns:1fr} }
+/* Grille dense : pour les ressources extérieures et les fiches d'annuaire,
+   plus petites, dont il peut y en avoir beaucoup. */
+.grille-dense{grid-template-columns:repeat(auto-fill,minmax(228px,272px))}
+@media (max-width:700px){ .grille, .grille-dense{grid-template-columns:1fr} }
 
-/* ------------------------------------------------------------------- carte */
-.carte{
+/* ------------------------------------------------------------ carte, fiche */
+.carte, .fiche{
   position:relative;display:flex;flex-direction:column;gap:9px;
   background:var(--papier);border:1px solid var(--ligne);border-radius:var(--rayon);
   box-shadow:var(--ombre);padding:15px 16px 14px;
@@ -218,8 +266,8 @@ a.carte:hover{
 a.carte:active{transform:translateY(0)}
 a.carte:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
 
-.carte .tete{display:flex;align-items:flex-start;gap:11px}
-.carte .vignette{
+.carte .tete, .fiche .tete{display:flex;align-items:flex-start;gap:11px}
+.carte .vignette, .fiche .vignette{
   width:36px;height:36px;flex:none;border-radius:var(--rayon-s);
   background:var(--primaire-fond);color:var(--primaire-encre);
   border:1px solid var(--primaire-bord);
@@ -227,7 +275,7 @@ a.carte:focus-visible{outline:2px solid var(--primaire);outline-offset:3px}
   transition:background-color var(--vitesse),color var(--vitesse),border-color var(--vitesse);
 }
 a.carte:hover .vignette{background:var(--primaire);color:var(--sur-primaire);border-color:var(--primaire)}
-.carte h3{
+.carte h3, .fiche h3{
   margin:0;font-size:14.5px;font-weight:700;line-height:1.3;color:var(--encre);
   letter-spacing:-.2px;flex:1;min-width:0;
 }
@@ -241,11 +289,20 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 
 .carte .pitch{margin:0;font-size:12.5px;color:var(--encre-2);line-height:1.5;flex:1}
 .carte .bas{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:1px}
-.carte .tags{display:flex;gap:5px;flex-wrap:wrap;flex:1;min-width:0}
-.carte .tag{
+.tags{display:flex;gap:5px;flex-wrap:wrap;flex:1;min-width:0}
+.tag{
   font-size:11px;color:var(--discret);background:var(--papier-2);
   border:1px solid var(--ligne-2);border-radius:999px;padding:1px 8px;white-space:nowrap;
 }
+
+/* Carte compacte, pour une ressource extérieure que nous ne maintenons pas.
+   Vingt liens ne doivent pas prendre le pas sur deux outils : ils sont utiles,
+   ils ne sont pas la raison d'être du hall. */
+.carte-lien{padding:12px 14px 11px;gap:7px}
+.carte-lien .vignette{width:30px;height:30px}
+.carte-lien h3{font-size:13.5px}
+.carte-lien .pitch{font-size:12px;line-height:1.45}
+.carte-lien .bas{margin-top:0}
 
 /* Pastille de statut. Le statut "en-ligne" n'en porte pas : le cas normal n'a
    pas besoin d'être annoncé, seules les exceptions méritent un signe. */
@@ -259,12 +316,28 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 .pastille.bureau{background:var(--papier-3);color:var(--encre-2);border-color:var(--ligne)}
 .pastille.obsolete{background:var(--haute-fond);color:var(--haute);border-color:var(--haute)}
 
-/* Cartes non cliquables : à venir, application de bureau, outil retiré. Elles
+/* Cartes non cliquables : à venir, application de bureau, porte retirée. Elles
    restent lisibles mais ne prétendent pas mener quelque part. */
 .carte.inerte{box-shadow:none;background:var(--papier-2);border-style:dashed}
 .carte.inerte .vignette{background:var(--papier-3);color:var(--discret);border-color:var(--ligne)}
 .carte.inerte h3{color:var(--encre-2)}
 .carte.obsolete h3{text-decoration:line-through;text-decoration-thickness:1px}
+
+/* ---------------------------------------------------------------- annuaire
+   Une fiche de contact n'est pas une porte : on n'y clique pas pour partir
+   ailleurs, on y prend une adresse. Elle ne se soulève donc pas au survol,
+   et ce sont ses liens mailto et tel qui portent l'interaction. */
+#annuaire{margin:32px 0 0;padding-top:26px;border-top:1px solid var(--ligne)}
+.fiche{box-shadow:none;gap:10px}
+.fiche .tete{align-items:center}
+.fiche h3{font-size:14px}
+.fiche .role{margin:1px 0 0;font-size:12px;color:var(--discret);line-height:1.35}
+.fiche .vignette{width:32px;height:32px}
+.joindre{display:flex;flex-direction:column;gap:5px;margin-top:1px}
+.joindre a{
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;
+  color:var(--lien);overflow-wrap:anywhere;
+}
 
 /* --------------------------------------------------- message aucun résultat */
 .vide{
@@ -275,7 +348,7 @@ a.carte:hover .sortie{color:var(--primaire-encre);transform:translate(2px,-2px)}
 
 /* -------------------------------------------------------------- pied de page */
 footer.pied{
-  padding:8px 22px 34px;max-width:1200px;margin:0 auto;
+  padding:8px 22px 40px;max-width:1200px;margin:0 auto;
   font-size:12px;color:var(--discret);line-height:1.7;
 }
 footer.pied .sep{margin:0 7px;opacity:.5}
@@ -327,22 +400,25 @@ footer.pied .sep{margin:0 7px;opacity:.5}
 .changelog .cl-txt{color:var(--encre-2);line-height:1.5}
 
 /* ---------------------------------------------------------------- impression
-   Un hub s'imprime rarement, mais s'il l'est il doit sortir en clair et porter
-   les adresses : sur papier, une carte cliquable sans son URL ne sert à rien. */
+   Le hall s'imprime rarement, mais s'il l'est il doit sortir en clair et
+   porter les adresses : une carte cliquable sans son URL ne sert à rien sur
+   papier. */
 @media print{
   :root,[data-theme="dark"]{
     color-scheme:light;
     --fond:#fff;--papier:#fff;--papier-2:#f7f8f6;--papier-3:#eef0ec;
     --encre:#1e2220;--encre-2:#4a4f4c;--discret:#636965;
     --ligne:#c7cbc6;--ligne-2:#dcdfda;
+    --marque:#7da32f;--marque-lavis:transparent;
     --primaire:#7da32f;--primaire-fond:#eaf3d8;--primaire-bord:#a9c67d;--primaire-encre:#3f5a12;
     --ombre:none;--ombre-haute:none;
   }
   body{background:#fff}
   header{position:static;box-shadow:none}
+  .hall{background-image:none}
   .noprint,.barre{display:none !important}
-  .grille{grid-template-columns:repeat(2,1fr)}
-  .carte{break-inside:avoid;box-shadow:none}
+  .grille,.grille-dense{grid-template-columns:repeat(2,1fr)}
+  .carte,.fiche{break-inside:avoid;box-shadow:none}
   .carte .sortie{display:none}
   a.carte[href]::after{
     content:" " attr(href);display:block;margin-top:6px;

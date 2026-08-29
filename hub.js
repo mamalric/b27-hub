@@ -1,11 +1,11 @@
 /* =====================================================================
-   hub.js : rendu du hub à partir de outils.js.
+   hub.js : rendu du hall d'entrée à partir de catalogue.js.
    =====================================================================
 
-   Ce fichier n'a pas besoin d'être modifié pour ajouter un outil. Tout ce
-   qui varie d'un outil à l'autre est dans outils.js. Ce qui se trouve ici,
-   ce sont les tracés d'icônes, la mécanique de thème, la construction des
-   cartes, le filtre et le panneau "À propos".
+   Ce fichier n'a pas besoin d'être modifié pour ajouter une porte. Tout ce
+   qui varie est dans catalogue.js. Ce qui se trouve ici, ce sont le logo,
+   les tracés d'icônes, la mécanique de thème, la construction du bandeau
+   d'accueil, des cartes, de l'annuaire, du filtre et du panneau "À propos".
 
    Aucune dépendance, aucune requête réseau : le hub s'ouvre aussi bien
    depuis GitHub Pages que par un double-clic sur index.html.
@@ -19,9 +19,34 @@
    possible entre l'en-tête du panneau et le journal qu'il affiche.
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v2", date: "2026-08-29", titre: "Hall d'entrée, logo B27 et signalement",
+    texte: "Bandeau d'accueil portant le logo B27 et le compte des portes ouvertes. Le catalogue s'élargit au-delà des outils : site de l'entreprise, B27 Mobility à venir, six ressources métier en cartes compactes, et un annuaire de contacts. Une pastille en bas à droite ouvre un formulaire de signalement avec capture d'écran et dictée vocale." },
   { v: "v1", date: "2026-08-29", titre: "Première mise en ligne",
-    texte: "Hub d'accueil des outils B27 : cartes cliquables construites à partir de outils.js, thème clair et sombre, panneau À propos. Deux outils référencés, la Calculette ECS et Bouclage et le Dimensionnement émetteurs Finimetal." }
+    texte: "Hub d'accueil des outils B27 : cartes cliquables construites à partir du catalogue, thème clair et sombre, panneau À propos. Deux outils référencés, la Calculette ECS et Bouclage et le Dimensionnement émetteurs Finimetal." }
 ];
+
+/* ---------------------------------------------------------------------
+   LOGO B27
+
+   Le monogramme seul, sans la plaque blanche du fichier logo-b27.svg qui
+   n'a de sens que pour une favicon. Sur la page, il se pose directement sur
+   le fond et prend la couleur de marque, lisible en clair comme en sombre.
+   Le viewBox est calé au plus juste sur les tracés (35.52 x 38.95) pour que
+   le logo occupe vraiment la taille demandée, sans marge morte.
+   --------------------------------------------------------------------- */
+const TRACES_LOGO =
+    '<path d="M0.59 27.13 C0.80 25.41 1.18 23.39 3.48 22.15 C4.95 21.40 7.17 21.02 9.44 21.02 C11.38 21.02 18.64 21.19 18.64 26.49 C18.64 27.65 18.22 28.80 17.43 29.72 C16.04 31.25 13.92 31.92 9.56 33.32 C6.78 34.21 6.22 34.48 5.49 35.50 L18.20 35.50 L18.20 38.95 L0.00 38.95 C0.03 37.93 0.03 35.77 1.50 33.81 C3.04 31.79 5.54 30.90 6.99 30.39 C8.23 29.96 9.47 29.56 10.74 29.10 C11.97 28.67 13.42 28.16 13.42 26.57 C13.42 24.50 10.79 24.36 9.38 24.36 C7.85 24.36 6.72 24.71 6.05 25.57 C5.57 26.14 5.54 26.65 5.49 27.13 L0.59 27.13"/>'
+  + '<path d="M0.61 0.00 L10.79 0.00 C16.42 0.00 18.55 2.40 18.55 4.87 C18.55 7.02 17.16 8.41 15.59 9.00 C17.16 9.48 19.22 10.84 19.22 13.34 C19.22 16.60 16.09 19.04 11.13 19.04 L0.61 19.04 L0.61 0.00 M10.21 7.51 C12.60 7.51 13.59 6.63 13.59 5.29 C13.59 3.90 12.30 3.18 10.36 3.18 L5.56 3.18 L5.56 7.51 L10.21 7.51 M5.56 15.86 L10.10 15.86 C12.82 15.86 14.06 14.93 14.06 13.20 C14.06 11.67 12.84 10.69 10.07 10.69 L5.56 10.69 L5.56 15.86"/>'
+  + '<path d="M20.64 21.59H30.73V25.63H20.64Z"/>'
+  + '<path d="M20.64 21.59 L35.52 21.59 L35.52 23.64 L26.84 38.85 L21.62 38.85 L29.61 25.63 L20.64 25.63 L20.64 21.59"/>';
+
+function logoB27(hauteur) {
+  const h = hauteur || 32;
+  const l = Math.round(h * 35.52 / 38.95 * 100) / 100;   // rapport du viewBox
+  return '<svg class="logo-b27" width="' + l + '" height="' + h + '"'
+    + ' viewBox="0 0 35.52 38.95" fill="currentColor" role="img" aria-label="B27">'
+    + TRACES_LOGO + "</svg>";
+}
 
 /* ---------------------------------------------------------------------
    ICÔNES
@@ -29,7 +54,7 @@ const CHANGELOG = [
    Tracés Lucide inlinés, comme dans les autres outils B27 : aucune requête
    externe, donc le hub reste affichable hors ligne et sur un poste sans
    accès sortant. Ajouter une icône, c'est ajouter une ligne ici, puis citer
-   son nom dans le champ "icone" d'un outil ou d'une catégorie.
+   son nom dans le champ "icone" d'une porte ou d'une catégorie.
    --------------------------------------------------------------------- */
 const TRACES_ICONES = {
   grille: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
@@ -62,9 +87,12 @@ const TRACES_ICONES = {
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   etiquette: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
   courrier: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  telephone: '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>',
+  personne: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   horloge: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
   valider: '<path d="M20 6 9 17l-5-5"/>',
-  attention: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>'
+  attention: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  porte: '<path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5.442 20.1a1 1 0 0 1-.442-.83V5.562a1 1 0 0 1 .58-.908l6-2.769a1 1 0 0 1 1.42.908z"/>'
 };
 
 function ico(nom, taille) {
@@ -101,10 +129,9 @@ function ech(txt) {
 
 // Comparaison insensible à la casse et aux accents : chercher "electricite"
 // doit trouver "Électricité", personne ne tape les accents dans un filtre.
+// NFD sépare la lettre de son accent, la plage U+0300 à U+036F retire les
+// accents ainsi détachés.
 function normaliser(txt) {
-  // NFD sépare la lettre de son accent, la plage U+0300 à U+036F retire les
-  // accents ainsi détachés. Écrite en séquences d'échappement et non en
-  // caractères combinants, qui seraient invisibles et fragiles dans le source.
   return String(txt || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
@@ -112,6 +139,10 @@ function dateFr(iso) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || "")) return iso || "inconnue";
   const [a, m, j] = iso.split("-");
   return j + "/" + m + "/" + a;
+}
+
+function accorde(n, singulier, pluriel) {
+  return n + " " + (n > 1 ? (pluriel || singulier + "s") : singulier);
 }
 
 // Un statut décrit à la fois ce qu'on affiche et si la carte mène quelque part.
@@ -123,22 +154,24 @@ const STATUTS = {
   "obsolete": { libelle: "Obsolète",   cliquable: false, pastille: true  }
 };
 
+const TYPES = { outil: true, lien: true };
+
 /* ---------------------------------------------------------------------
    CONTRÔLE DU CATALOGUE
 
-   outils.js se modifie à la main : une faute de frappe sur une catégorie ou
-   un statut y est le mode de panne le plus probable. Plutôt que d'afficher
-   une carte muette, on signale le problème dans la console et on retombe sur
-   un comportement sûr. Le même contrôle existe en version stricte dans
-   tests/verifier_outils.py, à lancer avant de publier.
+   catalogue.js se modifie à la main : une faute de frappe sur une catégorie
+   ou un statut y est le mode de panne le plus probable. Plutôt que
+   d'afficher une carte muette, on signale le problème dans la console et on
+   retombe sur un comportement sûr. Le même contrôle existe en version
+   stricte dans tests/verifier_catalogue.py, à lancer avant de publier.
    --------------------------------------------------------------------- */
 function controlerCatalogue() {
   const anomalies = [];
   const vus = new Set();
   const clesCategories = new Set(CATEGORIES.map(c => c.cle));
 
-  OUTILS.forEach((o, i) => {
-    const ou = 'outil ' + (i + 1) + ' (' + (o.nom || o.id || "sans nom") + ")";
+  PORTES.forEach((o, i) => {
+    const ou = "porte " + (i + 1) + " (" + (o.nom || o.id || "sans nom") + ")";
     if (!o.id) anomalies.push(ou + " : champ id manquant.");
     else if (vus.has(o.id)) anomalies.push(ou + ' : id "' + o.id + '" déjà utilisé.');
     else vus.add(o.id);
@@ -147,14 +180,22 @@ function controlerCatalogue() {
     if (!o.pitch) anomalies.push(ou + " : champ pitch manquant.");
     if (!clesCategories.has(o.categorie)) anomalies.push(ou + ' : catégorie "' + o.categorie + "\" inconnue de CATEGORIES.");
     if (!STATUTS[o.statut]) anomalies.push(ou + ' : statut "' + o.statut + '" inconnu.');
+    if (o.type && !TYPES[o.type]) anomalies.push(ou + ' : type "' + o.type + "\" inconnu, la carte sera rendue en type outil.");
     if (o.icone && !TRACES_ICONES[o.icone]) anomalies.push(ou + ' : icône "' + o.icone + "\" absente de TRACES_ICONES, remplacée par l'icône info.");
     if (STATUTS[o.statut] && STATUTS[o.statut].cliquable && !o.url) {
       anomalies.push(ou + " : statut cliquable mais url vide, la carte sera affichée non cliquable.");
     }
   });
 
+  (typeof CONTACTS === "undefined" ? [] : CONTACTS).forEach((c, i) => {
+    const ou = "contact " + (i + 1) + " (" + (c.nom || c.id || "sans nom") + ")";
+    if (!c.nom) anomalies.push(ou + " : champ nom manquant.");
+    if (!c.mail && !c.tel) anomalies.push(ou + " : ni mail ni téléphone, la fiche n'offrirait aucun moyen de joindre.");
+  });
+
   if (anomalies.length) {
-    console.warn("Hub B27 : " + anomalies.length + " anomalie(s) dans outils.js\n" + anomalies.map(a => "  - " + a).join("\n"));
+    console.warn("Hub B27 : " + anomalies.length + " anomalie(s) dans catalogue.js\n"
+      + anomalies.map(a => "  - " + a).join("\n"));
   }
   return anomalies;
 }
@@ -190,38 +231,93 @@ function initTheme() {
 }
 
 /* ---------------------------------------------------------------------
-   CONSTRUCTION DES CARTES
+   BANDEAU D'ACCUEIL
+
+   Le hall proprement dit : le logo B27 en grand, l'accroche, et le compte
+   de ce qui attend derrière. Les chiffres sont calculés, jamais écrits :
+   ils ne peuvent donc pas mentir après l'ajout d'une porte.
    --------------------------------------------------------------------- */
+function construireHall() {
+  const ouvertes = PORTES.filter(estCliquable).length;
+  const cats = categoriesPeuplees().length;
+
+  $("hallLogo").innerHTML = logoB27(58);
+  $("hallAccroche").textContent = REGLAGES.accroche || "";
+  $("hallAccroche").hidden = !REGLAGES.accroche;
+  $("hallChapeau").textContent = REGLAGES.chapeau || "";
+  $("hallChapeau").hidden = !REGLAGES.chapeau;
+
+  // Les portes fermées ne sont annoncées que s'il y en a : afficher
+  // "0 en préparation" attirerait l'oeil sur un vide.
+  const enPreparation = PORTES.length - ouvertes;
+  const chiffres = [
+    { n: ouvertes, mot: ouvertes > 1 ? "portes ouvertes" : "porte ouverte", fort: true },
+    { n: cats, mot: "univers" }
+  ];
+  if (enPreparation > 0) chiffres.push({ n: enPreparation, mot: "en préparation" });
+
+  $("hallChiffres").innerHTML = chiffres.map(c =>
+    '<li' + (c.fort ? ' class="fort"' : "") + "><b>" + c.n + "</b> "
+    + ech(c.mot) + "</li>").join("");
+}
+
+/* ---------------------------------------------------------------------
+   CARTES
+   --------------------------------------------------------------------- */
+
+function estCliquable(o) {
+  const st = STATUTS[o.statut];
+  return !!(st && st.cliquable && o.url);
+}
+
+function nomCategorie(cle) {
+  const c = CATEGORIES.find(c => c.cle === cle);
+  return c ? c.nom : cle;
+}
 
 // Une carte cliquable est un <a>, une carte inerte un <div> : un lien qui ne
 // mène nulle part serait annoncé comme un lien par un lecteur d'écran et
 // recevrait le focus au clavier pour rien.
 function html_carte(o) {
   const st = STATUTS[o.statut] || STATUTS["a-venir"];
-  const cliquable = st.cliquable && !!o.url;
-  const classes = ["carte"];
+  const type = TYPES[o.type] ? o.type : "outil";
+  const cliquable = estCliquable(o);
+
+  const classes = ["carte", "carte-" + type];
   if (!cliquable) classes.push("inerte");
   if (o.statut === "obsolete") classes.push("obsolete");
-
-  const tags = (o.tags || []).slice(0, 4)
-    .map(t => '<span class="tag">' + ech(t) + "</span>").join("");
 
   const pastille = st.pastille
     ? '<span class="pastille ' + ech(o.statut) + '">' + ech(st.libelle) + "</span>"
     : "";
-
   const sortie = cliquable ? '<span class="sortie">' + ico("sortie", 15) + "</span>" : "";
 
-  const interieur =
-      '<div class="tete">'
-    +   '<span class="vignette">' + ico(o.icone, 19) + "</span>"
-    +   "<h3>" + ech(o.nom) + "</h3>"
-    +   sortie
-    + "</div>"
-    + '<p class="pitch">' + ech(o.pitch) + "</p>"
-    + '<div class="bas"><div class="tags">' + tags + "</div>" + pastille + "</div>";
+  // Carte compacte pour les ressources extérieures : pas de mots-clés, le
+  // pitch tient sur une ligne. Vingt liens ne doivent pas noyer deux outils.
+  let interieur;
+  if (type === "lien") {
+    interieur =
+        '<div class="tete">'
+      +   '<span class="vignette">' + ico(o.icone, 17) + "</span>"
+      +   "<h3>" + ech(o.nom) + "</h3>"
+      +   sortie
+      + "</div>"
+      + '<p class="pitch">' + ech(o.pitch) + "</p>"
+      + (pastille ? '<div class="bas">' + pastille + "</div>" : "");
+  } else {
+    const tags = (o.tags || []).slice(0, 4)
+      .map(t => '<span class="tag">' + ech(t) + "</span>").join("");
+    interieur =
+        '<div class="tete">'
+      +   '<span class="vignette">' + ico(o.icone, 19) + "</span>"
+      +   "<h3>" + ech(o.nom) + "</h3>"
+      +   sortie
+      + "</div>"
+      + '<p class="pitch">' + ech(o.pitch) + "</p>"
+      + '<div class="bas"><div class="tags">' + tags + "</div>" + pastille + "</div>";
+  }
 
-  const attrsCommuns =
+  const attrs =
       ' class="' + classes.join(" ") + '"'
     + ' data-id="' + ech(o.id) + '"'
     + ' data-categorie="' + ech(o.categorie) + '"'
@@ -230,81 +326,116 @@ function html_carte(o) {
   if (!cliquable) {
     // aria-disabled plutôt que rien : la carte reste lue, mais annoncée
     // comme indisponible au lieu de passer pour un lien cassé.
-    return "<div" + attrsCommuns + ' aria-disabled="true" title="' + ech(st.libelle) + ' : cet outil n\'est pas accessible depuis le hub">' + interieur + "</div>";
+    return "<div" + attrs + ' aria-disabled="true" title="' + ech(st.libelle)
+      + " : cette porte n'est pas encore ouverte\">" + interieur + "</div>";
   }
-  // rel="noopener" : l'outil ouvert ne doit pas pouvoir manipuler la page du hub.
-  return '<a' + attrsCommuns + ' href="' + ech(o.url) + '" target="_blank" rel="noopener">' + interieur + "</a>";
+  // rel="noopener" : la page ouverte ne doit pas pouvoir manipuler le hub.
+  return "<a" + attrs + ' href="' + ech(o.url) + '" target="_blank" rel="noopener">' + interieur + "</a>";
 }
 
-function nomCategorie(cle) {
-  const c = CATEGORIES.find(c => c.cle === cle);
-  return c ? c.nom : cle;
-}
-
-// Catégories réellement peuplées, dans l'ordre déclaré. Les outils rangés dans
-// une catégorie inconnue sont regroupés à la fin plutôt que perdus.
+// Catégories réellement peuplées, dans l'ordre déclaré. Les portes rangées
+// dans une catégorie inconnue sont regroupées à la fin plutôt que perdues.
 function categoriesPeuplees() {
   const liste = CATEGORIES
-    .map(c => ({ ...c, outils: OUTILS.filter(o => o.categorie === c.cle) }))
-    .filter(c => c.outils.length);
+    .map(c => ({ ...c, portes: PORTES.filter(o => o.categorie === c.cle) }))
+    .filter(c => c.portes.length);
   const clesConnues = new Set(CATEGORIES.map(c => c.cle));
-  const orphelins = OUTILS.filter(o => !clesConnues.has(o.categorie));
-  if (orphelins.length) {
-    liste.push({ cle: "__autres", nom: "Autres", icone: "dossier", outils: orphelins });
+  const orphelines = PORTES.filter(o => !clesConnues.has(o.categorie));
+  if (orphelines.length) {
+    liste.push({ cle: "__autres", nom: "Autres", icone: "dossier", portes: orphelines });
   }
   return liste;
 }
 
 function construireCatalogue() {
   const cats = categoriesPeuplees();
-  const parSections = cats.length >= REGLAGES.seuilSections;
   const cible = $("catalogue");
 
-  if (!OUTILS.length) {
-    cible.innerHTML = '<div class="vide"><b>Aucun outil référencé pour le moment</b>'
-      + "Le catalogue se remplit en ajoutant une fiche dans outils.js.</div>";
+  if (!PORTES.length) {
+    cible.innerHTML = '<div class="vide"><b>Aucune porte pour le moment</b>'
+      + "Le hall se remplit en ajoutant une fiche dans catalogue.js.</div>";
     return;
   }
 
-  if (!parSections) {
+  if (cats.length < REGLAGES.seuilSections) {
     // Trop peu de catégories pour que des titres apportent quelque chose :
     // une grille unique se lit mieux qu'une suite de sections d'une carte.
     cible.innerHTML = '<div class="section"><div class="grille">'
-      + OUTILS.map(html_carte).join("") + "</div></div>";
+      + PORTES.map(html_carte).join("") + "</div></div>";
     return;
   }
 
-  cible.innerHTML = cats.map(c =>
-      '<section class="section" data-categorie="' + ech(c.cle) + '">'
-    +   '<h2 data-ico="' + ech(c.icone) + '" data-ico-taille="14">' + ech(c.nom)
-    +     ' <span class="compte">' + c.outils.length + "</span></h2>"
-    +   '<div class="grille">' + c.outils.map(html_carte).join("") + "</div>"
-    + "</section>"
-  ).join("");
+  cible.innerHTML = cats.map(c => {
+    // Une catégorie qui ne contient que des liens prend la grille dense.
+    const queDesLiens = c.portes.every(o => o.type === "lien");
+    return '<section class="section" data-categorie="' + ech(c.cle) + '">'
+      + '<h2><span class="pave">' + ico(c.icone, 15) + "</span>" + ech(c.nom)
+      +   ' <span class="compte">' + c.portes.length + "</span></h2>"
+      + '<div class="grille' + (queDesLiens ? " grille-dense" : "") + '">'
+      +   c.portes.map(html_carte).join("")
+      + "</div></section>";
+  }).join("");
+}
+
+/* ---------------------------------------------------------------------
+   ANNUAIRE
+
+   Une fiche de contact n'est pas une porte : on ne clique pas dessus pour
+   aller ailleurs, on y prend une adresse ou un numéro. D'où un rendu à
+   part, et des liens mailto et tel plutôt qu'une carte cliquable entière.
+   --------------------------------------------------------------------- */
+function construireAnnuaire() {
+  const contacts = typeof CONTACTS === "undefined" ? [] : CONTACTS;
+  const bloc = $("annuaire");
+  if (!contacts.length) { bloc.hidden = true; return; }
+  bloc.hidden = false;
+
+  bloc.innerHTML =
+      '<h2><span class="pave">' + ico("personne", 15) + "</span>Qui contacter"
+    +   ' <span class="compte">' + contacts.length + "</span></h2>"
+    + '<div class="grille grille-dense">'
+    + contacts.map(c => {
+        const sousTitre = [c.role, c.agence].filter(Boolean).join(" - ");
+        const sujets = (c.sujets || []).length
+          ? '<div class="tags">' + c.sujets.slice(0, 4).map(s => '<span class="tag">' + ech(s) + "</span>").join("") + "</div>"
+          : "";
+        const liens = [];
+        if (c.mail) liens.push('<a href="mailto:' + ech(c.mail) + '">' + ico("courrier", 14) + ech(c.mail) + "</a>");
+        if (c.tel) liens.push('<a href="tel:' + ech(c.tel.replace(/\s+/g, "")) + '">' + ico("telephone", 14) + ech(c.tel) + "</a>");
+        return '<div class="fiche">'
+          + '<div class="tete"><span class="vignette">' + ico("personne", 17) + "</span>"
+          +   "<div><h3>" + ech(c.nom) + "</h3>"
+          +   (sousTitre ? '<p class="role">' + ech(sousTitre) + "</p>" : "")
+          + "</div></div>"
+          + sujets
+          + (liens.length ? '<div class="joindre">' + liens.join("") + "</div>" : "")
+          + "</div>";
+      }).join("")
+    + "</div>";
 }
 
 /* ---------------------------------------------------------------------
    RECHERCHE ET FILTRES
 
-   La barre n'est construite qu'au-delà de REGLAGES.seuilFiltres outils. En
+   La barre n'est construite qu'au-delà de REGLAGES.seuilFiltres portes. En
    dessous, elle occuperait plus de place que le catalogue qu'elle filtre.
    --------------------------------------------------------------------- */
 let filtreCategorie = "tous";
 
 function construireBarre() {
-  if (OUTILS.length < REGLAGES.seuilFiltres) return false;
+  if (PORTES.length < REGLAGES.seuilFiltres) return false;
 
   const cats = categoriesPeuplees();
   $("barre").innerHTML =
       '<div class="recherche" id="zoneRecherche">'
     +   ico("recherche", 15)
-    +   '<input type="search" id="inpRecherche" placeholder="Rechercher un outil, un mot-clé..." aria-label="Rechercher un outil">'
+    +   '<input type="search" id="inpRecherche" placeholder="Rechercher une porte, un mot-clé..." aria-label="Rechercher une porte">'
     +   '<button type="button" class="vider" id="btnVider" aria-label="Effacer la recherche"></button>'
     + "</div>"
     + '<div class="filtres" role="group" aria-label="Filtrer par catégorie">'
-    +   '<button type="button" data-cat="tous" aria-pressed="true">Tous <span class="compte">' + OUTILS.length + "</span></button>"
+    +   '<button type="button" data-cat="tous" aria-pressed="true">Tous <span class="compte">' + PORTES.length + "</span></button>"
     +   cats.map(c => '<button type="button" data-cat="' + ech(c.cle) + '" aria-pressed="false">'
-          + ech(c.nom) + ' <span class="compte">' + c.outils.length + "</span></button>").join("")
+          + ech(c.nom) + ' <span class="compte">' + c.portes.length + "</span></button>").join("")
     + "</div>";
 
   $("btnVider").innerHTML = ico("fermer", 13);
@@ -330,6 +461,7 @@ function appliquerFiltres() {
   const champ = $("inpRecherche");
   if (!champ) return;
   const q = normaliser(champ.value.trim());
+  const filtre = q.length > 0 || filtreCategorie !== "tous";
   $("zoneRecherche").classList.toggle("remplie", champ.value.length > 0);
 
   let visibles = 0;
@@ -342,7 +474,7 @@ function appliquerFiltres() {
   });
 
   // Une section dont toutes les cartes sont masquées disparaît avec son titre :
-  // laisser un intitulé de catégorie au-dessus du vide donne l'impression d'un bug.
+  // laisser un intitulé de catégorie au-dessus du vide donne l'air d'un bug.
   document.querySelectorAll("#catalogue .section").forEach(sec => {
     const dedans = sec.querySelectorAll(".carte:not([hidden])").length;
     sec.hidden = dedans === 0;
@@ -350,18 +482,25 @@ function appliquerFiltres() {
     if (compte) compte.textContent = String(dedans);
   });
 
+  // L'annuaire n'est pas filtré : il ne contient pas de portes. Mais dès
+  // qu'un filtre est actif, l'afficher sous les résultats brouillerait la
+  // lecture, on le met de côté le temps de la recherche.
+  const annuaire = $("annuaire");
+  const contacts = typeof CONTACTS === "undefined" ? [] : CONTACTS;
+  if (contacts.length) annuaire.hidden = filtre;
+
   $("aucunResultat").hidden = visibles > 0;
   if (visibles === 0) {
-    $("aucunResultat").innerHTML = "<b>Aucun outil ne correspond</b>"
-      + "Essayez un autre mot-clé, ou revenez à la catégorie " + ech("Tous") + ".";
+    $("aucunResultat").innerHTML = "<b>Aucune porte ne correspond</b>"
+      + "Essayez un autre mot-clé, ou revenez à la catégorie Tous.";
   }
 }
 
 /* ---------------------------------------------------------------------
    PANNEAU "À PROPOS"
 
-   Les compteurs sont recalculés à chaque ouverture, jamais recopiés : ils ne
-   peuvent donc pas mentir après l'ajout d'un outil dans outils.js.
+   Les compteurs sont recalculés à chaque ouverture, jamais recopiés : ils
+   ne peuvent donc pas mentir après l'ajout d'une porte dans catalogue.js.
    --------------------------------------------------------------------- */
 function ligneStat(dt, dd) {
   return "<dt>" + ech(dt) + "</dt><dd>" + ech(dd) + "</dd>";
@@ -369,39 +508,43 @@ function ligneStat(dt, dd) {
 
 function remplirApropos() {
   const parStatut = {};
-  OUTILS.forEach(o => { parStatut[o.statut] = (parStatut[o.statut] || 0) + 1; });
-  const majs = OUTILS.map(o => o.maj).filter(Boolean).sort();
+  PORTES.forEach(o => { parStatut[o.statut] = (parStatut[o.statut] || 0) + 1; });
+  const majs = PORTES.map(o => o.maj).filter(Boolean).sort();
   const derniere = majs.length ? majs[majs.length - 1] : null;
   const cats = categoriesPeuplees();
+  const contacts = typeof CONTACTS === "undefined" ? [] : CONTACTS;
   const anomalies = controlerCatalogue();
+  const nosOutils = PORTES.filter(o => (o.type || "outil") === "outil").length;
 
   let h = "";
 
-  h += '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">Catalogue</h3><dl class="stats-liste">'
-     + ligneStat("Outils référencés", OUTILS.length)
+  h += '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">Le hall</h3><dl class="stats-liste">'
+     + ligneStat("Portes référencées", PORTES.length)
+     + ligneStat("dont ressources extérieures", PORTES.length - nosOutils)
      + Object.keys(STATUTS).filter(s => parStatut[s]).map(s =>
          ligneStat("dont " + STATUTS[s].libelle.toLowerCase(), parStatut[s])).join("")
      + ligneStat("Catégories représentées", cats.length)
-     + ligneStat("Outil mis à jour le plus récemment", derniere ? dateFr(derniere) : "non renseigné")
+     + ligneStat("Fiches à l'annuaire", contacts.length)
+     + ligneStat("Porte mise à jour le plus récemment", derniere ? dateFr(derniere) : "non renseigné")
      + ligneStat("Thème courant", document.documentElement.dataset.theme === "dark" ? "sombre" : "clair")
      + "</dl></div>";
 
-  h += '<div class="stats-groupe"><h3 data-ico="dossier" data-ico-taille="13">Ce que fait le hub</h3>'
+  h += '<div class="stats-groupe"><h3 data-ico="porte" data-ico-taille="13">Ce que fait le hub</h3>'
      + '<dl class="stats-liste gauche">'
-     + ligneStat("Rôle", "Point d'entrée unique vers les outils du bureau d'études. Le hub n'héberge aucun outil, il redirige.")
+     + ligneStat("Rôle", "Point d'entrée unique vers les outils et les ressources du bureau d'études. Le hub n'héberge rien, il redirige.")
      + ligneStat("Données", "Aucune. Aucun compte, aucun formulaire, aucun suivi. Seul le choix de thème est retenu dans le navigateur.")
-     + ligneStat("Hors ligne", "La page s'ouvre aussi depuis le disque, mais les outils qu'elle pointe demandent une connexion.")
+     + ligneStat("Hors ligne", "La page s'ouvre aussi depuis le disque, mais les portes qu'elle pointe demandent une connexion.")
      + "</dl></div>";
 
-  h += '<div class="stats-groupe"><h3 data-ico="etiquette" data-ico-taille="13">Ajouter un outil</h3>'
-     + '<div class="note">Un seul fichier à modifier : <code>outils.js</code>. Copier une fiche existante, '
+  h += '<div class="stats-groupe"><h3 data-ico="etiquette" data-ico-taille="13">Ajouter une porte</h3>'
+     + '<div class="note">Un seul fichier à modifier : <code>catalogue.js</code>. Copier une fiche existante, '
      + "remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis enregistrer. La carte apparaît, "
-     + "les compteurs et les filtres suivent. Le contrôle <code>python tests/verifier_outils.py</code> "
-     + "dit si la fiche est complète avant publication.</div></div>";
+     + "les compteurs, les sections et les filtres suivent. Le contrôle "
+     + "<code>python tests/verifier_catalogue.py</code> dit si la fiche est complète avant publication.</div></div>";
 
   if (anomalies.length) {
     h += '<div class="stats-groupe"><h3 data-ico="attention" data-ico-taille="13">Anomalies du catalogue</h3>'
-       + '<div class="note">' + anomalies.length + " anomalie(s) détectée(s) dans outils.js. "
+       + '<div class="note">' + anomalies.length + " anomalie(s) détectée(s) dans catalogue.js. "
        + "Le détail est dans la console du navigateur (touche F12).</div></div>";
   }
 
@@ -418,9 +561,9 @@ function remplirApropos() {
 
   if (REGLAGES.contact) {
     h += '<div class="stats-groupe"><h3 data-ico="courrier" data-ico-taille="13">Un bug, une idée d\'outil</h3>'
-       + '<dl class="stats-liste gauche">'
-       + '<dt>Contact</dt><dd><a href="mailto:' + ech(REGLAGES.contact) + '">' + ech(REGLAGES.contact) + "</a></dd>"
-       + "</dl></div>";
+       + '<div class="note">Le plus rapide est la pastille de signalement, en bas à droite de l\'écran : '
+       + "elle joint une capture de ce que vous avez sous les yeux et permet de dicter le problème à voix haute. "
+       + 'Sinon, par mail : <a href="mailto:' + ech(REGLAGES.contact) + '">' + ech(REGLAGES.contact) + "</a>.</div></div>";
   }
 
   const corps = $("aproposCorps");
@@ -449,26 +592,31 @@ function init() {
   document.title = REGLAGES.titre;
   $("titreHub").textContent = REGLAGES.titre;
   $("sousTitreHub").textContent = REGLAGES.sousTitre;
-  if (REGLAGES.chapeau) {
-    $("chapeauHub").textContent = REGLAGES.chapeau;
-    $("chapeauHub").hidden = false;
-  }
+  $("enteteLogo").innerHTML = logoB27(26);
 
   controlerCatalogue();
+  construireHall();
   construireCatalogue();
+  construireAnnuaire();
   const avecBarre = construireBarre();
   poserIcones();
   initTheme();
   initApropos();
 
-  const enLigne = OUTILS.filter(o => (STATUTS[o.statut] || {}).cliquable && o.url).length;
-  $("piedCompte").textContent = OUTILS.length + " outil" + (OUTILS.length > 1 ? "s" : "")
-    + " référencé" + (OUTILS.length > 1 ? "s" : "")
-    + ", " + enLigne + " accessible" + (enLigne > 1 ? "s" : "") + " en ligne";
+  const ouvertes = PORTES.filter(estCliquable).length;
+  $("piedCompte").textContent = accorde(PORTES.length, "porte référencée", "portes référencées")
+    + ", " + ouvertes + " ouverte" + (ouvertes > 1 ? "s" : "");
 
   if (REGLAGES.contact) {
-    $("piedContact").innerHTML = 'Un bug, une idée d\'outil : <a href="mailto:'
+    $("piedContact").innerHTML = 'Un bug, une idée d\'outil : la pastille en bas à droite, ou <a href="mailto:'
       + ech(REGLAGES.contact) + '">' + ech(REGLAGES.contact) + "</a>";
+  }
+
+  // Pastille de signalement. Le widget est autonome et se branche sur les
+  // réglages du catalogue ; s'il n'a pas été chargé, le hub fonctionne
+  // exactement pareil, sans la pastille.
+  if (typeof Signalement !== "undefined" && typeof SIGNALEMENT !== "undefined" && SIGNALEMENT.actif) {
+    Signalement.init(SIGNALEMENT);
   }
 
   if (avecBarre) appliquerFiltres();

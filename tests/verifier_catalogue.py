@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Contrôle du catalogue du hub B27.
 
-Le fichier outils.js se modifie à la main : une catégorie mal orthographiée, un
-statut inventé, une icône qui n'existe pas ou deux fiches partageant le même id
-sont les fautes les plus probables. Le hub sait déjà les signaler dans la console
-du navigateur, mais il faut penser à l'ouvrir. Ce script fait le même contrôle en
-version stricte, hors navigateur, avant de publier.
+Le fichier catalogue.js se modifie à la main : une catégorie mal orthographiée,
+un statut inventé, une icône qui n'existe pas ou deux fiches partageant le même
+id sont les fautes les plus probables. Le hub sait déjà les signaler dans la
+console du navigateur, mais il faut penser à l'ouvrir. Ce script fait le même
+contrôle en version stricte, hors navigateur, avant de publier.
 
-    python tests/verifier_outils.py
+    python tests/verifier_catalogue.py
 
 Code de sortie 0 si tout va bien, 1 s'il reste au moins une erreur. Les
 avertissements n'empêchent pas la publication mais méritent un coup d'oeil.
@@ -21,27 +21,30 @@ import pathlib
 import re
 import sys
 
-# La console Windows est en cp1252 par defaut : sans cette ligne, les accents
-# des messages sortent en caracteres de remplacement.
+# La console Windows est en cp1252 par défaut : sans cette ligne, les accents
+# des messages sortent en caractères de remplacement.
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except (AttributeError, OSError):
     pass
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
-FICHIER_OUTILS = RACINE / "outils.js"
+FICHIER_CATALOGUE = RACINE / "catalogue.js"
 FICHIER_HUB = RACINE / "hub.js"
 
 STATUTS_CONNUS = {"en-ligne", "beta", "a-venir", "bureau", "obsolete"}
 STATUTS_CLIQUABLES = {"en-ligne", "beta"}
+TYPES_CONNUS = {"outil", "lien"}
+TRANSPORTS_CONNUS = {"mailto", "formulaire", "endpoint"}
 LONGUEUR_PITCH_MAX = 140
-CHAMPS_ATTENDUS = {"id", "nom", "pitch", "url", "categorie", "statut", "icone", "tags", "maj"}
+CHAMPS_PORTE = {"id", "nom", "pitch", "url", "categorie", "statut", "type", "icone", "tags", "maj"}
+CHAMPS_CONTACT = {"id", "nom", "role", "agence", "mail", "tel", "sujets"}
 
 
 # --------------------------------------------------------------------------
 # Lecture des littéraux JavaScript
 #
-# outils.js n'est pas du JSON : il porte des commentaires, des clés sans
+# catalogue.js n'est pas du JSON : il porte des commentaires, des clés sans
 # guillemets et des virgules finales. Plutôt que d'imposer un format moins
 # commode à écrire à la main, on le convertit ici. Le retrait des commentaires
 # se fait caractère par caractère et non par expression régulière, sinon le
@@ -89,7 +92,7 @@ def extraire_litteral(source: str, nom: str):
     """Renvoie la valeur Python du littéral affecté à `nom` dans le source."""
     depart = re.search(r"\bconst\s+" + re.escape(nom) + r"\s*=\s*", source)
     if not depart:
-        raise ValueError("déclaration '%s' introuvable dans outils.js" % nom)
+        raise ValueError("déclaration '%s' introuvable dans catalogue.js" % nom)
     i = depart.end()
     ouvrant = source[i]
     fermant = {"[": "]", "{": "}"}.get(ouvrant)
@@ -120,8 +123,8 @@ def extraire_litteral(source: str, nom: str):
     else:
         raise ValueError("littéral '%s' non refermé" % nom)
 
-    # Clés sans guillemets vers clés JSON, apostrophes vers guillemets droits,
-    # puis retrait des virgules finales que JSON refuse.
+    # Clés sans guillemets vers clés JSON, puis retrait des virgules finales
+    # que JSON refuse.
     txt = re.sub(r"([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:", r'\1"\2":', brut)
     txt = re.sub(r",(\s*[\]}])", r"\1", txt)
     return json.loads(txt)
@@ -143,10 +146,12 @@ def cles_icones() -> set:
 def controler():
     erreurs, avertissements = [], []
 
-    source = retirer_commentaires(FICHIER_OUTILS.read_text(encoding="utf-8"))
-    outils = extraire_litteral(source, "OUTILS")
+    source = retirer_commentaires(FICHIER_CATALOGUE.read_text(encoding="utf-8"))
+    portes = extraire_litteral(source, "PORTES")
+    contacts = extraire_litteral(source, "CONTACTS")
     categories = extraire_litteral(source, "CATEGORIES")
     reglages = extraire_litteral(source, "REGLAGES")
+    signalement = extraire_litteral(source, "SIGNALEMENT")
     icones = cles_icones()
 
     # --- catégories
@@ -166,19 +171,35 @@ def controler():
     for champ in ("titre", "sousTitre", "seuilFiltres", "seuilSections"):
         if champ not in reglages:
             erreurs.append("REGLAGES : champ '%s' manquant." % champ)
+    if not reglages.get("accroche"):
+        avertissements.append("REGLAGES : pas d'accroche, le bandeau d'accueil sera nu.")
     if "contact" not in reglages:
         avertissements.append("REGLAGES : pas de champ 'contact', aucune adresse ne sera proposée.")
 
-    # --- outils
+    # --- signalement
+    if signalement.get("actif"):
+        transport = signalement.get("transport")
+        if transport not in TRANSPORTS_CONNUS:
+            erreurs.append("SIGNALEMENT : transport '%s' inconnu (attendu : %s)."
+                           % (transport, ", ".join(sorted(TRANSPORTS_CONNUS))))
+        elif transport == "mailto":
+            if not signalement.get("destinataire"):
+                erreurs.append("SIGNALEMENT : mode mailto sans destinataire, la pastille ne sera pas posée.")
+        elif not signalement.get("endpoint"):
+            erreurs.append("SIGNALEMENT : mode '%s' sans endpoint, le widget retombera en mailto." % transport)
+        if signalement.get("destinataire") and "@" not in signalement["destinataire"]:
+            erreurs.append("SIGNALEMENT : destinataire '%s' sans arobase." % signalement["destinataire"])
+
+    # --- portes
     ids = []
     aujourdhui = datetime.date.today()
-    for i, o in enumerate(outils, 1):
-        ou = "outil %d (%s)" % (i, o.get("nom") or o.get("id") or "sans nom")
+    for i, o in enumerate(portes, 1):
+        ou = "porte %d (%s)" % (i, o.get("nom") or o.get("id") or "sans nom")
 
-        oubliés = CHAMPS_ATTENDUS - set(o)
-        if oubliés:
-            erreurs.append("%s : champ(s) manquant(s) : %s." % (ou, ", ".join(sorted(oubliés))))
-        inconnus = set(o) - CHAMPS_ATTENDUS
+        manquants = CHAMPS_PORTE - set(o)
+        if manquants:
+            erreurs.append("%s : champ(s) manquant(s) : %s." % (ou, ", ".join(sorted(manquants))))
+        inconnus = set(o) - CHAMPS_PORTE
         if inconnus:
             avertissements.append("%s : champ(s) ignoré(s) par le hub : %s." % (ou, ", ".join(sorted(inconnus))))
 
@@ -202,6 +223,10 @@ def controler():
             erreurs.append("%s : statut '%s' inconnu (attendu : %s)."
                            % (ou, statut, ", ".join(sorted(STATUTS_CONNUS))))
 
+        if o.get("type") and o["type"] not in TYPES_CONNUS:
+            erreurs.append("%s : type '%s' inconnu (attendu : %s)."
+                           % (ou, o["type"], ", ".join(sorted(TYPES_CONNUS))))
+
         if icones and o.get("icone") and o["icone"] not in icones:
             erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, o["icone"]))
 
@@ -221,8 +246,7 @@ def controler():
             erreurs.append("%s : date de mise à jour '%s' hors format AAAA-MM-JJ." % (ou, maj))
         else:
             try:
-                jour = datetime.date.fromisoformat(maj)
-                if jour > aujourdhui:
+                if datetime.date.fromisoformat(maj) > aujourdhui:
                     avertissements.append("%s : date de mise à jour dans le futur (%s)." % (ou, maj))
             except ValueError:
                 erreurs.append("%s : date de mise à jour '%s' inexistante au calendrier." % (ou, maj))
@@ -234,20 +258,41 @@ def controler():
             avertissements.append("%s : %d mots-clés, la carte n'en affiche que 4 (les autres restent "
                                   "cherchables)." % (ou, len(tags)))
 
-    return outils, categories, erreurs, avertissements
+    # --- annuaire
+    ids_contacts = []
+    for i, c in enumerate(contacts, 1):
+        ou = "contact %d (%s)" % (i, c.get("nom") or c.get("id") or "sans nom")
+        inconnus = set(c) - CHAMPS_CONTACT
+        if inconnus:
+            avertissements.append("%s : champ(s) ignoré(s) : %s." % (ou, ", ".join(sorted(inconnus))))
+        if not c.get("nom"):
+            erreurs.append("%s : champ 'nom' manquant." % ou)
+        if c.get("id") in ids_contacts:
+            erreurs.append("%s : id '%s' déjà utilisé." % (ou, c.get("id")))
+        ids_contacts.append(c.get("id"))
+        if not c.get("mail") and not c.get("tel"):
+            erreurs.append("%s : ni mail ni téléphone, la fiche n'offre aucun moyen de joindre." % ou)
+        if c.get("mail") and "@" not in c["mail"]:
+            erreurs.append("%s : adresse '%s' sans arobase." % (ou, c["mail"]))
+        if c.get("tel") and not re.fullmatch(r"\+?[\d\s.\-()]{6,}", c["tel"]):
+            avertissements.append("%s : téléphone '%s' d'aspect inhabituel, il doit rester cliquable." % (ou, c["tel"]))
+
+    return portes, contacts, categories, erreurs, avertissements
 
 
 def main():
     try:
-        outils, categories, erreurs, avertissements = controler()
+        portes, contacts, categories, erreurs, avertissements = controler()
     except Exception as exc:                      # noqa: BLE001
         print("Lecture impossible : %s" % exc)
         return 1
 
-    peuplees = {o.get("categorie") for o in outils}
-    en_ligne = [o for o in outils if o.get("statut") in STATUTS_CLIQUABLES and o.get("url")]
-    print("Catalogue : %d outil(s), %d en ligne, %d catégorie(s) utilisée(s) sur %d déclarée(s)."
-          % (len(outils), len(en_ligne), len(peuplees), len(categories)))
+    peuplees = {o.get("categorie") for o in portes}
+    ouvertes = [o for o in portes if o.get("statut") in STATUTS_CLIQUABLES and o.get("url")]
+    liens = [o for o in portes if o.get("type") == "lien"]
+    print("Catalogue : %d porte(s), %d ouverte(s), %d ressource(s) extérieure(s), "
+          "%d catégorie(s) utilisée(s) sur %d déclarée(s), %d fiche(s) d'annuaire."
+          % (len(portes), len(ouvertes), len(liens), len(peuplees), len(categories), len(contacts)))
 
     for a in avertissements:
         print("  avertissement : %s" % a)
@@ -255,7 +300,7 @@ def main():
         print("  ERREUR : %s" % e)
 
     if erreurs:
-        print("\n%d erreur(s) : corriger outils.js avant de publier." % len(erreurs))
+        print("\n%d erreur(s) : corriger catalogue.js avant de publier." % len(erreurs))
         return 1
     print("\nCatalogue conforme%s." % (", %d avertissement(s)" % len(avertissements) if avertissements else ""))
     return 0

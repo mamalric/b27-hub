@@ -2,6 +2,27 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-29, deuxième session
+
+Le hub v1 était juste, mais vide : deux cartes sur une page blanche, sans B27 nulle part. Retour de l'utilisateur : ce qu'il veut, c'est un hall d'entrée, avec toutes les portes, et un moyen simple de signaler un problème. Cette session livre les deux.
+
+**Le logo.** L'utilisateur a fourni le SVG officiel, repris du Livre d'or REX. Le monogramme est en `#95c03d`. La feuille de B27 Mobility, retrouvée au passage, confirme ce vert de marque et distingue déjà une variante assombrie pour le texte. Le hub adopte la même séparation : `--marque` pour le logo et lui seul, `--primaire` (l'olive `#7da32f` des deux outils publiés) pour tout ce qui doit tenir un contraste. Dans la page, le monogramme est dessiné sans sa plaque blanche, viewBox calé au plus juste sur les tracés ; la plaque ne sert que pour la favicon.
+
+**Le hall.** Bandeau d'accueil pleine largeur : logo en grand, accroche, chapeau, et trois chiffres calculés à l'affichage (portes ouvertes, univers, en préparation). Lavis vert très dilué en radial-gradient dans l'angle haut gauche, pour réchauffer le blanc sans virer au bandeau décoratif. Les titres de section deviennent de vrais titres, avec pavé d'icône et compte, au lieu des micro-étiquettes grises en capitales qui suffisaient à deux cartes.
+
+**Le catalogue s'élargit.** `outils.js` devient `catalogue.js`, `OUTILS` devient `PORTES` : le fichier ne contient plus seulement des outils. Nouveau champ `type`, à deux valeurs qui comptent visuellement. `outil` garde la carte pleine ; `lien` reçoit une carte compacte dans une grille dense, parce que vingt ressources extérieures ne doivent pas noyer deux outils maison. Ajout du site b27.fr, de B27 Mobility en "à venir", et de six ressources métier dont les adresses ont été contrôlées une à une (Légifrance et ADEME renvoient 403 à curl par protection anti-robot, elles répondent normalement dans un navigateur). Nouveau tableau `CONTACTS` et section annuaire : une fiche n'est pas une porte, on n'y clique pas pour partir ailleurs, elle ne se soulève donc pas au survol et ce sont ses liens `mailto` et `tel` qui portent l'interaction. Le hall passe de 2 à 10 portes, ce qui fait apparaître d'elles-mêmes la recherche, les filtres et les sections.
+
+**Le signalement.** `signalement.js`, autonome, sans dépendance, feuille de style et icônes embarquées : deux lignes suffisent à le poser sur n'importe quel outil B27, ce qui était la demande. Pastille repliée en bas à droite, dépliée au survol. Au clic, la capture est tentée avant l'affichage du panneau, car ce qu'il faut photographier c'est l'écran du problème et non celui du formulaire ; la pastille se retire de l'image le temps de la prise. Dictée vocale en direct, le texte s'écrit pendant la parole, avec relance automatique du moteur que Chrome coupe après un silence.
+
+**Le point dur, et ce qu'il change.** L'utilisateur avait choisi un service tiers pour que l'envoi soit automatique, capture comprise. Vérification faite : Formspree, Web3Forms et EmailJS réservent tous les trois les pièces jointes à leurs offres payantes, de 9 à 15 dollars par mois. Le choix reposait donc sur une information fausse, la mienne. Plutôt que de trancher à sa place, le widget a été écrit avec trois transports interchangeables : `mailto` par défaut, qui marche aujourd'hui sans compte ni dépense, la capture passant par le presse-papiers puisque aucun lien mail ne peut porter de pièce jointe ; `formulaire` pour un service tiers ; `endpoint` pour un point de collecte maison, seule voie à la fois gratuite, complète et privée, un Worker Cloudflare convenant très bien. Changer de mode est une ligne dans `catalogue.js`.
+
+**Vérifications.** Hall et panneau en clair et en sombre, desktop et mobile. Pastille mesurée repliée (46 px) et dépliée (182 px). Capture refusée : repli propre. Circuit complet de capture exercé contre un flux d'écran simulé par un canvas animé, ce qui a permis de valider la réduction, l'encodage PNG, l'aperçu et la taille affichée sans dialogue système. Envoi en mode `endpoint` vers un point de collecte local : titre, description, contexte complet et capture en data URL de 80 ko reçus et relus. Composition du brouillon `mailto` contrôlée par relecture de l'URL, accents et caractères spéciaux intacts. Confirmé qu'aucune demande de microphone n'est faite tant que l'utilisateur ne clique pas sur Dicter.
+
+**Un défaut corrigé au passage.** La détection du navigateur annonçait "Safari" pour un Chromium : tous les navigateurs fondés sur Chromium terminent leur signature par `Safari/537.36`, et prendre le dernier jeton fait passer Edge pour Safari. Remplacé par un examen du plus spécifique au plus générique.
+
+**Reste à faire.** Trancher le mode d'envoi. Essayer la dictée et l'ouverture du brouillon sur un poste réel, le microphone et le client de messagerie n'ayant pas pu être exercés ici. Remplir l'annuaire. Publier les outils web encore locaux et ajouter leur fiche.
+
+
 ## 2026-08-29
 
 Première session de développement, à partir du prompt de `idee-origine.md`. Le hub v1 est écrit, vérifié et publié.

@@ -11,12 +11,12 @@
      référencé. robots.txt porte la même consigne côté serveur. -->
 <meta name="robots" content="noindex, nofollow">
 
-<meta name="description" content="Point d'entrée unique vers les outils et applications du bureau d'études B27.">
+<meta name="description" content="Le hall d'entrée des outils et applications du bureau d'études B27.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Outils B27">
-<meta property="og:description" content="Point d'entrée unique vers les outils et applications du bureau d'études B27.">
+<meta property="og:description" content="Le hall d'entrée des outils et applications du bureau d'études B27.">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237da32f'/%3E%3Cg transform='translate(4 4)' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='7' height='7' x='3' y='3' rx='1'/%3E%3Crect width='7' height='7' x='14' y='3' rx='1'/%3E%3Crect width='7' height='7' x='14' y='14' rx='1'/%3E%3Crect width='7' height='7' x='3' y='14' rx='1'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="logo-b27.svg">
 
 <link rel="stylesheet" href="hub.css">
 
@@ -28,7 +28,7 @@
 <body>
 
 <header>
-  <span class="logo" data-ico="grille" data-ico-taille="18"></span>
+  <span class="logo" id="enteteLogo"></span>
   <div class="titre">
     <h1 id="titreHub">Outils B27</h1>
     <span class="sub" id="sousTitreHub"></span>
@@ -38,18 +38,31 @@
   <button type="button" class="bouton-icone noprint" id="btnApropos" data-ico="engrenage" aria-label="À propos du hub" title="À propos du hub"></button>
 </header>
 
-<div class="wrap">
-  <!-- Phrase d'accueil, texte posé par hub.js depuis REGLAGES.chapeau. -->
-  <p class="chapeau" id="chapeauHub" hidden></p>
+<!-- Bandeau d'accueil. Logo, accroche et compte des portes ouvertes sont
+     posés par hub.js depuis les réglages du catalogue. -->
+<section class="hall">
+  <div class="hall-dedans">
+    <span class="hall-logo" id="hallLogo"></span>
+    <div class="hall-mots">
+      <p class="hall-accroche" id="hallAccroche" hidden></p>
+      <p class="hall-chapeau" id="hallChapeau" hidden></p>
+    </div>
+    <ul class="hall-chiffres" id="hallChiffres"></ul>
+  </div>
+</section>
 
+<div class="wrap">
   <!-- Barre de recherche et filtres : construite par hub.js seulement au-delà
-       de REGLAGES.seuilFiltres outils, elle reste vide en dessous. -->
+       de REGLAGES.seuilFiltres portes, elle reste vide en dessous. -->
   <div class="barre noprint" id="barre"></div>
 
-  <!-- Cartes construites à partir de outils.js. Rien à écrire ici à la main. -->
+  <!-- Cartes construites à partir de catalogue.js. Rien à écrire ici. -->
   <div id="catalogue"></div>
 
   <div class="vide" id="aucunResultat" hidden></div>
+
+  <!-- Annuaire, masqué tant que CONTACTS est vide. -->
+  <section id="annuaire" hidden></section>
 </div>
 
 <footer class="pied">
@@ -69,8 +82,11 @@
   <div class="modale-corps" id="aproposCorps"></div>
 </dialog>
 
-<!-- outils.js d'abord : hub.js le lit au chargement. -->
-<script src="outils.js"></script>
+<!-- catalogue.js d'abord : hub.js le lit au chargement.
+     signalement.js est autonome et n'a besoin de rien d'autre ; il pose la
+     pastille de signalement, en bas à droite. Le retirer ne casse rien. -->
+<script src="catalogue.js"></script>
+<script src="signalement.js"></script>
 <script src="hub.js"></script>
 </body>
 </html>

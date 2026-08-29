@@ -1,17 +1,17 @@
 # Outils B27
 
-Page d'accueil unique vers les outils et applications du bureau d'études B27. Un seul lien à transmettre, une carte par outil.
+Le hall d'entrée des outils du bureau d'études B27. Un seul lien à transmettre, une carte par porte : ce que nous fabriquons, les sites de l'entreprise, les ressources métier, et qui contacter.
 
 En ligne : https://mamalric.github.io/b27-hub/
 
-## Ajouter un outil
+## Ajouter une porte
 
-Un seul fichier à modifier, [`outils.js`](outils.js). Copier une fiche existante, remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis pousser sur `main`. La carte apparaît, les compteurs, les sections et les filtres suivent d'eux-mêmes. Le gabarit et les cinq statuts possibles sont documentés en tête du fichier.
+Un seul fichier à modifier, [`catalogue.js`](catalogue.js). Copier une fiche existante, remplir le nom, le pitch, l'adresse, la catégorie et le statut, puis pousser sur `main`. La carte apparaît, les compteurs, les sections et les filtres suivent d'eux-mêmes. Le gabarit, les deux types de carte et les cinq statuts sont documentés en tête du fichier.
 
 Avant de publier, vérifier que le catalogue est cohérent :
 
 ```bash
-python tests/verifier_outils.py
+python tests/verifier_catalogue.py
 ```
 
 ## Structure
@@ -19,14 +19,25 @@ python tests/verifier_outils.py
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Ossature de la page, presque vide : tout est construit à l'exécution. |
-| `outils.js` | Le catalogue : outils, catégories, réglages. Le seul fichier à faire vivre. |
-| `hub.js` | Icônes, thème, construction des cartes, recherche, panneau À propos. |
+| `catalogue.js` | Portes, annuaire, catégories, réglages. Le seul fichier à faire vivre. |
+| `hub.js` | Logo, icônes, thème, bandeau, cartes, annuaire, recherche, panneau À propos. |
 | `hub.css` | Charte graphique reprise des outils B27 existants. |
-| `tests/verifier_outils.py` | Contrôle du catalogue, bibliothèque standard uniquement. |
-| `docs/charte.md` | Palette, statuts, conventions visuelles. |
+| `signalement.js` | La pastille "Signaler un problème", autonome et réutilisable ailleurs. |
+| `logo-b27.svg` | Le logo, qui sert aussi de favicon. |
+| `tests/verifier_catalogue.py` | Contrôle du catalogue, bibliothèque standard uniquement. |
+| `docs/charte.md` | Palette, logo, types de carte, conventions visuelles. |
+| `docs/signalement.md` | Fonctionnement du signalement et modes d'envoi. |
 
 HTML, CSS et JavaScript sans framework et sans étape de build. Aucune requête externe : la page s'ouvre aussi bien en ligne que par un double-clic sur `index.html`.
+
+## Signaler un problème
+
+Une pastille en bas à droite de chaque écran. Elle joint une capture de ce que l'utilisateur a sous les yeux, lui demande un titre et une description qu'il peut dicter à voix haute, et transmet le tout.
+
+`signalement.js` est autonome : deux lignes suffisent à le poser sur n'importe quel autre outil B27. Voir [docs/signalement.md](docs/signalement.md) pour les modes d'envoi et leurs limites.
 
 ## Ce que le hub ne fait pas
 
 Il ne stocke rien, ne demande aucun compte et ne suit personne. Il redirige, c'est tout. Seul le choix de thème clair ou sombre est retenu dans le navigateur du visiteur. La page porte une balise `noindex` et un `robots.txt` : elle se transmet par son lien, elle n'a pas vocation à remonter dans un moteur de recherche.
+
+Une exception, et elle est signalée dans l'interface : la dictée vocale du signalement passe par le service de transcription du navigateur, la voix sort donc du poste. C'est la seule chose qui le fasse.
