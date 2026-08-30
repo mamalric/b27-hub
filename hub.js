@@ -20,6 +20,8 @@
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v10", date: "2026-08-30", titre: "Le sommaire, les métiers, la signature",
+    texte: "Le catalogue se groupe par métier et un sommaire fixé à droite de l'écran donne la vue d'ensemble : les treize métiers de B27 s'y lisent, ceux sans outil encore en attente, et le repère suit le défilement. Quatre outils de dimensionnement sont annoncés (eau froide, eaux usées et vannes, eaux pluviales, gaines de ventilation). Le site de l'entreprise quitte le rayon des outils pour signer le pied de page, et B27 Mobility, réservé à l'interne, quitte un portail public." },
   { v: "v9", date: "2026-08-29", titre: "La météo en grand",
     texte: "Un clic sur la tuile météo ouvre le panneau détaillé : dix mesures du moment dont le point de rosée calculé par Magnus, les prochaines vingt-quatre heures, la semaine, le soleil et la qualité de l'air avec les pollens. Et chacun compose sa tuile : les mesures affichées par défaut se cochent dans le panneau, le choix reste dans le navigateur." },
   { v: "v8", date: "2026-08-29", titre: "Le fond vit avec le ciel",
@@ -74,8 +76,8 @@ const TRACES_ICONES = {
   gouttes: '<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>',
   radiateur: '<path d="M11 8c2-3-2-3 0-6"/><path d="M15.5 8c2-3-2-3 0-6"/><path d="M6 10h.01"/><path d="M6 14h.01"/><path d="M10 16v-4"/><path d="M14 16v-4"/><path d="M18 16v-4"/><path d="M20 6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/><path d="M5 20v2"/><path d="M19 20v2"/>',
   vent: '<path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/>',
-  flocon: '<line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/>',
-  flamme: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  flocon: '<path d="m10 20-1.25-2.5L6 18"/><path d="M10 4 8.75 6.5 6 6"/><path d="m14 20 1.25-2.5L18 18"/><path d="m14 4 1.25 2.5L18 6"/><path d="m17 21-3-6h-4"/><path d="m17 3-3 6 1.5 3"/><path d="M2 12h6.5L10 9"/><path d="m20 10-1.5 2 1.5 2"/><path d="M22 12h-6.5L14 15"/><path d="m4 10 1.5 2L4 14"/><path d="m7 21 3-6-1.5-3"/><path d="m7 3 3 6h4"/>',
+  flamme: '<path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/>',
   thermometre: '<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
   feuille: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
   bouclier: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
@@ -88,11 +90,13 @@ const TRACES_ICONES = {
   base_donnees: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
   dossier: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
   voiture: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+  reseau: '<path d="m10.586 5.414-5.172 5.172"/><path d="m18.586 13.414-5.172 5.172"/><path d="M6 12h12"/><circle cx="12" cy="20" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="12" r="2"/>',
   regle: '<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/>',
   recherche: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
   sortie: '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
   soleil: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
   nuage_soleil: '<path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',
+  ondes: '<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>',
   pluie: '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>',
   neige: '<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/>',
   orage: '<path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/>',
@@ -1423,34 +1427,164 @@ function html_ressource(o, index) {
     + "</a>";
 }
 
+/* ---------------------------------------------------------------------
+   LES RAYONS EN GROUPES, ET LE SOMMAIRE
+
+   La page se déroule : c'est sa nature, et les détours essayés pour l'en
+   empêcher (les dossiers de la v3, puis une ruche d'alvéoles hexagonales
+   où l'on plongeait métier par métier) ont tous fini par être retirés,
+   parce que cacher le catalogue derrière un clic coûte plus qu'il ne
+   range. Les groupes s'alignent donc à plat, un par métier pour les
+   outils, un par domaine pour les ressources, et c'est le sommaire fixé
+   à droite de l'écran qui donne la vue d'ensemble : tous les métiers de
+   la maison s'y lisent, ceux qui n'ont pas encore d'outil en attente, et
+   un clic descend au groupe choisi.
+   --------------------------------------------------------------------- */
+
+/* Un groupe : un titre en capitales, une pastille à la couleur du métier,
+   et ce qu'on veut dedans. La pastille n'est pas décorative, c'est le code
+   couleur de lot B27 qui remonte du contenu jusqu'au titre : on lit le
+   métier avant d'avoir lu son nom. L'identifiant est la cible du
+   sommaire. */
+function html_groupe(nom, couleur, dedans, id) {
+  return '<div class="groupe" id="' + ech(id) + '">'
+    +   '<h3><span class="groupe-puce" style="--c:' + couleurSure(couleur) + '"></span>' + ech(nom) + "</h3>"
+    +   dedans
+    + "</div>";
+}
+
+// Les entrées du sommaire, remplies par construireRayons dans l'ordre de
+// la page. Une entrée sans cible est un métier encore vide : elle se
+// montre, estompée, mais ne mène nulle part.
+const SOMMAIRE = [];
+
+function construireSommaire() {
+  const nav = $("sommaire");
+  const entrees = SOMMAIRE.slice();
+  if (contacts().length) {
+    entrees.push({ nom: "Contact", couleur: "", cible: "rayonContact", bloc: "contact" });
+  }
+  if (!entrees.length) return;
+
+  let blocPrecedent = entrees[0].bloc;
+  nav.innerHTML = entrees.map(e => {
+    const debut = e.bloc !== blocPrecedent ? " som-debut" : "";
+    blocPrecedent = e.bloc;
+    const dedans = '<span class="som-puce"></span><span class="som-nom">' + ech(e.nom) + "</span>";
+    if (!e.cible) {
+      return '<span class="som-ligne vide' + debut + '" style="--c:' + couleurSure(e.couleur) + '"'
+        + ' title="' + ech(e.nom) + " : bientôt" + '">' + dedans + "</span>";
+    }
+    return '<button type="button" class="som-ligne' + debut + '" style="--c:' + couleurSure(e.couleur) + '"'
+      + ' data-cible="' + ech(e.cible) + '" title="' + ech(e.nom) + '">' + dedans + "</button>";
+  }).join("");
+  nav.hidden = false;
+}
+
+function initSommaire() {
+  const nav = $("sommaire");
+  const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Le clic défile, l'adresse ne bouge pas : le portail n'a pas de
+  // fragment, un lien copié mène toujours à la page entière.
+  nav.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-cible]");
+    if (!b) return;
+    const cible = $(b.dataset.cible);
+    if (!cible) return;
+    window.scrollTo({
+      top: cible.getBoundingClientRect().top + window.scrollY - 76,
+      behavior: reduit ? "auto" : "smooth"
+    });
+  });
+
+  // Le repère suit le défilement : la dernière cible passée au-dessus du
+  // tiers haut de l'écran est le groupe où l'on se trouve.
+  let prevu = false;
+  function reperer() {
+    prevu = false;
+    const seuil = window.scrollY + innerHeight * 0.3;
+    let courant = null;
+    nav.querySelectorAll("[data-cible]").forEach(b => {
+      const s = $(b.dataset.cible);
+      if (s && !s.hidden && s.getBoundingClientRect().top + window.scrollY <= seuil) courant = b;
+    });
+    nav.querySelectorAll(".som-ligne").forEach(b => b.classList.toggle("actif", b === courant));
+  }
+  window.addEventListener("scroll", () => {
+    if (!prevu) { prevu = true; requestAnimationFrame(reperer); }
+  }, { passive: true });
+  reperer();
+}
+
 function construireRayons() {
   const outils = PORTES.filter(estOutil);
   const liens = PORTES.filter(o => !estOutil(o));
+  SOMMAIRE.length = 0;
 
+  // Nos outils se groupent par métier, dans l'ordre de CATEGORIES : le lot
+  // du bureau d'études, pas un rangement inventé pour l'occasion. Un métier
+  // sans outil n'a pas de groupe dans la page, une section vide serait du
+  // bruit, mais garde sa ligne au sommaire, estompée : c'est ainsi que le
+  // portail montre les métiers de la maison avant d'avoir écrit leurs
+  // outils.
   if (outils.length) {
-    $("grilleOutils").innerHTML = outils.map(html_outil).join("");
+    let i = 0;
+    const groupes = CATEGORIES
+      .map(cat => ({ cle: cat.cle, nom: cat.nom, court: cat.court, couleur: cat.couleur,
+                     metier: cat.metier,
+                     portes: outils.filter(o => o.categorie === cat.cle) }))
+      .filter(g => g.portes.length || g.metier);
+
+    // Un outil qui se réclame d'un métier non déclaré ne doit pas
+    // disparaître en silence : le contrôle du catalogue le signale déjà, et
+    // ici il atterrit dans un groupe de fin plutôt que nulle part.
+    const orphelins = outils.filter(o => !categorie(o.categorie));
+    if (orphelins.length) {
+      groupes.push({ cle: "divers", nom: "Divers", court: "Divers", couleur: "", portes: orphelins });
+    }
+
+    $("groupesOutils").innerHTML = groupes.filter(g => g.portes.length).map(g =>
+      html_groupe(g.nom, g.couleur,
+        '<div class="grille-outils">' + g.portes.map(o => html_outil(o, i++)).join("") + "</div>",
+        "groupe-" + g.cle)).join("");
+    groupes.forEach(g => SOMMAIRE.push({
+      nom: g.court || g.nom, couleur: g.couleur,
+      cible: g.portes.length ? "groupe-" + g.cle : null, bloc: "outils"
+    }));
     $("rayonOutils").hidden = false;
   }
 
   // Les ressources se groupent par sous-catégorie, dans l'ordre où elles
-  // sont déclarées ; ce qui n'en a pas se groupe par catégorie.
+  // sont déclarées ; ce qui n'en a pas se groupe par catégorie. Une
+  // sous-catégorie sans teinte propre hérite de celle de sa catégorie.
   if (liens.length) {
     const groupes = [];
     const toutesSous = typeof SOUS_CATEGORIES === "undefined" ? [] : SOUS_CATEGORIES;
-    toutesSous.forEach(s => {
-      const dedans = liens.filter(o => o.sousCategorie === s.cle);
-      if (dedans.length) groupes.push({ nom: s.nom, portes: dedans });
+    toutesSous.forEach(sc => {
+      const dedans = liens.filter(o => o.sousCategorie === sc.cle);
+      const parent = categorie(sc.categorie);
+      if (dedans.length) {
+        groupes.push({ cle: sc.cle, nom: sc.nom, court: sc.court,
+                       couleur: sc.couleur || (parent && parent.couleur), portes: dedans });
+      }
     });
     CATEGORIES.forEach(cat => {
       const dedans = liens.filter(o => o.categorie === cat.cle && !o.sousCategorie);
-      if (dedans.length) groupes.push({ nom: cat.nom, portes: dedans });
+      if (dedans.length) {
+        groupes.push({ cle: "cat-" + cat.cle, nom: cat.nom, court: cat.court,
+                       couleur: cat.couleur, portes: dedans });
+      }
     });
+
     let i = 0;
     $("groupesRessources").innerHTML = groupes.map(g =>
-        '<div class="groupe">'
-      +   "<h3>" + ech(g.nom) + "</h3>"
-      +   '<div class="rangs">' + g.portes.map(o => html_ressource(o, i++)).join("") + "</div>"
-      + "</div>").join("");
+      html_groupe(g.nom, g.couleur,
+        '<div class="rangs">' + g.portes.map(o => html_ressource(o, i++)).join("") + "</div>",
+        "groupe-r-" + g.cle)).join("");
+    groupes.forEach(g => SOMMAIRE.push({
+      nom: g.court || g.nom, couleur: g.couleur, cible: "groupe-r-" + g.cle, bloc: "ressources"
+    }));
     $("rayonRessources").hidden = false;
   }
 
@@ -1479,6 +1613,34 @@ function construireRayons() {
   document.title = REGLAGES.titre;
   $("titrePortail").textContent = REGLAGES.titre;
   $("embleme").innerHTML = logoB27(58);
+  construireSommaire();
+}
+
+/* ---------------------------------------------------------------------
+   SIGNATURE
+
+   Le site de l'entreprise n'est pas un outil que nous fabriquons. Rangé
+   dans le rayon des outils, il en prenait l'apparence et le compteur le
+   comptait comme tel ; il signe désormais la page en pied. Pas de fond de
+   carte, un filet en travers de la page : c'est du mobilier de page, comme
+   l'en-tête, et il reste donc hors du filtre de recherche. Sans url dans
+   REGLAGES.editeur, rien ne s'affiche.
+   --------------------------------------------------------------------- */
+function construireSignature() {
+  const e = (typeof REGLAGES === "object" && REGLAGES.editeur) || null;
+  if (!e || !/^https?:\/\//.test(String(e.url || ""))) return;
+
+  $("signature").innerHTML =
+      '<a class="signature-lien" href="' + ech(e.url) + '" target="_blank" rel="noopener noreferrer">'
+    +   '<span class="signature-logo">' + logoB27(26) + "</span>"
+    +   '<span class="signature-texte">'
+    +     '<span class="signature-quoi">Le portail est édité par</span>'
+    +     '<span class="signature-nom">' + ech(e.nom || "B27") + "</span>"
+    +     (e.pitch ? '<span class="signature-pitch">' + ech(e.pitch) + "</span>" : "")
+    +   "</span>"
+    +   '<span class="signature-cta">' + ech(e.lien || e.url) + ico("sortie", 15) + "</span>"
+    + "</a>";
+  $("signature").hidden = false;
 }
 
 /* ---------------------------------------------------------------------
@@ -1492,6 +1654,10 @@ function filtrer(brut) {
   const q = normaliser(brut.trim());
   let visibles = 0;
 
+  // Pendant une recherche, le sommaire s'efface : ses repères pointeraient
+  // des groupes à moitié vidés. Il revient dès que le champ se vide.
+  document.body.classList.toggle("cherche", !!q);
+
   document.querySelectorAll("[data-cherche]").forEach(el => {
     const garde = !q || el.dataset.cherche.indexOf(q) !== -1;
     el.hidden = !garde;
@@ -1503,7 +1669,7 @@ function filtrer(brut) {
   document.querySelectorAll(".groupe").forEach(g => {
     g.hidden = !g.querySelector("[data-cherche]:not([hidden])");
   });
-  [["rayonOutils", "grilleOutils"], ["rayonRessources", "groupesRessources"],
+  [["rayonOutils", "groupesOutils"], ["rayonRessources", "groupesRessources"],
    ["rayonContact", "grilleContact"]].forEach(([rayon, dedans]) => {
     const vide = !$(dedans).querySelector("[data-cherche]:not([hidden])");
     $(rayon).hidden = vide || !$(dedans).innerHTML;
@@ -1763,11 +1929,13 @@ function initApropos() {
 function init() {
   controlerCatalogue();
   construireRayons();
+  construireSignature();
   peindreCalendrier();
   poserIcones();
   initTheme();
   initFond();
   initRecherche();
+  initSommaire();
   initReflets();
   initAncre();
   initApropos();

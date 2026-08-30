@@ -107,9 +107,15 @@ a:hover{text-decoration:underline}
    body se peindrait par-dessus le canvas en z négatif. */
 #fond{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1}
 
+/* L'entrée monte jusqu'à l'opacité de repos de l'élément, et non jusqu'à 1.
+   Une animation l'emporte sur une déclaration normale : terminer sur
+   opacity:1 écrasait le retrait des cartes en attente pendant toute la
+   durée de l'entrée, délai compris. Elles arrivaient à pleine opacité, donc
+   pour l'oeil disponibles, avant de retomber d'un coup. Ce qui a une
+   opacité de repos autre que 1 la déclare dans --opacite. */
 @keyframes lever{
   from{opacity:0;transform:translateY(16px)}
-  to{opacity:1;transform:none}
+  to{opacity:var(--opacite,1);transform:none}
 }
 @keyframes halo{
   from{opacity:.55;transform:scale(.92)}
@@ -339,6 +345,54 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .cal-lig-act{background:rgba(149,192,61,.08)}
 .cal-auj{background:var(--accent);color:var(--accent-encre);font-weight:800}
 
+/* ========================================================== SOMMAIRE ==
+   La table de la page, fixée à droite : tous les métiers de la maison,
+   ceux qui ont des outils cliquables, ceux qui n'en ont pas encore
+   estompés avec une pastille en pointillé, puis les domaines de
+   ressources et le contact. Un clic descend au groupe, le repère suit le
+   défilement. La page se déroule, c'est sa nature, et le sommaire donne
+   la vue d'ensemble : c'est lui qui a remplacé la ruche d'hexagones,
+   retirée parce qu'elle introduisait une forme étrangère à la charte et
+   cachait le catalogue derrière un clic.
+
+   Sur écran moyen, les noms se replient et il ne reste que les pastilles
+   de couleur ; sous 1240 px il disparaît, le défilement suffit. Pendant
+   une recherche il s'efface : ses repères pointeraient des groupes à
+   moitié vidés. */
+.sommaire{
+  position:fixed;top:50%;right:16px;transform:translateY(-50%);z-index:25;
+  display:none;flex-direction:column;gap:1px;
+  max-height:calc(100vh - 150px);overflow-y:auto;overscroll-behavior:contain;
+  padding:8px;border-radius:var(--rayon-m);
+  background:var(--carte);border:1px solid var(--ligne);backdrop-filter:blur(10px);
+}
+body.cherche .sommaire{display:none}
+.som-ligne{
+  display:flex;align-items:center;gap:9px;padding:5px 8px;border:0;border-radius:7px;
+  background:none;color:var(--encre-2);font:inherit;font-size:12px;font-weight:600;
+  cursor:pointer;text-align:left;white-space:nowrap;
+  transition:background var(--vitesse),color var(--vitesse);
+}
+.som-ligne:hover{background:color-mix(in srgb,var(--c,#95c03d) 10%,transparent);color:var(--encre)}
+.som-ligne.actif{background:color-mix(in srgb,var(--c,#95c03d) 16%,transparent);color:var(--encre)}
+.som-puce{width:9px;height:9px;flex:none;border-radius:3px;background:var(--c,#95c03d)}
+/* Un métier encore vide se montre mais ne mène nulle part. */
+.som-ligne.vide{color:var(--discret);cursor:default}
+.som-ligne.vide:hover{background:none;color:var(--discret)}
+.som-ligne.vide .som-puce{background:none;border:1.5px dashed color-mix(in srgb,var(--c,#95c03d) 60%,transparent)}
+/* Un filet sépare les outils, les ressources et le contact. */
+.som-debut{margin-top:9px;position:relative}
+.som-debut::before{content:"";position:absolute;top:-5px;left:8px;right:8px;height:1px;background:var(--ligne)}
+
+@media (min-width:1240px){
+  .sommaire{display:flex}
+  .som-nom{display:none}
+}
+/* Assez de marge pour les noms : (1460 - 1080) / 2 = 190 px à droite. */
+@media (min-width:1460px){
+  .som-nom{display:inline}
+}
+
 /* ============================================================ RAYONS == */
 .rayon{max-width:1080px;margin:44px auto 0}
 .rayon h2{
@@ -352,6 +406,8 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
    ses plans. Le reflet qui suit la souris est peint en --mx/--my par
    hub.js : le genre de détail qui se sent plus qu'il ne se voit. */
 .grille-outils{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+#groupesOutils .groupe{margin:0 0 22px}
+#groupesOutils .groupe:last-child{margin-bottom:0}
 .carte{
   position:relative;display:flex;flex-direction:column;gap:10px;overflow:hidden;
   padding:18px;border-radius:var(--rayon-g);
@@ -383,7 +439,7 @@ a.carte:hover::after{opacity:1}
 a.carte:hover .carte-sortie{opacity:1;transform:none}
 .carte-nom{font-size:15.5px;font-weight:700;letter-spacing:-.2px;line-height:1.25}
 .carte-pitch{margin:0;font-size:13px;color:var(--encre-2);line-height:1.5}
-.carte.attente{opacity:.62}
+.carte.attente{--opacite:.62;opacity:var(--opacite)}
 .badge{
   position:absolute;top:14px;right:14px;
   font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
@@ -396,7 +452,11 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 .groupe h3{
   margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:1.4px;
   text-transform:uppercase;color:var(--discret);
+  display:flex;align-items:center;gap:9px;
 }
+/* La couleur du lot remonte du contenu jusqu'au titre du groupe : on lit le
+   métier avant d'avoir lu son nom. */
+.groupe-puce{width:9px;height:9px;flex:none;border-radius:3px;background:var(--c,#95c03d)}
 .rangs{display:flex;flex-direction:column;gap:7px}
 .rang{
   display:flex;align-items:center;gap:13px;padding:12px 16px;
@@ -425,6 +485,41 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 .fiche-nom{font-size:14.5px;font-weight:700}
 .fiche-role{font-size:12px;color:var(--discret)}
 .fiche-mail{font-size:12.5px}
+
+/* ---- signature de l'éditeur. Volontairement sans fond de carte : un
+   simple filet en travers de la page, la marque à gauche, le lien à
+   droite. C'est ce qui la distingue au premier regard d'une carte du
+   rayon des outils, où le site de l'entreprise passait pour un des
+   nôtres. */
+.signature{max-width:1080px;margin:76px auto 0;padding-top:8px;border-top:1px solid var(--ligne)}
+.signature[hidden]{display:none}
+.signature-lien{
+  display:flex;align-items:center;gap:16px;padding:20px 4px;color:var(--encre);
+}
+.signature-lien:hover{text-decoration:none}
+.signature-logo{
+  display:grid;place-items:center;width:54px;height:54px;flex:none;
+  border-radius:16px;color:var(--accent);
+  background:linear-gradient(160deg,#222c12,#101707);
+  border:1px solid var(--ligne-forte);
+  transition:border-color var(--vitesse),box-shadow var(--vitesse);
+}
+[data-theme="light"] .signature-logo{color:#5f7f1f;background:linear-gradient(160deg,#eef4e0,#ffffff)}
+.signature-lien:hover .signature-logo{border-color:var(--accent);box-shadow:var(--lueur)}
+.signature-texte{display:flex;flex-direction:column;gap:2px;min-width:0}
+.signature-quoi{
+  font-size:10.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--discret);
+}
+.signature-nom{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.signature-pitch{font-size:12.5px;color:var(--encre-2);line-height:1.45}
+.signature-cta{
+  margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:7px;
+  padding:9px 15px;border-radius:99px;border:1px solid var(--ligne);
+  font-size:13px;font-weight:650;color:var(--lien);
+  transition:border-color var(--vitesse),transform var(--vitesse) var(--courbe);
+}
+.signature-lien:hover .signature-cta{border-color:var(--ligne-forte);transform:translateX(4px)}
 
 .rien{
   max-width:1080px;margin:48px auto 0;text-align:center;
@@ -630,6 +725,9 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   .rayon{margin-top:36px}
   .grille-outils{grid-template-columns:1fr}
   .rang-pitch{white-space:normal}
+  .signature{margin-top:56px}
+  .signature-lien{flex-wrap:wrap;gap:13px}
+  .signature-cta{margin-left:0;width:100%;justify-content:center}
 }
 
 /* ============================================================ PAPIER == */

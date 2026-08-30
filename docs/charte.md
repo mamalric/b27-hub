@@ -54,11 +54,19 @@ L'entrée du portail ne disparaît pas quand on déroule : elle se transforme. L
 
 ## Les rayons
 
-Deux rayons et une fiche, sans métaphore : **Nos outils** — fabriqués ici — en cartes, **Ressources** — sites de référence — en rangées compactes groupées par domaine, **Contact** en fiche. Le sous-titre grisé accolé au titre du rayon est la seule glose autorisée : les petits commentaires partout ont été retirés à la demande.
+Deux rayons et une fiche, sans métaphore : **Nos outils** (fabriqués ici) en cartes, **Ressources** (sites de référence) en rangées compactes, **Contact** en fiche.
 
-Les pastilles d'icône gardent les couleurs de lot B27 (CVC bleu, plomberie sarcelle, SSI rouge...) : un ingénieur y reconnaît le code couleur de ses plans. Toute couleur nouvelle doit tenir 3:1 sur trois fronts — glyphe blanc, fond clair, fond sombre — et le contrôle du catalogue vérifie les trois.
+**La page se déroule, et le sommaire donne la vue d'ensemble.** Se dérouler est la nature de cette page, et les détours essayés pour l'en empêcher, les dossiers de la v3 puis une ruche d'alvéoles hexagonales où l'on plongeait métier par métier, ont tous fini par être retirés : cacher le catalogue derrière un clic coûte plus qu'il ne range. Les groupes s'alignent donc à plat, un par métier pour les outils dans l'ordre de `CATEGORIES`, un par domaine pour les ressources, chaque titre portant une pastille à la couleur du lot : la couleur remonte du contenu jusqu'au titre, on lit le métier avant d'avoir lu son nom. Un métier sans outil n'ouvre pas de groupe, une section vide serait du bruit ; il vit au sommaire.
 
-Au survol, une carte se soulève, sa bordure prend la couleur de sa catégorie, et un reflet suit la souris — peint en variables CSS par un unique écouteur délégué. Une entrée « à venir » est estompée et non cliquable.
+**Le sommaire est fixé à droite de l'écran.** Tous les métiers de la maison s'y lisent : ceux qui ont des outils mènent d'un clic à leur groupe, ceux qui n'en ont pas encore restent estompés, pastille en pointillé, et c'est ainsi que le portail montre l'étendue du bureau d'études avant d'en avoir écrit tous les outils. Suivent les domaines de ressources et le contact, séparés par un filet. Le repère suit le défilement et marque où l'on est. Sur écran moyen les noms se replient et il ne reste que les pastilles de couleur ; sous 1240 px le sommaire disparaît, le défilement suffit ; pendant une recherche il s'efface, ses repères pointeraient des groupes à moitié vidés. Le clic défile sans toucher à l'adresse : le portail n'a toujours pas de fragment.
+
+De la ruche reste une leçon, notée pour ne pas la repayer : une forme étrangère à la page, l'hexagone quand tout le reste est rectangle arrondi, dénature la charte quelle que soit la qualité de son exécution. Toute nouveauté visuelle doit se construire avec le vocabulaire déjà présent, rectangles arrondis, pastilles, filets, verre.
+
+## La signature, et ce qui n'entre pas dans le portail
+
+Le site de l'entreprise n'est pas un de nos outils. Rangé dans "Nos outils, fabriqués ici", il en prenait la carte, la couleur de lot et le compteur : il se donnait pour un outil du bureau d'études. Il signe désormais la page en pied : un filet en travers de la largeur, le monogramme à gauche sur sa plaque, "le portail est édité par B27", le lien `b27.fr` à droite. Pas de fond de carte, et c'est ce qui le distingue au premier regard des rayons. C'est du mobilier de page, au même titre que l'en-tête, donc hors du filtre de recherche. Tout se règle dans `REGLAGES.editeur` ; sans url, la signature disparaît.
+
+Et ce qui est réservé à l'interne n'entre pas dans le portail. Il est public et se transmet à des clients : un outil que seuls les salariés peuvent ouvrir, la réservation des voitures de société par exemple, y serait au mieux inutile, au pire une porte fermée au nez du visiteur. La règle vaut pour toute entrée future.
 
 ## La recherche
 

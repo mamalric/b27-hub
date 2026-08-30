@@ -212,6 +212,11 @@ def controler():
         cles_categories.append(c.get("cle"))
         if icones and c.get("icone") and c["icone"] not in icones:
             erreurs.append("%s : icône '%s' absente de TRACES_ICONES (hub.js)." % (ou, c["icone"]))
+        # Un métier garde sa ligne au sommaire, même vide : sans nom court,
+        # le nom complet y est à l'étroit.
+        if c.get("metier") and not c.get("court"):
+            avertissements.append("%s : marquée metier sans nom court, le nom complet "
+                                  "sera à l'étroit dans le sommaire." % ou)
         erreurs.extend(controler_couleur(ou, c.get("couleur")))
         if not c.get("couleur"):
             avertissements.append("%s : pas de couleur, la tuile prendra le vert de repli."
@@ -256,6 +261,22 @@ def controler():
         if not meteo.get("ville"):
             avertissements.append("REGLAGES.meteo : pas de nom de ville, la tuile affichera "
                                   "le lieu sans le nommer.")
+
+    # --- signature de l'éditeur, en pied de page
+    editeur = reglages.get("editeur")
+    if isinstance(editeur, dict):
+        url = editeur.get("url") or ""
+        if not url:
+            avertissements.append("REGLAGES.editeur : pas d'url, la signature de pied de page "
+                                  "ne s'affichera pas.")
+        elif not url.startswith(("https://", "http://")):
+            erreurs.append("REGLAGES.editeur : url '%s' sans schéma http ou https, la signature "
+                           "sera muette." % url)
+        elif url.startswith("http://"):
+            avertissements.append("REGLAGES.editeur : url en http, préférer https.")
+        if url and not editeur.get("nom"):
+            avertissements.append("REGLAGES.editeur : pas de nom, la signature affichera "
+                                  'le repli "B27".')
 
     # --- signalement
     if signalement.get("actif"):

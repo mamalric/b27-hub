@@ -2,6 +2,118 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-30, la page assume de se dérouler : la ruche cède la place au sommaire
+
+Aucune des pistes ne convenait plus, et c'est l'utilisateur qui a mis le doigt sur la contradiction de fond : "l'application est faite pour se dérouler, et on essaie de réduire au maximum, c'est un peu bête". Il a conclu lui-même : revenir aux cartes, qui étaient très bien, et poser un sommaire, à droite.
+
+La ruche est donc retirée du code, et la piste des icônes d'application abandonnée avec elle. Les rayons reviennent aux groupes de cartes par métier, titre en capitales et pastille à la couleur du lot, qui se déroulent à plat comme avant.
+
+**Le sommaire, fixé à droite de l'écran.** Tous les métiers de la maison s'y lisent : les trois pourvus mènent d'un clic à leur groupe, les dix vides restent estompés avec une pastille en pointillé, l'idée des métiers visibles avant leurs outils survit donc à la ruche. Suivent les domaines de ressources et le contact, séparés par un filet. Le repère suit le défilement, le tiers haut de l'écran décidant du groupe courant. Le clic défile sans toucher à l'adresse, le portail restant sans fragment. Sur écran moyen les noms se replient en pastilles de couleur seules ; sous 1240 px le sommaire disparaît ; pendant une recherche il s'efface, ses repères pointeraient des groupes à moitié vidés.
+
+La charte gagne la leçon payée par la ruche : une forme étrangère à la page dénature la charte quelle que soit son exécution, toute nouveauté doit se construire avec le vocabulaire déjà présent.
+
+Vérifié à 1600 px de large : dix-sept lignes au sommaire dont dix estompées, clic qui descend au groupe et repère qui suit, recherche qui efface puis rend le sommaire, noms repliés en pastilles à 1300 px, sommaire absent à 1100 px, contrôle du catalogue et syntaxe au vert.
+
+## 2026-08-30, la piste des icônes d'application
+
+Les cinq présentations précédentes sont écartées d'un bloc, et l'utilisateur arrive avec son idée : de grandes icônes carrées à coins arrondis, la couleur du lot et le glyphe au centre, rien d'autre. Alignées les unes aux autres, elles réagissent au survol en grossissant un peu ; au clic on plonge dedans et les outils apparaissent sous la même forme d'icônes d'application. Aucun compteur, et les métiers vides en pointillé.
+
+La page d'essais est refaite sur cette famille. Son idée d'abord, telle quelle, avec la plongée réellement implémentée : l'origine de l'agrandissement est calculée sur l'icône cliquée, sans quoi on plongerait dans le centre de la grille et non dans elle. Les trois métiers pourvus ouvrent sur leurs vrais outils, où le pointillé sert une seconde fois pour marquer ce qui est à venir.
+
+Six variantes proposées à côté, toutes dans la même famille pour ne pas relancer le débat de forme : grille en colonnes strictes plutôt qu'en rangées centrées, plaques en dégradé pour la profondeur des vraies icônes d'application, aplat doux, verre et couleur avec les noms complets, une seule rangée de treize, et un dock à magnification des voisines.
+
+Deux arbitrages restent à poser et n'ont pas été tranchés seul : une icône d'application n'a pas de place pour le pitch, cette phrase qui dit ce que fait chaque outil et que porte aujourd'hui chaque carte ; et le rayon des ressources, dont les six sites ont aussi leur pitch, doit décider s'il suit la même forme.
+
+## 2026-08-30, le nid d'abeille dénature la charte : cinq présentations à comparer
+
+L'utilisateur, honnêtement : depuis le nid d'abeille, la charte B27 est dénaturée. Il a raison, et le défaut se nomme précisément. **L'hexagone est la seule forme non rectangulaire de toute la page.** Cartes, tuiles vivantes, panneaux, pilule d'ancrage, champ de recherche, badges : tout le reste est un rectangle arrondi à 14 ou 20 pixels, ou un cercle. Le nid d'abeille a introduit un vocabulaire de forme qui n'existe nulle part ailleurs, et c'est ce décalage qui s'entend, pas la couleur ni la densité.
+
+Une page de comparaison a donc été produite plutôt qu'un avis : cinq présentations du même sélecteur, avec les treize vrais métiers, leurs vraies couleurs de lot, leurs vraies icônes et le vrai nombre d'outils, extraits des fichiers du portail par script pour que rien ne soit recopié à la main. Les deux thèmes basculent, et cliquer une entrée montre l'état choisi et l'aperçu de ce qui se déplierait dessous.
+
+Les cinq : le nid d'abeille actuel pour comparer, des tuiles reprenant le vocabulaire des cartes, des pastilles filtrantes, un index de lots à la manière d'une légende de plan, et un bandeau de lots en bande continue. La page vit dans le bac à sable de la session, pas dans le dépôt : c'est un outil de décision, pas un livrable.
+
+Décision en attente. Rien du portail n'a été touché, hormis l'icône du chauffage.
+
+**Le chauffage se dit désormais par la flamme**, tracé Lucide fourni par l'utilisateur : c'est la production de chaleur, pas l'émetteur, et le radiateur reste disponible pour les outils d'émission.
+
+## 2026-08-30, la climatisation se sépare du chauffage, et le pavage révèle un défaut de parité
+
+Trois demandes de l'utilisateur, dont la première a fait apparaître un bug que rien ne montrait jusque-là.
+
+**La climatisation devient un métier à part.** La catégorie `cvc` couvrait chauffage et climatisation sous le seul nom de "Chauffage" : elle est scindée. Sa clé devient `chauffage`, ce qui valait mieux que de garder `cvc` pour un métier qui n'en couvre plus que le tiers, et le seul outil qui s'y rangeait a suivi. La famille CVC de B27 n'a qu'un bleu pour trois métiers : le bleu du lot, #3e8fb8, reste au chauffage, le cyan #2f7f92 va à l'air en mouvement, et un bleu froid #4a6fb0 rejoint la production de froid. Trois teintes d'une même famille, distinctes au premier coup d'oeil. L'écart est signalé en commentaire au même titre que les autres.
+
+**La sécurité prend son nom de lot, SSI**, dans l'alvéole ; le nom complet reste "Sécurité incendie" pour les résultats de recherche, où l'abréviation seule serait sèche.
+
+**Deux icônes fournies par l'utilisateur** rejoignent le registre : le tracé Lucide "waypoints" pour le VRD, des points reliés en étoile, ce que dessine un plan de réseaux enterrés bien mieux qu'une goutte de pluie ; et le vrai flocon Lucide à six branches ramifiées, qui remplace l'ancienne étoile à flèches et sert à la fois à la climatisation et à la neige de la météo.
+
+**Le défaut de parité du pavage.** Au treizième métier, les rangées sont tombées à sept et six, et Climatisation chevauchait Électricité. La cause : une rangée incomplète était décalée d'un nombre entier de colonnes, ce qui semblait suffire, mais une colonne sur deux est haute et l'autre basse. Un décalage impair fait tomber une alvéole haute là où la grille en attend une basse. La rangée inverse désormais son propre zigzag quand son décalage est impair, ce qui remet chacune à sa place sans rien déplacer. Le défaut dormait depuis la mise en place du pavage : douze métiers tombaient à six et six, décalage nul, il ne pouvait pas se voir.
+
+Vérifié : sept plus six collées sur grand écran, quatre rangées de trois et une seule alvéole en contretemps en 375 px, sans débordement ni chevauchement, coordonnées relevées sur la page.
+
+## 2026-08-30, une carte en attente ne s'annonce plus disponible
+
+L'utilisateur voit les placeholders arriver à pleine opacité pendant une seconde, comme s'ils étaient disponibles, avant de retomber en grisé.
+
+La cause est une règle de cascade et non un réglage : une animation l'emporte sur une déclaration normale. L'entrée des cartes, `lever`, se terminait sur `opacity:1`, ce qui écrasait le `.62` de `.attente` pendant toute sa durée, délai d'échelonnement compris, soit jusqu'à sept cents millisecondes. La carte montait donc jusqu'à l'opacité d'un outil publié avant de redescendre d'un coup, exactement au moment où l'oeil se pose dessus.
+
+L'entrée monte désormais jusqu'à l'opacité de repos de l'élément et non jusqu'à 1 : elle se termine sur `var(--opacite,1)`, et ce qui a un repos autre que 1 le déclare. Une seule carte à corriger aujourd'hui, mais la règle vaut pour toutes celles qui viendront.
+
+Mesuré sur la page, vingt relevés à cinquante millisecondes d'intervalle : une carte en attente ne dépasse jamais 0,62 du début à la fin, une carte publiée atteint bien 1, et les rangées de ressources comme la fiche de contact sont inchangées.
+
+## 2026-08-29, douze métiers, un hexagone adouci, un pavage sans jointure
+
+Trois demandes dans le même échange, et la deuxième était une bonne question de l'utilisateur sur mon propre travail.
+
+**Tous les métiers de B27, même vides.** Un champ `metier` sur les catégories décide de ce qui se montre sans rien contenir : l'alvéole reste, en trait pointillé, marquée "bientôt", bouton inerte que le navigateur refuse de lui-même. Douze métiers désormais, dont trois nouveaux relevés dans la liste des lots B27 que portait déjà le catalogue : paysage, structure, BIM. Leurs trois couleurs sont des approximations signalées comme telles en commentaire, seule leur famille étant notée, vert, gris et violet ; les valeurs exactes de `b27-site/src/styles/tokens.css` les remplaceront. Le carbone cède la feuille au paysage et prend le nuage, deux verts voisins ne devant pas porter le même glyphe.
+
+**"Ça fait un peu geek, non ?"** Il avait raison, et c'est son propre brief qui le dit : moderne et sérieux, sans faire geek. Trois tics trahissaient, tous corrigés. Les pointes vives de l'hexagone, adoucies : chaque sommet est coupé à onze pixels et refermé par une quadratique dont le sommet est le point de contrôle, le tracé reste un hexagone mais ne pique plus. L'aplat saturé, descendu de quinze à dix pour cent au repos. Et le compteur en petites capitales espacées, passé en bas de casse. La forme reste, le clin d'oeil s'en va. L'aplat translucide et le `backdrop-filter` ont disparu au passage : la forme entière, remplissage compris, est maintenant dessinée en SVG, seule façon d'arrondir un angle que le `clip-path` en polygone laisse vif.
+
+**"Pourquoi ne pas coller les nids d'abeille entre eux ?"** Parce que le repli automatique du navigateur centre chaque rangée pour elle-même : deux rangées de longueurs différentes tombaient décalées d'une demi-colonne et le pavage se défaisait. Mesuré sur la page, l'écart était de 92,5 pixels là où il aurait fallu un multiple de 111. Les rangées sont donc découpées à la main, équilibrées pour ne pas laisser une alvéole seule sous une rangée pleine, une rangée incomplète décalée d'un nombre entier de colonnes, et le tout recalculé au redimensionnement. Le pavage tient désormais à une seule mesure, `--alv`, dont la hauteur, le chevauchement et la descente découlent par la géométrie de l'hexagone régulier.
+
+Vérifié : douze alvéoles en deux rangées de six collées sur grand écran, quatre rangées de trois en 375 px, sans débordement ; la plongée survit à la recherche et au redimensionnement ; les neuf alvéoles vides sont bien inertes ; rendu contrôlé dans les deux thèmes.
+
+## 2026-08-29, la ruche : on ne déroule plus, on plonge
+
+"On perd en visibilité avec tout ça." L'utilisateur voyait la page s'allonger à mesure que les groupes s'empilaient, et il a décrit ce qu'il voulait à la place : un sélecteur de thèmes en bulles ou en formes géométriques, avec une vue plongeante donnant accès à ce qu'il y a dessous.
+
+Trois questions posées avant de toucher à la mise en page, parce que trois lectures différentes menaient à trois travaux différents. Ses réponses : hexagones en nid d'abeille, rien d'affiché avant d'avoir plongé, et un sélecteur propre à chaque rayon. La deuxième option lui a été signalée comme celle qui rapproche le plus le portail des dossiers rejetés en v7 ; il l'a choisie en connaissance de cause.
+
+**La ruche.** Chaque rayon s'ouvre sur des alvéoles hexagonales translucides, une par métier pour les outils, une par domaine pour les ressources. Cliquer allume l'alvéole, met les autres en retrait et fait monter son contenu dessous ; un second clic referme. Une seule ouverte à la fois par ruche, les deux ruches indépendantes. La translucidité est la vue plongeante : le champ d'écoulement passe derrière, à peine voilé.
+
+**Ce qui empêche le retour aux dossiers.** La ruche est un sélecteur, pas un niveau de navigation : même page, pas d'adresse à fragment, pas de fil d'Ariane. Les compteurs du bandeau annoncent dès l'arrivée ce que contient le portail. Et surtout, la recherche court-circuite tout : dès qu'on tape, les ruches s'effacent, tous les panneaux s'ouvrent et les résultats sortent à plat avec leur titre de groupe. Le champ vidé, la plongée où l'on était revient exactement comme on l'avait laissée.
+
+**La géométrie n'est pas réglée au jugé.** Chevauchement d'un quart de largeur, une alvéole sur deux descendue d'une demi-hauteur : les deux nombres viennent de l'hexagone et font coïncider l'arête bas-droite d'une alvéole avec l'arête haut-gauche de la suivante, au pixel près. La découpe interdit bordure, ombre portée et contour de mise au point : le trait est un SVG posé dedans, l'ombre un drop-shadow, et la mise au point épaissit le trait.
+
+Un champ `court` rejoint les catégories, le nom complet ne tenant pas dans un hexagone. La glose grisée du titre de rayon, seule légende autorisée par la charte, porte l'invitation tant que rien n'est ouvert.
+
+Vérifié : ouverture, fermeture par second clic, indépendance des deux ruches, bascule en recherche et retour à l'état précédent, `aria-expanded` suivi, rendu dans les deux thèmes, et en 375 px où trois alvéoles tiennent encore de front sans débordement. Le retrait a dû être remonté en thème clair, où le fond presque blanc rendait les alvéoles éteintes illisibles.
+
+Sur papier, la ruche disparaît et tous les panneaux sortent : il n'y a rien à déplier sur une feuille.
+
+## 2026-08-29, les outils se rangent par métier
+
+Quatre placeholders demandés par l'utilisateur, tous au statut `a-venir` donc estompés et non cliquables : dimensionnement de l'eau froide sanitaire, des eaux usées et eaux vannes, des eaux pluviales, et des gaines de ventilation.
+
+Et le rayon "Nos outils" se lit maintenant par métier, comme le voulait l'utilisateur. Le groupement se fait sur la catégorie, qui est déjà le lot B27 avec sa couleur : rien de nouveau à saisir dans le catalogue, et un métier sans outil reste invisible, ce qui permet de déclarer d'avance ceux qui viendront. Le composant de groupe est désormais partagé par les deux rayons, et son titre porte une pastille à la couleur du lot : la couleur remonte du contenu jusqu'au titre.
+
+Deux métiers de plus sont déclarés, vides pour l'instant : VRD et assainissement, Utilitaires. Leurs deux teintes sont inventées ici faute d'équivalent dans les lots B27, et le commentaire du catalogue le dit noir sur blanc pour que la vraie couleur maison, si elle existe, vienne les remplacer. Les deux passent le contrôle des 3:1 sur les trois fronts.
+
+Une icône d'ondes rejoint le registre pour les évacuations, les gouttes étant déjà prises par l'eau sous pression.
+
+Vérifié : la recherche traverse correctement les nouveaux groupes (un groupe vidé disparaît, un rayon vidé aussi, le message d'absence revient), rendu contrôlé en 375 px et en pleine largeur.
+
+Reste ouvert : le compteur annonce "6 outils" alors que quatre ne sont pas encore publiés. Le distinguer, ou non, est un choix à faire.
+
+## 2026-08-29, le site de l'entreprise n'est pas un de nos outils
+
+Deux corrections de fond sur le catalogue, demandées par l'utilisateur. Le Site B27 était rangé dans "Nos outils, fabriqués ici" : il en prenait la carte, la couleur de lot et le compteur, et se donnait donc pour un outil du bureau d'études. Et B27 Mobility, la réservation des voitures de société, est un outil interne : le portail est public et se transmet à des clients, il n'y a pas sa place.
+
+B27 Mobility est retiré. Le site de l'entreprise quitte le tableau des portes pour un réglage à lui, `REGLAGES.editeur`, rendu en **signature de pied de page** : un filet en travers de la largeur, le monogramme à gauche sur sa plaque, "le portail est édité par B27", le lien `b27.fr` à droite. Pas de fond de carte, c'est ce qui le distingue au premier regard d'une carte de rayon ; et comme c'est du mobilier de page, au même titre que l'en-tête, il reste hors du filtre de recherche. La catégorie `b27`, vidée de ses deux portes, disparaît de CATEGORIES.
+
+Le compteur dit maintenant ce qu'il prétend dire : deux outils, et ce sont les deux que nous avons écrits. Le contrôle du catalogue vérifie l'url de l'éditeur au même titre que le reste. Vérifié dans les deux thèmes et en 375 px, où le lien passe en pleine largeur sous le texte ; à fond de page, la pastille de signalement ne recouvre pas le lien.
+
+Règle posée dans `docs/charte.md` pour la suite : ce qui est réservé à l'interne n'entre pas dans le portail.
+
 ## 2026-08-29, l'ete se voit meme couvert
 
 L'utilisateur, en aout : « je crois que nous sommes en ete et je n'ai pas vu de dore — est-ce bien dans l'app ? » Il etait dans le code, mais son ciel couvert le masquait totalement : les ambiances couvert et orage REMPLACAIENT la palette de saison par des teintes fixes. Ma phrase « la saison teinte tout » promettait plus que le code ne tenait.

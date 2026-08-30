@@ -45,6 +45,10 @@
   <button type="button" class="bouton-icone" id="btnApropos" data-ico="engrenage" aria-label="À propos du portail" title="À propos du portail"></button>
 </div>
 
+<!-- Le sommaire : la table de la page, fixée à droite. Construit par
+     hub.js depuis le catalogue ; sous 1240 px il n'apparaît pas. -->
+<nav class="sommaire noprint" id="sommaire" aria-label="Sommaire de la page" hidden></nav>
+
 <!-- Le menu des langues. Seul le français vit : les autres entrées sont
      des emplacements posés pour la suite. -->
 <div class="menu-langues noprint" id="menuLangues" role="menu" aria-label="Choix de la langue"></div>
@@ -72,10 +76,12 @@
     <article class="tuile-vive" id="tuileCalendrier"></article>
   </section>
 
-  <!-- Les rayons du portail, construits depuis catalogue.js. -->
+  <!-- Les rayons du portail, construits depuis catalogue.js : les groupes
+       se déroulent, un par métier pour les outils, un par domaine pour les
+       ressources. Le sommaire fixé à droite descend au groupe choisi. -->
   <section class="rayon" id="rayonOutils" hidden>
     <h2>Nos outils <span>fabriqués ici</span></h2>
-    <div class="grille-outils" id="grilleOutils"></div>
+    <div id="groupesOutils"></div>
   </section>
 
   <section class="rayon" id="rayonRessources" hidden>
@@ -89,6 +95,11 @@
   </section>
 
   <p class="rien" id="rienTrouve" hidden></p>
+
+  <!-- La signature : qui édite ce portail. Le site de l'entreprise n'est pas
+       un outil que nous fabriquons, il ne se range pas dans leur rayon ; il
+       signe la page. Construite depuis REGLAGES.editeur. -->
+  <footer class="signature" id="signature" hidden></footer>
 
 </main>
 

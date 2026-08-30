@@ -3,8 +3,12 @@
    =====================================================================
 
    Le portail se lit en deux rayons, nos outils et les ressources, plus la
-   fiche de contact. Ajouter quelque chose, c'est ajouter un objet dans un
-   des tableaux ci-dessous. Aucun autre fichier n'est à toucher : ni
+   fiche de contact et, en pied de page, la signature de l'éditeur (réglée
+   dans REGLAGES.editeur, tout en bas). Les rayons se déroulent
+   en groupes, un par métier pour les outils et un par domaine pour les
+   ressources, et un sommaire fixé à droite de l'écran mène au groupe
+   choisi. Ajouter quelque chose, c'est ajouter
+   un objet dans un des tableaux ci-dessous. Aucun autre fichier n'est à toucher : ni
    index.html, ni hub.js, ni hub.css. Les rayons, les compteurs, la
    recherche et le panneau "À propos" se recalculent seuls.
 
@@ -26,7 +30,7 @@
        nom: "Nom affiché",         // titre de la carte
        pitch: "Une phrase.",       // ce que c'est, 140 caractères maximum
        url: "https://...",         // page à ouvrir ; chaîne vide si pas encore en ligne
-       categorie: "cvc",           // une clé de CATEGORIES, plus bas
+       categorie: "chauffage",     // une clé de CATEGORIES, plus bas
        sousCategorie: "",          // facultatif : une clé de SOUS_CATEGORIES
        statut: "en-ligne",         // en-ligne | beta | a-venir | bureau | obsolete
        type: "outil",              // outil | lien  (voir plus bas)
@@ -82,7 +86,7 @@ const PORTES = [
     nom: "Dimensionnement émetteurs Finimetal",
     pitch: "Sélection des radiateurs et sèche-serviettes Finimetal pièce par pièce, à partir des déperditions.",
     url: "https://mamalric.github.io/S-lectionneur-de-radiateurs/",
-    categorie: "cvc",
+    categorie: "chauffage",
     statut: "en-ligne",
     type: "outil",
     icone: "radiateur",
@@ -90,32 +94,56 @@ const PORTES = [
     maj: "2026-08-28"
   },
 
-  /* ---- B27 --------------------------------------------------------- */
-
   {
-    id: "site-b27",
-    nom: "Site B27",
-    pitch: "Le site de l'entreprise : métiers, agences, réalisations, actualités.",
-    url: "https://www.b27.fr",
-    categorie: "b27",
-    statut: "en-ligne",
+    id: "dimensionnement-gaine-ventilation",
+    nom: "Dimensionnement Gaine de ventilation",
+    pitch: "Sections, vitesses et pertes de charge des réseaux aérauliques, tronçon par tronçon.",
+    url: "",
+    categorie: "ventilation",
+    statut: "a-venir",
     type: "outil",
-    icone: "immeuble",
-    tags: ["entreprise", "vitrine"],
+    icone: "vent",
+    tags: ["aéraulique", "gaines", "pertes de charge"],
     maj: "2026-08-29"
   },
 
   {
-    id: "b27-mobility",
-    nom: "B27 Mobility",
-    pitch: "Réservation des voitures de société : disponibilités, créneaux, trajets.",
+    id: "dimensionnement-eau-froide-sanitaire",
+    nom: "Dimensionnement Eau froide sanitaire",
+    pitch: "Diamètres et pertes de charge du réseau d'eau froide, à partir des appareils desservis.",
     url: "",
-    categorie: "b27",
+    categorie: "plomberie",
     statut: "a-venir",
     type: "outil",
-    icone: "voiture",
-    tags: ["voitures", "réservation", "flotte"],
-    maj: "2026-08-26"
+    icone: "gouttes",
+    tags: ["EFS", "diamètres", "DTU 60.11"],
+    maj: "2026-08-29"
+  },
+
+  {
+    id: "dimensionnement-eaux-usees-eaux-vannes",
+    nom: "Dimensionnement Eaux usées et Eaux vannes",
+    pitch: "Chutes, collecteurs et ventilation primaire des EU et EV, selon les appareils raccordés.",
+    url: "",
+    categorie: "plomberie",
+    statut: "a-venir",
+    type: "outil",
+    icone: "ondes",
+    tags: ["EU", "EV", "évacuation", "DTU 60.11"],
+    maj: "2026-08-29"
+  },
+
+  {
+    id: "dimensionnement-eaux-pluviales",
+    nom: "Dimensionnement Eaux pluviales",
+    pitch: "Chéneaux, descentes et collecteurs EP à partir de la surface et de l'intensité de pluie.",
+    url: "",
+    categorie: "plomberie",
+    statut: "a-venir",
+    type: "outil",
+    icone: "pluie",
+    tags: ["EP", "descentes", "chéneaux", "DTU 60.11"],
+    maj: "2026-08-29"
   },
 
   /* ---- Ressources et référentiels ----------------------------------
@@ -247,13 +275,34 @@ const CONTACTS = [
    vert, BIM violet, structure gris. Ce ne sont donc pas des teintes
    décoratives : un ingénieur B27 y reconnaît le code couleur de ses plans.
 
-   Trois écarts, assumés et signalés. L'ocre de l'électricité est assombri de
-   #c18900 à #b17e00, le premier ne tenant que 3,07:1 avec le glyphe blanc.
-   Le rouge SSI est au contraire éclairci de #b01818 à #c62828 : l'original
-   tenait très bien face au glyphe, mais tombait à 2,68:1 face au fond du
-   thème sombre, où la tuile se distinguait mal de la page. La ventilation
-   n'a pas de teinte propre chez B27, où elle appartient à la famille CVC :
-   un cyan #2f7f92 la distingue du chauffage sans quitter la famille de l'air.
+   Quatre écarts, assumés et signalés. L'ocre de l'électricité est assombri
+   de #c18900 à #b17e00, le premier ne tenant que 3,07:1 avec le glyphe
+   blanc. Le rouge SSI est au contraire éclairci de #b01818 à #c62828 :
+   l'original tenait très bien face au glyphe, mais tombait à 2,68:1 face au
+   fond du thème sombre, où la tuile se distinguait mal de la page.
+
+   Les deux derniers écarts viennent de la même cause : B27 ne connaît qu'un
+   bleu CVC, là où le portail sépare trois métiers. Le bleu du lot, #3e8fb8,
+   reste au chauffage ; un cyan #2f7f92 va à l'air en mouvement et un bleu
+   froid #4a6fb0 à la production de froid. Trois teintes d'une même famille,
+   distinctes au premier coup d'oeil : on voit qu'on est en CVC, et lequel
+   des trois.
+
+   Deux teintes ne viennent pas des conventions B27 et sont inventées ici,
+   faute d'équivalent dans les lots : le brun de terre #7a6249 du VRD, pour
+   les réseaux enterrés, et le gris neutre #6b6f76 des utilitaires, neutre
+   précisément parce qu'un utilitaire n'est le lot de personne. Si B27 a
+   déjà une couleur pour ces deux-là, elle prime : il n'y a qu'à la
+   remplacer ici.
+
+   ATTENTION, TROIS VALEURS SONT À VÉRIFIER. Le paysage, le BIM et la
+   structure sont bien des lots B27, mais seule leur famille était notée
+   ici, vert, violet et gris ; les valeurs exactes n'étaient pas relevées.
+   Celles qui figurent ci-dessous (#4e8a2f, #9450a5, #5f6a74) ont été
+   choisies dans la bonne famille, assez éloignées des teintes voisines
+   pour rester distinctes, et elles passent le contrôle des trois fronts.
+   Ce sont des approximations : remplacer par les valeurs de
+   b27-site/src/styles/tokens.css dès qu'elles sont sous la main.
 
    TOUTE COULEUR NOUVELLE DOIT TENIR AU MOINS 3:1 SUR TROIS FRONTS : avec le
    glyphe blanc, avec le fond du thème clair, et avec celui du thème sombre.
@@ -261,22 +310,39 @@ const CONTACTS = [
    disparaître la tuile sur fond noir. Le contrôle du catalogue vérifie les
    trois et refuse de passer en dessous.
 
-   Les dossiers du premier niveau. L'ordre de ce tableau est l'ordre
-   d'affichage. Une catégorie sans aucune porte n'apparaît pas : elles
-   peuvent donc être déclarées d'avance, elles restent invisibles jusqu'à
-   la première porte qui s'y range.
+   Les métiers du portail. L'ordre de ce tableau est l'ordre d'affichage.
+   Une catégorie sans aucune porte n'apparaît pas : elles peuvent donc être
+   déclarées d'avance, elles restent invisibles jusqu'à la première porte
+   qui s'y range.
+
+   Le champ "court" est le nom écrit dans le sommaire, où le nom complet
+   serait à l'étroit. Il est facultatif : sans lui, le sommaire reprend le
+   nom complet. Quinze caractères sont un maximum confortable.
+
+   Le champ "metier" décide de ce qui se montre vide. Une catégorie
+   ordinaire n'apparaît que si une porte s'y range ; une catégorie marquée
+   metier garde sa ligne au sommaire même sans aucun outil (estompée,
+   pastille en pointillé, inerte), sans pour autant ouvrir de groupe vide
+   dans la page. C'est ce qui permet de montrer les métiers de la maison
+   avant d'avoir écrit leurs outils. La catégorie des ressources ne le
+   porte pas : ce n'est pas un métier.
    --------------------------------------------------------------------- */
 
 const CATEGORIES = [
-  { cle: "cvc",         nom: "Chauffage et climatisation",  icone: "radiateur",   couleur: "#3e8fb8" },
-  { cle: "ventilation", nom: "Ventilation",                 icone: "vent",        couleur: "#2f7f92" },
-  { cle: "plomberie",   nom: "Plomberie et ECS",            icone: "gouttes",     couleur: "#1f7a6e" },
-  { cle: "thermique",   nom: "Thermique et réglementation", icone: "thermometre", couleur: "#c4562f" },
-  { cle: "securite",    nom: "Sécurité incendie",           icone: "bouclier",    couleur: "#c62828" },
-  { cle: "carbone",     nom: "Carbone et environnement",    icone: "feuille",     couleur: "#557a3a" },
-  { cle: "electricite", nom: "Électricité",                 icone: "eclair",      couleur: "#b17e00" },
-  { cle: "b27",         nom: "B27",                         icone: "immeuble",    couleur: "#5f7f1f" },
-  { cle: "ressources",  nom: "Ressources et référentiels",  icone: "livre",       couleur: "#6b5ba6" }
+  { cle: "chauffage",   nom: "Chauffage",                   court: "Chauffage",    icone: "flamme",      couleur: "#3e8fb8", metier: true },
+  { cle: "climatisation", nom: "Climatisation et froid",    court: "Climatisation",icone: "flocon",      couleur: "#4a6fb0", metier: true },
+  { cle: "ventilation", nom: "Ventilation",                 court: "Ventilation",  icone: "vent",        couleur: "#2f7f92", metier: true },
+  { cle: "plomberie",   nom: "Plomberie et ECS",            court: "Plomberie",    icone: "gouttes",     couleur: "#1f7a6e", metier: true },
+  { cle: "vrd",         nom: "VRD et assainissement",       court: "VRD",          icone: "reseau",      couleur: "#7a6249", metier: true },
+  { cle: "thermique",   nom: "Thermique et réglementation", court: "Thermique",    icone: "thermometre", couleur: "#c4562f", metier: true },
+  { cle: "securite",    nom: "Sécurité incendie",           court: "SSI",          icone: "bouclier",    couleur: "#c62828", metier: true },
+  { cle: "electricite", nom: "Électricité",                 court: "Électricité",  icone: "eclair",      couleur: "#b17e00", metier: true },
+  { cle: "carbone",     nom: "Carbone et environnement",    court: "Carbone",      icone: "nuage",       couleur: "#557a3a", metier: true },
+  { cle: "paysage",     nom: "Paysage et aménagement",      court: "Paysage",      icone: "feuille",     couleur: "#4e8a2f", metier: true },
+  { cle: "structure",   nom: "Structure",                   court: "Structure",    icone: "immeuble",    couleur: "#5f6a74", metier: true },
+  { cle: "bim",         nom: "BIM et maquette numérique",   court: "BIM",          icone: "grille",      couleur: "#9450a5", metier: true },
+  { cle: "utilitaire",  nom: "Utilitaires",                 court: "Utilitaires",  icone: "calculatrice",couleur: "#6b6f76", metier: true },
+  { cle: "ressources",  nom: "Ressources et référentiels",  court: "Ressources",   icone: "livre",       couleur: "#6b5ba6" }
 ];
 
 /* ---------------------------------------------------------------------
@@ -294,9 +360,9 @@ const CATEGORIES = [
    --------------------------------------------------------------------- */
 
 const SOUS_CATEGORIES = [
-  { cle: "reglementation", categorie: "ressources", nom: "Réglementation", icone: "livre" },
-  { cle: "donnees",        categorie: "ressources", nom: "Données et bases", icone: "base_donnees" },
-  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", icone: "regle" }
+  { cle: "reglementation", categorie: "ressources", nom: "Réglementation", court: "Réglementation", icone: "livre" },
+  { cle: "donnees",        categorie: "ressources", nom: "Données et bases", court: "Données", icone: "base_donnees" },
+  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", court: "Documentation", icone: "regle" }
 ];
 
 /* ---------------------------------------------------------------------
@@ -311,6 +377,17 @@ const REGLAGES = {
   // L'accroche est la phrase sous le titre du portail. Chaîne vide : elle
   // disparaît.
   accroche: "Les outils et les ressources du bureau d'études, ouverts à tous. Rien à installer, aucun compte.",
+
+  // L'éditeur du portail, en signature de pied de page. Le site de
+  // l'entreprise n'est pas un outil que nous fabriquons : rangé avec eux, il
+  // passait pour l'un d'eux. Il signe la page au lieu d'y prendre une carte.
+  // url vide : la signature disparaît.
+  editeur: {
+    nom: "B27",
+    pitch: "Le site de l'entreprise : métiers, agences, réalisations, actualités.",
+    url: "https://www.b27.fr",
+    lien: "b27.fr"
+  },
 
   // Tuile météo du portail. Données réelles d'Open-Meteo (open-meteo.com),
   // sans clé et sans compte : c'est un service de données météo ouvert,
