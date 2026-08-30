@@ -284,6 +284,11 @@ body.aimante.defile .entete-rayon.entre{opacity:0;translate:0 calc(var(--d,1) * 
     min-height:100vh;min-height:100svh;
     justify-content:center;padding:32px 0;
   }
+  /* Pendant une recherche, l'entrée rend sa hauteur : pleine page, elle
+     poussait tous les résultats sous la ligne de flottaison et l'on
+     croyait la recherche muette alors qu'elle trouvait. Ce qu'on cherche
+     doit apparaître sous le champ, pas un écran plus bas. */
+  body.cherche .entree{min-height:0;padding:clamp(40px,7vh,72px) 0 24px}
 }
 
 /* L'emblème : le monogramme B27 sur une plaque de verre, une aura verte

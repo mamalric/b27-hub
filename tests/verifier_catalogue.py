@@ -42,7 +42,7 @@ CHAMPS_PORTE = {"id", "nom", "pitch", "url", "categorie", "statut", "type", "ico
 # en porte la traduction anglaise du nom et du pitch : le portail se traduit,
 # et une fiche sans traduction reste rendue en francais, ce qui est le cas
 # voulu pour les ressources exterieures.
-CHAMPS_PORTE_FACULTATIFS = {"sousCategorie", "en"}
+CHAMPS_PORTE_FACULTATIFS = {"sousCategorie", "en", "attente"}
 
 # Fonds contre lesquels une couleur de tuile doit tenir. Le glyphe est blanc,
 # et la tuile est un aplat posé sur la page : une teinte trop claire efface le

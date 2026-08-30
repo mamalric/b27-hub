@@ -64,6 +64,8 @@ Deux rayons, sans métaphore, et une seule forme de carte pour les deux : **Nos 
 
 **La page se déroule, et le sommaire donne la vue d'ensemble.** Se dérouler est la nature de cette page, et les détours essayés pour l'en empêcher, les dossiers de la v3 puis une ruche d'alvéoles hexagonales où l'on plongeait métier par métier, ont tous fini par être retirés : cacher le catalogue derrière un clic coûte plus qu'il ne range. Les groupes s'alignent donc à plat, un par métier pour les outils dans l'ordre de `CATEGORIES`, un par domaine pour les ressources, chaque titre portant une pastille à la couleur du lot : la couleur remonte du contenu jusqu'au titre, on lit le métier avant d'avoir lu son nom. Un métier sans outil n'ouvrirait pas de groupe, une section vide serait du bruit ; mais la règle d'affichage est qu'il n'y en a pas : chaque métier porte au moins une carte, parce que le portail montre l'étendue de la maison avant ses outils. Le pointillé du sommaire reste prêt pour un métier futur déclaré sans carte.
 
+**Une carte qui attend ne se compte pas**, et elle le dit dans le catalogue par un champ `attente`. Annoncer dix-sept outils quand sept d'entre eux ne sont qu'un mot serait faux, et le compteur sous la recherche est la première chose qu'un visiteur lit. Le panneau À propos, lui, les compte à part, sous le nom de métiers en attente : c'est une information, pas une promesse.
+
 **Une carte qui attend ne porte aucun nom d'outil**, et c'est la leçon d'une erreur. Ces cartes ont d'abord été des prête-noms, des applications plausibles du métier inventées pour tenir la place : un portail public annonçait ainsi des outils que personne n'avait décidés, sous des noms que personne n'avait validés. Une carte qui attend se contente désormais de dire qu'elle attend, et n'annonce que ce que la maison a nommé. La règle vaut au-delà des cartes : rien de ce que le portail affiche ne s'invente.
 
 **Le sommaire est fixé à droite de l'écran, en colonne de bulles.** Tous les métiers de la maison s'y lisent : ceux qui ont des outils mènent d'un clic à leur groupe, ceux qui n'en ont pas encore gardent leur bulle, en pointillé, et c'est ainsi que le portail montre l'étendue du bureau d'études avant d'en avoir écrit tous les outils. Suivent les domaines de ressources, séparés par un filet. Le repère suit le défilement et marque où l'on est.
@@ -102,7 +104,7 @@ Et ce qui est réservé à l'interne n'entre pas dans le portail. Il est public 
 
 ## La recherche
 
-Un seul champ, centré, qui filtre tout en direct, outils et ressources. La touche `/` l'amène depuis n'importe où, Échap le vide — les conventions d'un outil qu'on utilise au clavier. Pendant une recherche, les tuiles vivantes s'effacent : on est venu chercher quelque chose, la météo attendra.
+Un seul champ, centré, qui filtre tout en direct, outils et ressources. **Pendant une recherche, l'entrée rend sa hauteur** : pleine page, elle poussait tous les résultats sous la ligne de flottaison, et l'on croyait la recherche muette alors qu'elle trouvait. Ce qu'on cherche doit apparaître sous le champ, pas un écran plus bas. La touche `/` l'amène depuis n'importe où, Échap le vide — les conventions d'un outil qu'on utilise au clavier. Pendant une recherche, les tuiles vivantes s'effacent : on est venu chercher quelque chose, la météo attendra.
 
 ## Les panneaux et les barres
 

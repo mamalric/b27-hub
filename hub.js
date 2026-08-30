@@ -539,6 +539,7 @@ const TRADUCTIONS = {
 
     /* ---- le panneau À propos */
     "Le portail": "The portal",
+    "Métiers en attente": "Trades awaiting a tool",
     "Dernière mise à jour du catalogue": "Catalogue last updated",
     "Thème courant": "Current theme",
     "sombre": "dark",
@@ -2547,8 +2548,12 @@ function construireRayons() {
     $("rayonRessources").hidden = false;
   }
 
+  // Les cartes en attente tiennent la place d'un métier sans projet
+  // décidé : elles s'affichent, mais annoncer qu'on en a dix-sept quand
+  // sept ne sont qu'un mot serait faux.
+  const reels = outils.filter(o => !o.attente);
   const morceaux = [];
-  if (outils.length) morceaux.push(outils.length + " " + mot(outils.length > 1 ? "outils" : "outil"));
+  if (reels.length) morceaux.push(reels.length + " " + mot(reels.length > 1 ? "outils" : "outil"));
   if (liens.length) morceaux.push(liens.length + " " + mot(liens.length > 1 ? "ressources" : "ressource"));
   $("compte").textContent = morceaux.join("  ·  ");
 
@@ -2700,14 +2705,16 @@ function ligneStat(dt, dd) {
 }
 
 function remplirApropos() {
-  const outils = PORTES.filter(estOutil).length;
-  const liens = PORTES.length - outils;
+  const outils = PORTES.filter(o => estOutil(o) && !o.attente).length;
+  const attente = PORTES.filter(o => estOutil(o) && o.attente).length;
+  const liens = PORTES.filter(o => !estOutil(o)).length;
   const majs = PORTES.map(o => o.maj).filter(Boolean).sort();
   const anomalies = controlerCatalogue();
 
   let h = '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">' + ech(mot("Le portail")) + '</h3>'
     + '<dl class="stats-liste">'
     + ligneStat(mot("Nos outils"), outils)
+    + (attente ? ligneStat(mot("Métiers en attente"), attente) : "")
     + ligneStat(mot("Ressources"), liens)
     + ligneStat(mot("Dernière mise à jour du catalogue"), majs.length ? dateFr(majs[majs.length - 1]) : mot("non renseignée"))
     + ligneStat(mot("Thème courant"), mot(document.documentElement.dataset.theme === "dark" ? "sombre" : "clair"))

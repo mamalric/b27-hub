@@ -38,6 +38,11 @@
        maj: "2026-08-29"           // AAAA-MM-JJ, dernière mise à jour de la porte
      }
 
+   Deux champs facultatifs en plus : "en", qui porte la traduction anglaise
+   du nom et du pitch, et "attente", qui marque une carte posée pour tenir
+   la place d'un métier sans projet décidé. Une carte en attente s'affiche
+   comme les autres mais ne se compte pas : ce n'est pas un outil.
+
    Le champ sousCategorie est facultatif. Une catégorie dont aucune porte
    n'en déclare s'ouvre directement sur ses portes ; dès qu'au moins une en
    déclare une, la catégorie s'ouvre sur des sous-dossiers, et les portes
@@ -212,6 +217,7 @@ const PORTES = [
     url: "",
     categorie: "carbone",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],
@@ -240,6 +246,7 @@ const PORTES = [
     url: "",
     categorie: "utilitaire",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],
@@ -266,6 +273,7 @@ const PORTES = [
     url: "",
     categorie: "vrd",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],
@@ -280,6 +288,7 @@ const PORTES = [
     url: "",
     categorie: "electricite",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],
@@ -294,6 +303,7 @@ const PORTES = [
     url: "",
     categorie: "paysage",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],
@@ -308,6 +318,7 @@ const PORTES = [
     url: "",
     categorie: "structure",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],
@@ -322,6 +333,7 @@ const PORTES = [
     url: "",
     categorie: "bim",
     statut: "a-venir",
+    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
     type: "outil",
     icone: "horloge",
     tags: ["à venir", "en préparation"],

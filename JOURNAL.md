@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-30, la recherche trouvait sans qu'on la voie, et le compteur mentait
+
+Deux défauts signalés coup sur coup, tous deux dus à des changements du jour.
+
+**"Faire une recherche n'affiche rien."** La recherche fonctionnait pourtant : mesuré sur "plomb", quatre cartes trouvées et démasquées. Seulement l'entrée occupe l'écran entier depuis ce matin, et les résultats se rangeaient dessous, à 721 pixels du haut sur une fenêtre qui en fait 607. On voyait une page vide. L'entrée rend donc sa hauteur pendant une recherche : mesurée à 424 pixels, la première carte remonte à 538, sous les yeux. Ce qu'on cherche doit apparaître sous le champ, pas un écran plus bas.
+
+**"Dix-sept outils, c'est faux, il n'y en a pas autant."** Vrai aussi : sept des dix-sept sont les cartes À venir posées ce matin pour tenir la place des métiers sans projet. Une carte qui attend n'est pas un outil. Elle porte maintenant un champ `attente` dans le catalogue, le compteur ne la compte plus, et le portail annonce dix outils. Le panneau À propos les compte à part, sous le nom de métiers en attente : c'est une information, pas une promesse.
+
+Vérifié : compteur à dix outils et dix-sept ressources, recherche visible sans défiler, retour à l'entrée pleine hauteur quand le champ se vide, panneau À propos à dix outils et sept métiers en attente. Console vide, contrôle du catalogue au vert.
+
+Leçon de test, et elle m'a coûté six essais : le volet d'aperçu garde un cache tenace sur les fichiers servis en local, et rechargeait une version d'il y a deux corrections. Vérifier une correction dans ce volet demande de servir sur un autre port, ce qui donne une origine neuve et un cache vide.
+
 ## 2026-08-30, le portail parle anglais
 
 Le menu des langues portait cinq emplacements morts depuis la v7. L'anglais vit maintenant, et lui seul : une deuxième langue bien faite vaut mieux que cinq à moitié, et c'est la seule dont un client étranger a vraiment l'usage.
