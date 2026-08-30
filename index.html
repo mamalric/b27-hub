@@ -20,7 +20,7 @@
 
 <!-- Thème posé avant le premier rendu, sombre par défaut : c'est l'identité
      du portail, pas un réglage du poste. La préférence enregistrée gagne. -->
-<script>try{var t=localStorage.getItem('hub_b27_theme');document.documentElement.dataset.theme=t||'dark';}catch(e){document.documentElement.dataset.theme='dark';}</script>
+<script>try{var t=localStorage.getItem('hub_b27_theme');document.documentElement.dataset.theme=t||'dark';var g=localStorage.getItem('hub_b27_langue');if(g)document.documentElement.lang=g;}catch(e){document.documentElement.dataset.theme='dark';}</script>
 </head>
 
 <body>
@@ -33,7 +33,8 @@
 
 <!-- La pilule d'ancrage : l'emblème seul s'y pose au défilement, le nom du
      rayon se lisant juste dessous. Cliquer ramène en haut. -->
-<button type="button" class="ancre noprint" id="ancre" aria-label="Revenir en haut de la page">
+<button type="button" class="ancre noprint" id="ancre" aria-label="Revenir en haut de la page"
+        data-t="aria-label:Revenir en haut de la page">
   <span class="ancre-logo" id="ancreLogo"></span>
 </button>
 
@@ -48,11 +49,14 @@
 <div class="entete-rayon noprint" id="enteteRayon" aria-hidden="true"></div>
 
 <div class="haut noprint">
-  <button type="button" class="bouton-icone" id="btnTheme" aria-label="Changer de thème"></button>
+  <button type="button" class="bouton-icone" id="btnTheme" aria-label="Changer de thème"
+          data-t="aria-label:Changer de thème"></button>
   <button type="button" class="bouton-icone" id="btnSon" aria-label="Couper le son" title="Couper le son"></button>
   <button type="button" class="bouton-icone" id="btnLangue" data-ico="langue" aria-label="Langue"
-          title="Langue" aria-haspopup="true" aria-expanded="false"></button>
-  <button type="button" class="bouton-icone" id="btnApropos" data-ico="engrenage" aria-label="À propos du portail" title="À propos du portail"></button>
+          title="Langue" aria-haspopup="true" aria-expanded="false"
+          data-t="aria-label:Langue|title:Langue"></button>
+  <button type="button" class="bouton-icone" id="btnApropos" data-ico="engrenage" aria-label="À propos du portail" title="À propos du portail"
+          data-t="aria-label:À propos du portail|title:À propos du portail"></button>
 </div>
 
 <!-- Le filtre "goutte" du sommaire : un flou puis un contraste d'alpha,
@@ -68,11 +72,13 @@
 
 <!-- Le sommaire : la table de la page, fixée à droite. Construit par
      hub.js depuis le catalogue ; sous 1240 px il n'apparaît pas. -->
-<nav class="sommaire noprint" id="sommaire" aria-label="Sommaire de la page" hidden></nav>
+<nav class="sommaire noprint" id="sommaire" aria-label="Sommaire de la page"
+     data-t="aria-label:Sommaire de la page" hidden></nav>
 
 <!-- Le menu des langues. Seul le français vit : les autres entrées sont
      des emplacements posés pour la suite. -->
-<div class="menu-langues noprint" id="menuLangues" role="menu" aria-label="Choix de la langue"></div>
+<div class="menu-langues noprint" id="menuLangues" role="menu" aria-label="Choix de la langue"
+     data-t="aria-label:Choix de la langue"></div>
 
 <main class="portail">
 
@@ -84,7 +90,8 @@
     <div class="quete noprint" id="quete" hidden>
       <span class="quete-loupe" data-ico="recherche" data-ico-taille="18" aria-hidden="true"></span>
       <input id="champRecherche" type="search" autocomplete="off" spellcheck="false"
-             placeholder="Rechercher un outil, une ressource…" aria-label="Rechercher dans le portail">
+             placeholder="Rechercher un outil, une ressource…" aria-label="Rechercher dans le portail"
+             data-t="placeholder:Rechercher un outil, une ressource…|aria-label:Rechercher dans le portail">
       <kbd class="quete-touche" aria-hidden="true">/</kbd>
     </div>
     <p class="compte" id="compte"></p>
@@ -92,7 +99,8 @@
 
   <!-- Les tuiles vivantes : météo en données réelles, calendrier en
        semaines ISO. Construites par hub.js. -->
-  <section class="tuiles-vives noprint" id="tuilesVives" aria-label="Météo et calendrier">
+  <section class="tuiles-vives noprint" id="tuilesVives" aria-label="Météo et calendrier"
+           data-t="aria-label:Météo et calendrier">
     <article class="tuile-vive" id="tuileMeteo" hidden></article>
     <article class="tuile-vive" id="tuileCalendrier"></article>
   </section>
@@ -102,12 +110,12 @@
        ressources, tous en cartes. Le sommaire fixé à droite descend au
        groupe choisi. -->
   <section class="rayon" id="rayonOutils" hidden>
-    <h2>Nos outils <span>fabriqués ici</span></h2>
+    <h2 data-t="texte:Nos outils">Nos outils <span data-t="texte:fabriqués ici">fabriqués ici</span></h2>
     <div id="groupesOutils"></div>
   </section>
 
   <section class="rayon" id="rayonRessources" hidden>
-    <h2>Ressources <span>sites de référence</span></h2>
+    <h2 data-t="texte:Ressources">Ressources <span data-t="texte:sites de référence">sites de référence</span></h2>
     <div id="groupesRessources"></div>
   </section>
 
@@ -117,18 +125,18 @@
 
 <dialog id="dlgMeteo" class="modale modale-large noprint" aria-labelledby="dlgMeteoTitre">
   <div class="modale-tete">
-    <h2 id="dlgMeteoTitre" data-ico="nuage" data-ico-taille="15">Météo détaillée</h2>
+    <h2 id="dlgMeteoTitre" data-ico="nuage" data-ico-taille="15" data-t="texte:Météo détaillée">Météo détaillée</h2>
     <span class="espace"></span>
-    <button type="button" class="bouton-icone" id="btnMeteoFermer" data-ico="fermer" aria-label="Fermer"></button>
+    <button type="button" class="bouton-icone" id="btnMeteoFermer" data-ico="fermer" aria-label="Fermer" data-t="aria-label:Fermer"></button>
   </div>
   <div class="modale-corps" id="meteoDetail"></div>
 </dialog>
 
 <dialog id="dlgApropos" class="modale noprint" aria-labelledby="dlgAproposTitre">
   <div class="modale-tete">
-    <h2 id="dlgAproposTitre" data-ico="engrenage" data-ico-taille="15">À propos du portail</h2>
+    <h2 id="dlgAproposTitre" data-ico="engrenage" data-ico-taille="15" data-t="texte:À propos du portail">À propos du portail</h2>
     <span class="espace"></span>
-    <button type="button" class="bouton-icone" id="btnAproposFermer" data-ico="fermer" aria-label="Fermer"></button>
+    <button type="button" class="bouton-icone" id="btnAproposFermer" data-ico="fermer" aria-label="Fermer" data-t="aria-label:Fermer"></button>
   </div>
   <div class="modale-corps" id="aproposCorps"></div>
 </dialog>

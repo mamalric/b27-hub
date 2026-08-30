@@ -18,18 +18,27 @@
 
 /* ---------------------------------------------------------------------
    VERSION ET JOURNAL
+
+   Un journal de versions est un résumé, pas un récit : deux ou trois
+   phrases par version, ce qui a changé pour qui l'utilise. Le détail, les
+   pourquoi et les leçons vont dans JOURNAL.md, qui est fait pour ça.
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v12", date: "2026-08-30", titre: "Le portail parle anglais",
+    texte: "Le cadre, nos outils, les métiers et les domaines se lisent en anglais, le choix se mémorisant comme le thème. Les fiches de ressources restent en français : elles mènent à des sites français." },
+
   { v: "v11", date: "2026-08-30", titre: "Le déroulé a un foyer",
-    texte: "La page qui se déroule met en avant ce qu'on regarde : le groupe au foyer se tient un peu plus grand et à pleine encre, son titre grossit, sa pastille prend un halo, et les autres reculent, s'estompent et se floutent en attendant leur tour. Le foyer suit le défilement en vague magnétique, la même cloche que les bulles du sommaire mais couchée le long de la page ; cliquer une bulle du sommaire pose vraiment son métier au foyer. Pendant une recherche et sur un poste qui demande moins d'animations, la page reste à plat. L'entrée occupe l'écran entier, emblème, titre et recherche tenus en son milieu, et le catalogue commence sous la ligne de flottaison. Les titres de rayon quittent le fil de la page pour l'entête, où ils glissent de l'un à l'autre au passage. La molette avance ensuite par crans, un par pichenette et neuf par seconde au plus tant qu'on tourne, et chaque métier se pose au même endroit de l'écran, au pixel près. Les flèches du clavier font de même, un métier par touche. Le portail répond enfin aux gestes, à l'oeil et à l'oreille : cinq sons courts synthétisés en local, un rebond en bout de course, une bulle du sommaire qui bat à l'arrivée, et un bouton pour tout couper. Le foyer est exclusif, ce qui l'entoure passe au lointain, presque effacé et flou. Le catalogue rejoint au passage l'axe du logo, titres et cartes centrés, une rangée pleine se partageant la largeur et une rangée courte se centrant. Les ressources se lisent désormais dans la même carte que les outils, au lieu des rangées compactes qui leur étaient réservées ; la fiche de contact et la signature de pied de page quittent le portail, la pastille de signalement restant la voie pour écrire, et le site de l'entreprise devient une carte des ressources, en dernier groupe de la page." },
+    texte: "Le déroulé a un foyer : le métier regardé se tient en avant, les autres passent au lointain. Molette et flèches avancent d'un métier par cran, avec retour à l'oeil et à l'oreille. L'entrée occupe l'écran, le catalogue se centre, et le site de l'entreprise rejoint les ressources." },
+
   { v: "v10", date: "2026-08-30", titre: "Le sommaire, les métiers, la signature",
-    texte: "Le catalogue se groupe par métier et un sommaire fixé à droite de l'écran donne la vue d'ensemble : les treize métiers de B27 s'y lisent, ceux sans outil encore en attente, et le repère suit le défilement. Quatre outils de dimensionnement sont annoncés (eau froide, eaux usées et vannes, eaux pluviales, gaines de ventilation). Le site de l'entreprise quitte le rayon des outils pour signer le pied de page, et B27 Mobility, réservé à l'interne, quitte un portail public." },
+    texte: "Le catalogue se groupe par métier, et un sommaire fixé à droite donne la vue d'ensemble. Quatre outils de dimensionnement sont annoncés. Le site de l'entreprise quitte le rayon des outils, B27 Mobility quitte le portail." },
   { v: "v9", date: "2026-08-29", titre: "La météo en grand",
-    texte: "Un clic sur la tuile météo ouvre le panneau détaillé : dix mesures du moment dont le point de rosée calculé par Magnus, les prochaines vingt-quatre heures, la semaine, le soleil et la qualité de l'air avec les pollens. Et chacun compose sa tuile : les mesures affichées par défaut se cochent dans le panneau, le choix reste dans le navigateur." },
+    texte: "Un clic sur la tuile météo ouvre le panneau détaillé : les mesures du moment, les prochaines heures, la semaine, le soleil et la qualité de l'air. Chacun y compose sa tuile, le choix restant dans le navigateur." },
   { v: "v8", date: "2026-08-29", titre: "Le fond vit avec le ciel",
-    texte: "Le champ d'écoulement suit désormais la météo affichée : bruine et pluie en fines stries inclinées par le vent mesuré, neige en flocons qui oscillent, brouillard presque immobile, orage en turbulence — jamais en éclairs, le calme est la règle. La saison teinte la palette, hiver froid, été doré. Au défilement, tout s'ancre : la météo et le calendrier se replient en pastilles, le logo et le titre se posent dans une pilule centrale qui ramène en haut." },
+    texte: "Le champ d'écoulement suit la météo affichée, pluie, neige, brouillard et orage, et la saison en teinte la palette. Au défilement tout s'ancre : les tuiles se replient en pastilles, l'emblème se pose en haut au centre." },
+
   { v: "v7", date: "2026-08-29", titre: "Le portail",
-    texte: "Refonte complète : tout est centré sous le logo, un champ d'écoulement animé calculé en local occupe le fond, la météo affiche des données réelles Open-Meteo, un calendrier donne les semaines ISO. Le catalogue se lit en deux rayons, nos outils et les ressources, et la métaphore des portes disparaît. Sombre par défaut. La pastille de signalement est conservée telle quelle." },
+    texte: "Refonte complète : tout est centré sous le logo, un champ d'écoulement animé occupe le fond, la météo et le calendrier s'affichent en tuiles. Le catalogue se lit en deux rayons et la métaphore des portes disparaît. Sombre par défaut." },
   { v: "v6", date: "2026-08-29", titre: "Bandeau photo, épuré",
     texte: "Bandeau d'accueil pleine largeur à photo de chantier teintée au vert B27. Retiré dès la v7 au profit du fond animé." },
   { v: "v5", date: "2026-08-29", titre: "Bandeau de charpente",
@@ -364,7 +373,7 @@ function sonEtat(actif) {
   SON.actif = !!actif;
   const b = $("btnSon");
   if (!b) return;
-  const quoi = SON.actif ? "Couper le son" : "Activer le son";
+  const quoi = mot(SON.actif ? "Couper le son" : "Activer le son");
   b.innerHTML = ico(SON.actif ? "son" : "muet", 17);
   b.setAttribute("aria-label", quoi);
   b.setAttribute("title", quoi);
@@ -396,6 +405,203 @@ function initSon() {
     if (ev.target.closest("a.carte, .som-ligne[data-cible], .ancre, .bouton-icone, .rang")) {
       sonJouer("clic");
     }
+  });
+}
+
+/* ---------------------------------------------------------------------
+   LA LANGUE
+
+   Le portail se traduit, pas les sites qu'il pointe. Le cadre, nos propres
+   outils et la structure passent en anglais ; les fiches de ressources
+   gardent leur nom et leur description en français, puisqu'elles mènent à
+   des sites français et qu'une description traduite promettrait un contenu
+   qui n'existe pas.
+
+   DEUX SOURCES, ET C'EST VOULU. Le vocabulaire de l'interface vit ici,
+   dans un dictionnaire dont la clé est la phrase française : le code
+   continue de s'écrire en français, une chaîne sans traduction retombe
+   d'elle-même sur l'original, et rien ne casse si l'on en oublie une. Le
+   contenu du catalogue, lui, se traduit dans catalogue.js, sur chaque
+   fiche, pour que ce fichier reste le seul à faire vivre.
+
+   CHANGER DE LANGUE RECHARGE LA PAGE. Tout se construit à l'exécution,
+   sommaire et écouteurs compris : reconstruire à chaud demanderait de
+   défaire et refaire des liaisons que rien n'oblige à toucher. Le choix
+   vit dans le navigateur comme le thème, et la page repart dans la bonne
+   langue.
+   --------------------------------------------------------------------- */
+const CLE_LANGUE = "hub_b27_langue";
+const LANGUE = { courante: "fr" };
+
+const TRADUCTIONS = {
+  en: {
+    /* ---- le cadre */
+    "Revenir en haut de la page": "Back to top",
+    "Changer de thème": "Switch theme",
+    "Couper le son": "Mute",
+    "Activer le son": "Unmute",
+    "Langue": "Language",
+    "À propos du portail": "About this portal",
+    "Sommaire de la page": "Page contents",
+    "Choix de la langue": "Language",
+    "Météo et calendrier": "Weather and calendar",
+    "Rechercher dans le portail": "Search the portal",
+    "Rechercher un outil, une ressource…": "Search for a tool or a resource…",
+    "Fermer": "Close",
+    "bientôt": "soon",
+    "Bientôt disponible": "Coming soon",
+
+    /* ---- les rayons et le catalogue */
+    "Nos outils": "Our tools",
+    "fabriqués ici": "built here",
+    "Ressources": "Resources",
+    "sites de référence": "reference sites",
+    "outil": "tool",
+    "outils": "tools",
+    "ressource": "resource",
+    "ressources": "resources",
+    "Aucun résultat pour": "No result for",
+    "Divers": "Miscellaneous",
+
+    /* ---- les statuts d'une fiche */
+    "En ligne": "Online",
+    "Bêta": "Beta",
+    "Bientôt": "Soon",
+    "Au bureau": "On site",
+    "Obsolète": "Retired",
+
+    /* ---- la tuile météo */
+    "Météo": "Weather",
+    "Calendrier": "Calendar",
+    "ma position": "my location",
+    "Actualiser le relevé": "Refresh reading",
+    "Utiliser ma position": "Use my location",
+    "Position choisie": "Chosen location",
+    "Relevé": "Reading",
+    "données Open-Meteo": "Open-Meteo data",
+    "Météo à": "Weather in",
+    "Météo détaillée": "Detailed weather",
+
+    /* ---- le temps qu'il fait */
+    "Ciel dégagé": "Clear sky",
+    "Peu nuageux": "Partly cloudy",
+    "Couvert": "Overcast",
+    "Brouillard": "Fog",
+    "Bruine": "Drizzle",
+    "Pluie": "Rain",
+    "Neige": "Snow",
+    "Averses": "Showers",
+    "Averses de neige": "Snow showers",
+    "Orage": "Thunderstorm",
+    "Temps mêlé": "Mixed weather",
+
+    /* ---- les mesures */
+    "Ressenti": "Feels like",
+    "Vent": "Wind",
+    "Rafales": "Gusts",
+    "Humidité": "Humidity",
+    "Pression": "Pressure",
+    "Pression mer": "Sea pressure",
+    "Nébulosité": "Cloud cover",
+    "Précipitations": "Precipitation",
+    "Point de rosée": "Dew point",
+    "Indice UV": "UV index",
+
+    /* ---- le panneau météo */
+    "Prochaines 24 heures": "Next 24 hours",
+    "La semaine": "The week",
+    "Le soleil": "The sun",
+    "Lever": "Sunrise",
+    "Coucher": "Sunset",
+    "Jour": "Daylight",
+    "UV max": "Max UV",
+    "Qualité de l’air": "Air quality",
+    "Bon": "Good", "Correct": "Fair", "Dégradé": "Moderate",
+    "Mauvais": "Poor", "Très mauvais": "Very poor", "Extrême": "Extreme",
+    "Aulne": "Alder", "Bouleau": "Birch", "Graminées": "Grass",
+    "Pollen": "Pollen", "vent": "wind", "auj.": "today",
+    "dim.": "Sun", "lun.": "Mon", "mar.": "Tue", "mer.": "Wed",
+    "jeu.": "Thu", "ven.": "Fri", "sam.": "Sat",
+    "Composer la tuile": "Compose the tile",
+    "Les mesures cochées sont celles que la tuile du portail affiche, jusqu’à 6. Ce choix reste dans ce navigateur.":
+      "The ticked measurements are the ones the portal tile shows, up to 6. This choice stays in this browser.",
+    "Modèle": "Model",
+    "point à": "point at",
+    "d’altitude": "elevation",
+    "Auj.": "Today",
+
+    /* ---- le calendrier */
+    "Semaine": "Week",
+    "janvier": "January", "février": "February", "mars": "March",
+    "avril": "April", "mai": "May", "juin": "June",
+    "juillet": "July", "août": "August", "septembre": "September",
+    "octobre": "October", "novembre": "November", "décembre": "December",
+
+    /* ---- le panneau À propos */
+    "Le portail": "The portal",
+    "Dernière mise à jour du catalogue": "Catalogue last updated",
+    "Thème courant": "Current theme",
+    "sombre": "dark",
+    "clair": "light",
+    "non renseignée": "not set",
+    "Contacts": "Contacts",
+    "Anomalies du catalogue": "Catalogue anomalies",
+    "Journal des versions": "Version log"
+  }
+};
+
+/* Une phrase de l'interface. La clé est le français : sans traduction, on
+   rend l'original, et le portail reste lisible plutôt que troué. */
+function mot(fr) {
+  const d = TRADUCTIONS[LANGUE.courante];
+  return (d && d[fr]) || fr;
+}
+
+/* Un champ traduit d'une fiche du catalogue, d'une catégorie ou des
+   réglages. Le français est le champ nominal, la traduction vit à côté
+   dans un objet portant le code de langue : sans elle, on rend le
+   français, ce qui est le cas voulu pour les ressources extérieures. */
+function champ(o, nom) {
+  if (!o) return "";
+  const tr = o[LANGUE.courante];
+  return (tr && tr[nom]) || o[nom] || "";
+}
+
+// La langue du navigateur, ou le français : le portail est écrit ici.
+function langueDepart() {
+  let m = null;
+  try { m = localStorage.getItem(CLE_LANGUE); } catch (e) { /* stockage refusé */ }
+  return TRADUCTIONS[m] ? m : "fr";
+}
+
+/* Changer de langue : on retient le choix et on recharge. Voir le
+   commentaire du module pour le pourquoi de ce rechargement. */
+function langueChoisir(cle) {
+  if (cle === LANGUE.courante) return;
+  try { localStorage.setItem(CLE_LANGUE, cle); } catch (e) { /* non mémorisé */ }
+  location.reload();
+}
+
+/* Le texte des éléments statiques d'index.html. Chacun porte en data-t la
+   phrase française d'origine, qui sert de clé : le HTML reste lisible tel
+   quel, et la traduction ne fait que la remplacer. */
+function traduireStatiques() {
+  if (LANGUE.courante === "fr") return;
+  document.querySelectorAll("[data-t]").forEach(el => {
+    const clefs = el.dataset.t.split("|");
+    clefs.forEach(c => {
+      const [ou, fr] = c.indexOf(":") > 0 ? [c.slice(0, c.indexOf(":")), c.slice(c.indexOf(":") + 1)] : ["texte", c];
+      const v = mot(fr);
+      if (v === fr) return;
+      if (ou === "texte") {
+        // On ne remplace que le premier noeud de texte : le reste du
+        // contenu, icône ou sous-titre, a sa propre clé.
+        const n = [...el.childNodes].find(x => x.nodeType === 3 && x.nodeValue.trim());
+        if (n) n.nodeValue = n.nodeValue.replace(fr, v); else el.textContent = v;
+      } else {
+        el.setAttribute(ou, v);
+      }
+    });
   });
 }
 
@@ -965,7 +1171,7 @@ const TEMPS = [
 
 function tempsDe(code) {
   const t = TEMPS.find(([a, b]) => code >= a && code <= b);
-  return t ? { libelle: t[2], icone: t[3] } : { libelle: "Temps mêlé", icone: "nuage" };
+  return t ? { libelle: mot(t[2]), icone: t[3] } : { libelle: mot("Temps mêlé"), icone: "nuage" };
 }
 
 function cardinal(deg) {
@@ -1055,7 +1261,7 @@ function html_mesuresTuile(mesure) {
   return champsChoisis().map(k => {
     let v;
     try { v = METRIQUES[k].val(mesure); } catch (e) { v = null; }
-    return "<div><dt>" + ech(METRIQUES[k].nom) + "</dt><dd>"
+    return "<div><dt>" + ech(mot(METRIQUES[k].nom)) + "</dt><dd>"
       + (v == null || /NaN|undefined/.test(String(v)) ? "\u2014" : v) + "</dd></div>";
   }).join("");
 }
@@ -1068,22 +1274,24 @@ function peindreMeteo(mesure, lieu, quand) {
       '<div class="tv-chip" aria-hidden="true">' + ico(t.icone, 18)
     +   "<b>" + Math.round(mesure.temperature_2m) + "°</b></div>"
     + '<div class="tv-plein">'
-    + '<div class="tv-tete"><h3>Météo</h3><span class="espace"></span>'
-    +   '<button type="button" class="btn-position" id="btnMeteoMaj" title="Actualiser le relevé" aria-label="Actualiser le relevé">'
+    + '<div class="tv-tete"><h3>' + ech(mot("Météo")) + '</h3><span class="espace"></span>'
+    +   '<button type="button" class="btn-position" id="btnMeteoMaj" title="' + ech(mot("Actualiser le relevé"))
+    +   '" aria-label="' + ech(mot("Actualiser le relevé")) + '">'
     +     ico("actualiser", 12) + "</button>"
-    +   '<button type="button" class="btn-position" id="btnPosition" title="Utiliser ma position">'
-    +     ico("position", 12) + " ma position</button></div>"
+    +   '<button type="button" class="btn-position" id="btnPosition" title="'
+    +     ech(mot("Utiliser ma position")) + '">'
+    +     ico("position", 12) + " " + ech(mot("ma position")) + "</button></div>"
     + '<div class="meteo-corps">'
     +   '<span class="meteo-icone">' + ico(t.icone, 46, 1.5) + "</span>"
     +   '<span class="meteo-temp">' + ech(virgule(mesure.temperature_2m)) + "<small>°C</small></span>"
     +   '<span class="meteo-quoi">'
     +     '<span class="meteo-libelle">' + ech(t.libelle) + "</span>"
-    +     '<span class="meteo-lieu">' + ech(lieu.nom || "Position choisie") + "</span>"
+    +     '<span class="meteo-lieu">' + ech(lieu.nom || mot("Position choisie")) + "</span>"
     +   "</span>"
     + "</div>"
     + '<dl class="meteo-mesures">' + html_mesuresTuile(mesure) + "</dl>"
-    + '<p class="meteo-pied"><span>Relevé ' + hhmm + "</span>"
-    +   '<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">données Open-Meteo</a></p>'
+    + '<p class="meteo-pied"><span>' + mot("Relevé") + " " + hhmm + "</span>"
+    +   '<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">' + ech(mot("données Open-Meteo")) + '</a></p>'
     + "</div>";
   MESURE_COURANTE = mesure; LIEU_COURANT = lieu; QUAND_COURANT = quand;
   $("tuileMeteo").hidden = false;
@@ -1250,12 +1458,12 @@ function tirerAir(lieu) {
 
 // L'indice européen de qualité de l'air, par paliers officiels.
 function libelleAqi(v) {
-  if (v <= 20) return { t: "Bon", c: "#7ab648" };
-  if (v <= 40) return { t: "Correct", c: "#a8c24a" };
-  if (v <= 60) return { t: "D\u00e9grad\u00e9", c: "#c9a227" };
-  if (v <= 80) return { t: "Mauvais", c: "#c4562f" };
-  if (v <= 100) return { t: "Tr\u00e8s mauvais", c: "#b0303f" };
-  return { t: "Extr\u00eame", c: "#8a2fb0" };
+  if (v <= 20) return { t: mot("Bon"), c: "#7ab648" };
+  if (v <= 40) return { t: mot("Correct"), c: "#a8c24a" };
+  if (v <= 60) return { t: mot("D\u00e9grad\u00e9"), c: "#c9a227" };
+  if (v <= 80) return { t: mot("Mauvais"), c: "#c4562f" };
+  if (v <= 100) return { t: mot("Tr\u00e8s mauvais"), c: "#b0303f" };
+  return { t: mot("Extr\u00eame"), c: "#8a2fb0" };
 }
 
 function heureCourte(iso) {
@@ -1272,13 +1480,13 @@ function html_detailMeteo(d) {
     + '<span class="meteo-icone">' + ico(t.icone, 44, 1.5) + "</span>"
     + '<span class="md-temp">' + ech(virgule(m.temperature_2m)) + "<small>\u00b0C</small></span>"
     + '<span class="md-quoi"><span class="md-libelle">' + ech(t.libelle) + "</span>"
-    + '<span class="md-sous">' + ech(LIEU_COURANT.nom || "Position choisie")
+    + '<span class="md-sous">' + ech(LIEU_COURANT.nom || mot("Position choisie"))
     + " \u00b7 relev\u00e9 " + heureCourte(new Date(QUAND_COURANT - new Date().getTimezoneOffset() * 60000).toISOString()) + "</span></span>"
     + "</div>"
     + '<dl class="md-grille">'
     + Object.keys(METRIQUES).map(k => {
         let v; try { v = METRIQUES[k].val(m); } catch (e) { v = null; }
-        return "<div><dt>" + ech(METRIQUES[k].nom) + "</dt><dd>"
+        return "<div><dt>" + ech(mot(METRIQUES[k].nom)) + "</dt><dd>"
           + (v == null || /NaN|undefined/.test(String(v)) ? "\u2014" : v) + "</dd></div>";
       }).join("")
     + "</dl>";
@@ -1297,24 +1505,24 @@ function html_detailMeteo(d) {
         + "<b>" + Math.round(H.temperature_2m[i]) + "\u00b0</b>"
         + '<span class="pluie">' + (H.precipitation_probability ? Math.round(H.precipitation_probability[i]) + "\u00a0%" : "") + "</span></div>";
     }
-    h += '<div class="stats-groupe"><h3 data-ico="horloge" data-ico-taille="13">Prochaines 24 heures</h3>'
+    h += '<div class="stats-groupe"><h3 data-ico="horloge" data-ico-taille="13">' + ech(mot("Prochaines 24 heures")) + '</h3>'
       + '<div class="md-heures">' + hh + "</div></div>";
   }
 
   // ---- la semaine
   if (prev && prev.daily && prev.daily.time) {
     const D = prev.daily;
-    const noms = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
-    h += '<div class="stats-groupe"><h3 data-ico="calendrier" data-ico-taille="13">La semaine</h3><div class="md-jours">'
+    const noms = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."].map(mot);
+    h += '<div class="stats-groupe"><h3 data-ico="calendrier" data-ico-taille="13">' + ech(mot("La semaine")) + '</h3><div class="md-jours">'
       + D.time.map((jour, i) => {
           const w = tempsDe(D.weather_code[i]);
           const dj = new Date(jour + "T12:00");
           return '<div class="md-jour">'
-            + '<span class="quand">' + (i === 0 ? "auj." : noms[dj.getDay()] + " " + dj.getDate()) + "</span>"
+            + '<span class="quand">' + (i === 0 ? mot("auj.") : noms[dj.getDay()] + " " + dj.getDate()) + "</span>"
             + ico(w.icone, 17)
             + '<span class="temps">' + ech(w.libelle) + "</span>"
             + '<span class="pluie">' + virgule(D.precipitation_sum[i]) + "\u00a0mm \u00b7 "
-            + Math.round(D.precipitation_probability_max[i]) + "\u00a0% \u00b7 vent "
+            + Math.round(D.precipitation_probability_max[i]) + "\u00a0% \u00b7 " + mot("vent") + " "
             + Math.round(D.wind_speed_10m_max[i]) + "</span>"
             + "<b>" + Math.round(D.temperature_2m_max[i]) + "\u00b0<small> / "
             + Math.round(D.temperature_2m_min[i]) + "\u00b0</small></b>"
@@ -1325,12 +1533,12 @@ function html_detailMeteo(d) {
     // ---- le soleil du jour
     const dj = prev.daily;
     const duree = Math.round(dj.daylight_duration[0] / 60);
-    h += '<div class="stats-groupe"><h3 data-ico="soleil" data-ico-taille="13">Le soleil</h3>'
+    h += '<div class="stats-groupe"><h3 data-ico="soleil" data-ico-taille="13">' + ech(mot("Le soleil")) + '</h3>'
       + '<dl class="md-grille">'
-      + "<div><dt>Lever</dt><dd>" + heureCourte(dj.sunrise[0]) + "</dd></div>"
-      + "<div><dt>Coucher</dt><dd>" + heureCourte(dj.sunset[0]) + "</dd></div>"
+      + "<div><dt>" + mot("Lever") + "</dt><dd>" + heureCourte(dj.sunrise[0]) + "</dd></div>"
+      + "<div><dt>" + mot("Coucher") + "</dt><dd>" + heureCourte(dj.sunset[0]) + "</dd></div>"
       + "<div><dt>Jour</dt><dd>" + Math.floor(duree / 60) + "\u00a0h\u00a0" + String(duree % 60).padStart(2, "0") + "</dd></div>"
-      + "<div><dt>UV max</dt><dd>" + virgule(dj.uv_index_max[0]) + "</dd></div>"
+      + "<div><dt>" + mot("UV max") + "</dt><dd>" + virgule(dj.uv_index_max[0]) + "</dd></div>"
       + "</dl></div>";
   }
 
@@ -1340,27 +1548,27 @@ function html_detailMeteo(d) {
     const q = libelleAqi(c.european_aqi);
     const pollen = [["Aulne", c.alder_pollen], ["Bouleau", c.birch_pollen], ["Gramin\u00e9es", c.grass_pollen]]
       .filter(x => isFinite(x[1]) && x[1] > 0);
-    h += '<div class="stats-groupe"><h3 data-ico="feuille" data-ico-taille="13">Qualit\u00e9 de l\u2019air'
+    h += '<div class="stats-groupe"><h3 data-ico="feuille" data-ico-taille="13">' + ech(mot("Qualit\u00e9 de l\u2019air"))
       + ' <span class="aqi" style="--c:' + q.c + '"><i></i>' + ech(q.t) + " \u00b7 " + Math.round(c.european_aqi) + "</span></h3>"
       + '<dl class="md-grille">'
       + "<div><dt>PM2,5</dt><dd>" + virgule(c.pm2_5) + "\u00a0\u00b5g/m\u00b3</dd></div>"
       + "<div><dt>PM10</dt><dd>" + virgule(c.pm10) + "\u00a0\u00b5g/m\u00b3</dd></div>"
       + "<div><dt>NO\u2082</dt><dd>" + virgule(c.nitrogen_dioxide) + "\u00a0\u00b5g/m\u00b3</dd></div>"
       + "<div><dt>O\u2083</dt><dd>" + virgule(c.ozone) + "\u00a0\u00b5g/m\u00b3</dd></div>"
-      + pollen.map(x => "<div><dt>Pollen " + x[0].toLowerCase() + "</dt><dd>" + Math.round(x[1]) + "\u00a0gr/m\u00b3</dd></div>").join("")
+      + pollen.map(x => "<div><dt>" + mot("Pollen") + " " + mot(x[0]).toLowerCase() + "</dt><dd>" + Math.round(x[1]) + "\u00a0gr/m\u00b3</dd></div>").join("")
       + "</dl></div>";
   }
 
   // ---- le composeur de tuile
   const choisis = champsChoisis();
-  h += '<div class="stats-groupe"><h3 data-ico="engrenage" data-ico-taille="13">Composer la tuile</h3>'
+  h += '<div class="stats-groupe"><h3 data-ico="engrenage" data-ico-taille="13">' + ech(mot("Composer la tuile")) + '</h3>'
     + '<p class="note">Les mesures cochées sont celles que la tuile du portail affiche, jusqu\u2019\u00e0 '
     + CHAMPS_MAX + ". Ce choix reste dans ce navigateur.</p>"
     + '<div class="md-composer">'
     + Object.keys(METRIQUES).map(k =>
         '<label><input type="checkbox" data-champ="' + k + '"'
         + (choisis.indexOf(k) !== -1 ? " checked" : "") + "><span>"
-        + ech(METRIQUES[k].nom) + "</span></label>").join("")
+        + ech(mot(METRIQUES[k].nom)) + "</span></label>").join("")
     + "</div></div>";
 
   h += '<p class="md-note"><span>Mod\u00e8le best_match \u00b7 point \u00e0 '
@@ -1473,16 +1681,16 @@ function peindreCalendrier() {
   let h = '<div class="tv-chip" aria-hidden="true"><span class="tv-chip-s">S</span><b>'
     + semaineISO(auj) + "</b></div>"
     + '<div class="tv-plein">'
-    + '<div class="tv-tete"><h3>Calendrier</h3><span class="espace"></span>'
-    + '<span class="cal-semaine">Semaine ' + semaineISO(auj) + "</span>"
+    + '<div class="tv-tete"><h3>' + ech(mot("Calendrier")) + '</h3><span class="espace"></span>'
+    + '<span class="cal-semaine">' + mot("Semaine") + " " + semaineISO(auj) + "</span>"
     + '<span class="cal-nav">'
     +   '<button type="button" id="calPrec" aria-label="Mois précédent">' + ico("chevron_g", 13) + "</button>"
     +   '<button type="button" id="calSuiv" aria-label="Mois suivant">' + ico("chevron_d", 13) + "</button>"
     + "</span></div>"
-    + '<div class="cal-mois">' + MOIS[vue.getMonth()] + " " + vue.getFullYear() + "</div>"
+    + '<div class="cal-mois">' + mot(MOIS[vue.getMonth()]) + " " + vue.getFullYear() + "</div>"
     + '<div class="cal-grille" role="grid" aria-label="Calendrier du mois">';
 
-  h += '<span class="cal-ent" title="Semaine">S</span>';
+  h += '<span class="cal-ent" title="' + mot("Semaine") + '">S</span>';
   ["L", "M", "M", "J", "V", "S", "D"].forEach((j, i) =>
     h += '<span class="cal-ent' + (i >= 5 ? " cal-we" : "") + '">' + j + "</span>");
 
@@ -1526,14 +1734,15 @@ function estOutil(o) { return (o.type || "outil") === "outil"; }
 function clesRecherche(o) {
   const cat = categorie(o.categorie);
   const sous = o.sousCategorie ? sousCategorie(o.sousCategorie) : null;
-  return normaliser([o.nom, o.pitch, (o.tags || []).join(" "),
-                     cat && cat.nom, sous && sous.nom].filter(Boolean).join(" "));
+  return normaliser([champ(o, "nom"), champ(o, "pitch"), o.nom, o.pitch,
+                     (o.tags || []).join(" "),
+                     champ(cat, "nom"), champ(sous, "nom")].filter(Boolean).join(" "));
 }
 
 function html_badge(o) {
   const s = STATUTS[o.statut];
   if (!s || !s.pastille) return "";
-  return '<span class="badge' + (o.statut === "beta" ? " beta" : "") + '">' + ech(s.libelle) + "</span>";
+  return '<span class="badge' + (o.statut === "beta" ? " beta" : "") + '">' + ech(mot(s.libelle)) + "</span>";
 }
 
 /* LA MEME CARTE POUR LES DEUX RAYONS. Les ressources ont d'abord vécu en
@@ -1555,8 +1764,8 @@ function html_carte(o, index) {
     +     ico(o.icone || (estOutil(o) ? "grille" : "livre"), 21) + "</span>"
     +   '<span class="carte-sortie">' + ico("sortie", 15) + "</span>"
     + "</div>"
-    + '<span class="carte-nom">' + ech(o.nom) + "</span>"
-    + '<p class="carte-pitch">' + ech(o.pitch) + "</p>"
+    + '<span class="carte-nom">' + ech(champ(o, "nom")) + "</span>"
+    + '<p class="carte-pitch">' + ech(champ(o, "pitch")) + "</p>"
     + html_badge(o);
   const attrs = ' class="carte apparait' + (cliquable ? "" : " attente") + '"'
     + ' style="--c:' + c + ';--i:' + index + '" data-cherche="' + ech(clesRecherche(o)) + '"';
@@ -1615,7 +1824,7 @@ function construireSommaire() {
     // Pas d'attribut title : il doublerait la bulle-étiquette d'une
     // infobulle native. Le nom vit dans la bulle, lue aussi au clavier.
     const dedans = '<span class="som-puce"></span>'
-      + '<span class="som-nom">' + ech(e.cible ? e.nom : e.nom + " · bientôt") + "</span>";
+      + '<span class="som-nom">' + ech(e.cible ? e.nom : e.nom + " · " + mot("bientôt")) + "</span>";
     if (!e.cible) {
       return '<span class="som-ligne vide' + debut + '" style="--c:' + couleurSure(e.couleur) + '">'
         + dedans + "</span>";
@@ -2281,7 +2490,7 @@ function construireRayons() {
   if (outils.length) {
     let i = 0;
     const groupes = CATEGORIES
-      .map(cat => ({ cle: cat.cle, nom: cat.nom, court: cat.court, couleur: cat.couleur,
+      .map(cat => ({ cle: cat.cle, nom: champ(cat, "nom"), court: champ(cat, "court"), couleur: cat.couleur,
                      metier: cat.metier,
                      portes: outils.filter(o => o.categorie === cat.cle) }))
       .filter(g => g.portes.length || g.metier);
@@ -2291,7 +2500,7 @@ function construireRayons() {
     // ici il atterrit dans un groupe de fin plutôt que nulle part.
     const orphelins = outils.filter(o => !categorie(o.categorie));
     if (orphelins.length) {
-      groupes.push({ cle: "divers", nom: "Divers", court: "Divers", couleur: "", portes: orphelins });
+      groupes.push({ cle: "divers", nom: mot("Divers"), court: mot("Divers"), couleur: "", portes: orphelins });
     }
 
     $("groupesOutils").innerHTML = groupes.filter(g => g.portes.length).map(g =>
@@ -2315,14 +2524,14 @@ function construireRayons() {
       const dedans = liens.filter(o => o.sousCategorie === sc.cle);
       const parent = categorie(sc.categorie);
       if (dedans.length) {
-        groupes.push({ cle: sc.cle, nom: sc.nom, court: sc.court,
+        groupes.push({ cle: sc.cle, nom: champ(sc, "nom"), court: champ(sc, "court"),
                        couleur: sc.couleur || (parent && parent.couleur), portes: dedans });
       }
     });
     CATEGORIES.forEach(cat => {
       const dedans = liens.filter(o => o.categorie === cat.cle && !o.sousCategorie);
       if (dedans.length) {
-        groupes.push({ cle: "cat-" + cat.cle, nom: cat.nom, court: cat.court,
+        groupes.push({ cle: "cat-" + cat.cle, nom: champ(cat, "nom"), court: champ(cat, "court"),
                        couleur: cat.couleur, portes: dedans });
       }
     });
@@ -2339,14 +2548,15 @@ function construireRayons() {
   }
 
   const morceaux = [];
-  if (outils.length) morceaux.push(outils.length + " outil" + (outils.length > 1 ? "s" : ""));
-  if (liens.length) morceaux.push(liens.length + " ressource" + (liens.length > 1 ? "s" : ""));
+  if (outils.length) morceaux.push(outils.length + " " + mot(outils.length > 1 ? "outils" : "outil"));
+  if (liens.length) morceaux.push(liens.length + " " + mot(liens.length > 1 ? "ressources" : "ressource"));
   $("compte").textContent = morceaux.join("  ·  ");
 
-  $("devise").textContent = REGLAGES.accroche || "";
-  $("devise").hidden = !REGLAGES.accroche;
-  document.title = REGLAGES.titre;
-  $("titrePortail").textContent = REGLAGES.titre;
+  const accroche = champ(REGLAGES, "accroche");
+  $("devise").textContent = accroche;
+  $("devise").hidden = !accroche;
+  document.title = champ(REGLAGES, "titre");
+  $("titrePortail").textContent = champ(REGLAGES, "titre");
   $("embleme").innerHTML = logoB27(58);
   construireSommaire();
 }
@@ -2387,7 +2597,7 @@ function filtrer(brut) {
   aimantRecherche(!!q);
   $("rienTrouve").hidden = !(q && visibles === 0);
   if (q && visibles === 0) {
-    $("rienTrouve").textContent = "Aucun résultat pour « " + brut.trim() + " ».";
+    $("rienTrouve").textContent = mot("Aucun résultat pour") + " «\u00a0" + brut.trim() + "\u00a0».";
   }
 }
 
@@ -2495,21 +2705,21 @@ function remplirApropos() {
   const majs = PORTES.map(o => o.maj).filter(Boolean).sort();
   const anomalies = controlerCatalogue();
 
-  let h = '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">Le portail</h3>'
+  let h = '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">' + ech(mot("Le portail")) + '</h3>'
     + '<dl class="stats-liste">'
-    + ligneStat("Nos outils", outils)
-    + ligneStat("Ressources", liens)
-    + ligneStat("Dernière mise à jour du catalogue", majs.length ? dateFr(majs[majs.length - 1]) : "non renseignée")
-    + ligneStat("Thème courant", document.documentElement.dataset.theme === "dark" ? "sombre" : "clair")
+    + ligneStat(mot("Nos outils"), outils)
+    + ligneStat(mot("Ressources"), liens)
+    + ligneStat(mot("Dernière mise à jour du catalogue"), majs.length ? dateFr(majs[majs.length - 1]) : mot("non renseignée"))
+    + ligneStat(mot("Thème courant"), mot(document.documentElement.dataset.theme === "dark" ? "sombre" : "clair"))
     + "</dl></div>";
 
   if (anomalies.length) {
-    h += '<div class="stats-groupe"><h3 data-ico="attention" data-ico-taille="13">Anomalies du catalogue</h3>'
+    h += '<div class="stats-groupe"><h3 data-ico="attention" data-ico-taille="13">' + ech(mot("Anomalies du catalogue")) + '</h3>'
       + '<div class="note">' + anomalies.length + " anomalie(s) détectée(s) dans catalogue.js. "
       + "Le détail est dans la console du navigateur (touche F12).</div></div>";
   }
 
-  h += '<div class="stats-groupe"><h3 data-ico="horloge" data-ico-taille="13">Journal des versions</h3>'
+  h += '<div class="stats-groupe"><h3 data-ico="horloge" data-ico-taille="13">' + ech(mot("Journal des versions")) + '</h3>'
     + '<ul class="changelog">'
     + CHANGELOG.map(c =>
         "<li>"
@@ -2578,7 +2788,7 @@ function initMolettePanneaux() {
    se lise déjà dans l'interface. */
 const LANGUES = [
   { cle: "fr", nom: "Français", active: true },
-  { cle: "en", nom: "English" },
+  { cle: "en", nom: "English", active: true },
   { cle: "de", nom: "Deutsch" },
   { cle: "zh", nom: "中文" },
   { cle: "ja", nom: "日本語" },
@@ -2589,11 +2799,12 @@ function initLangues() {
   const menu = $("menuLangues");
   const btn = $("btnLangue");
   menu.innerHTML = LANGUES.map(l =>
-      '<button type="button" role="menuitem"' + (l.active ? "" : ' class="langue-off" title="Bientôt disponible"')
+      '<button type="button" role="menuitem"'
+    +   (l.active ? "" : ' class="langue-off" title="' + ech(mot("Bientôt disponible")) + '"')
     +   ' data-langue="' + l.cle + '">'
-    +   '<span class="coche">' + (l.active ? ico("valider", 14) : "") + "</span>"
+    +   '<span class="coche">' + (l.cle === LANGUE.courante ? ico("valider", 14) : "") + "</span>"
     +   "<span>" + ech(l.nom) + "</span><span class=\"espace\"></span>"
-    +   (l.active ? "" : '<span class="langue-badge">bientôt</span>')
+    +   (l.active ? "" : '<span class="langue-badge">' + ech(mot("bientôt")) + "</span>")
     + "</button>").join("");
 
   function fermer() {
@@ -2608,9 +2819,11 @@ function initLangues() {
   menu.addEventListener("click", ev => {
     const b = ev.target.closest("[data-langue]");
     if (!b) return;
-    // Les langues à venir ne font rien, et c'est voulu : l'emplacement est
-    // posé, la mécanique attendra les traductions.
-    if (b.dataset.langue === "fr") fermer();
+    // Les langues sans traduction ne font rien, et c'est voulu :
+    // l'emplacement est posé, la mécanique attendra les traductions.
+    if (b.dataset.langue !== "fr" && !TRADUCTIONS[b.dataset.langue]) return;
+    fermer();
+    langueChoisir(b.dataset.langue);
   });
   document.addEventListener("click", ev => {
     if (!menu.contains(ev.target) && ev.target !== btn) fermer();
@@ -2636,6 +2849,11 @@ function initApropos() {
    DÉPART
    --------------------------------------------------------------------- */
 function init() {
+  // La langue avant tout le reste : elle décide de ce que les autres
+  // constructions vont écrire.
+  LANGUE.courante = langueDepart();
+  document.documentElement.lang = LANGUE.courante;
+  traduireStatiques();
   controlerCatalogue();
   construireRayons();
   peindreCalendrier();

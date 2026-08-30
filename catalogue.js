@@ -71,6 +71,7 @@ const PORTES = [
     id: "calculette-ecs-bouclage",
     nom: "Calculette ECS et Bouclage",
     pitch: "Besoin de stockage d'eau chaude sanitaire et dimensionnement du bouclage, selon l'usage du bâtiment.",
+    en: { nom: "DHW and Loop Calculator", pitch: "Domestic hot water storage demand and loop sizing, according to the use of the building." },
     url: "https://mamalric.github.io/calculette-ecs-bouclage/",
     categorie: "plomberie",
     statut: "en-ligne",
@@ -84,6 +85,7 @@ const PORTES = [
     id: "selectionneur-radiateurs-finimetal",
     nom: "Dimensionnement émetteurs Finimetal",
     pitch: "Sélection des radiateurs et sèche-serviettes Finimetal pièce par pièce, à partir des déperditions.",
+    en: { nom: "Finimetal Emitter Sizing", pitch: "Room-by-room selection of Finimetal radiators and towel rails, from the heat losses." },
     url: "https://mamalric.github.io/S-lectionneur-de-radiateurs/",
     categorie: "chauffage",
     statut: "en-ligne",
@@ -97,6 +99,7 @@ const PORTES = [
     id: "dimensionnement-gaine-ventilation",
     nom: "Dimensionnement Gaine de ventilation",
     pitch: "Sections, vitesses et pertes de charge des réseaux aérauliques, tronçon par tronçon.",
+    en: { nom: "Ventilation Duct Sizing", pitch: "Sections, velocities and pressure drops of air networks, run by run." },
     url: "",
     categorie: "ventilation",
     statut: "a-venir",
@@ -110,6 +113,7 @@ const PORTES = [
     id: "dimensionnement-eau-froide-sanitaire",
     nom: "Dimensionnement Eau froide sanitaire",
     pitch: "Diamètres et pertes de charge du réseau d'eau froide, à partir des appareils desservis.",
+    en: { nom: "Cold Water Sizing", pitch: "Diameters and pressure drops of the cold water network, from the fixtures served." },
     url: "",
     categorie: "plomberie",
     statut: "a-venir",
@@ -123,6 +127,7 @@ const PORTES = [
     id: "dimensionnement-eaux-usees-eaux-vannes",
     nom: "Dimensionnement Eaux usées et Eaux vannes",
     pitch: "Chutes, collecteurs et ventilation primaire des EU et EV, selon les appareils raccordés.",
+    en: { nom: "Waste and Soil Water Sizing", pitch: "Stacks, collectors and primary venting for waste and soil water, from the connected fixtures." },
     url: "",
     categorie: "plomberie",
     statut: "a-venir",
@@ -136,6 +141,7 @@ const PORTES = [
     id: "dimensionnement-eaux-pluviales",
     nom: "Dimensionnement Eaux pluviales",
     pitch: "Chéneaux, descentes et collecteurs EP à partir de la surface et de l'intensité de pluie.",
+    en: { nom: "Rainwater Sizing", pitch: "Gutters, downpipes and collectors from the catchment area and the rainfall intensity." },
     url: "",
     categorie: "plomberie",
     statut: "a-venir",
@@ -158,6 +164,7 @@ const PORTES = [
     id: "refriselect",
     nom: "RefriSelect",
     pitch: "Sélection et comparaison des fluides frigorifiques d'une installation de froid.",
+    en: { nom: "RefriSelect", pitch: "Selection and comparison of the refrigerants of a cooling installation." },
     url: "",
     categorie: "climatisation",
     statut: "a-venir",
@@ -173,6 +180,7 @@ const PORTES = [
     id: "etiquette-dpe",
     nom: "Étiquette DPE",
     pitch: "Étiquette énergie et climat d'un bâtiment.",
+    en: { nom: "EPC Label", pitch: "Energy and climate label of a building." },
     url: "",
     categorie: "thermique",
     statut: "a-venir",
@@ -186,6 +194,7 @@ const PORTES = [
     id: "desenfumage",
     nom: "Désenfumage",
     pitch: "Dimensionnement du désenfumage : amenées d'air et évacuations, selon l'IT 246.",
+    en: { nom: "Smoke Extraction", pitch: "Smoke extraction sizing: air inlets and outlets, to the French IT 246 rules." },
     url: "",
     categorie: "securite",
     statut: "a-venir",
@@ -199,6 +208,7 @@ const PORTES = [
     id: "a-venir-carbone",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "carbone",
     statut: "a-venir",
@@ -212,6 +222,7 @@ const PORTES = [
     id: "rtex-tool",
     nom: "RTex Tool",
     pitch: "Application de la RT existant à une rénovation, élément par élément.",
+    en: { nom: "RTex Tool", pitch: "Applying the existing-building thermal regulation to a renovation, element by element." },
     url: "",
     categorie: "thermique",
     statut: "a-venir",
@@ -225,6 +236,7 @@ const PORTES = [
     id: "a-venir-utilitaire",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "utilitaire",
     statut: "a-venir",
@@ -250,6 +262,7 @@ const PORTES = [
     id: "a-venir-vrd",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "vrd",
     statut: "a-venir",
@@ -263,6 +276,7 @@ const PORTES = [
     id: "a-venir-electricite",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "electricite",
     statut: "a-venir",
@@ -276,6 +290,7 @@ const PORTES = [
     id: "a-venir-paysage",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "paysage",
     statut: "a-venir",
@@ -289,6 +304,7 @@ const PORTES = [
     id: "a-venir-structure",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "structure",
     statut: "a-venir",
@@ -302,6 +318,7 @@ const PORTES = [
     id: "a-venir-bim",
     nom: "À venir",
     pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
     url: "",
     categorie: "bim",
     statut: "a-venir",
@@ -633,20 +650,20 @@ const PORTES = [
    --------------------------------------------------------------------- */
 
 const CATEGORIES = [
-  { cle: "chauffage",   nom: "Chauffage",                   court: "Chauffage",    icone: "flamme",      couleur: "#3e8fb8", metier: true },
-  { cle: "climatisation", nom: "Climatisation et froid",    court: "Climatisation",icone: "flocon",      couleur: "#4a6fb0", metier: true },
-  { cle: "ventilation", nom: "Ventilation",                 court: "Ventilation",  icone: "vent",        couleur: "#2f7f92", metier: true },
-  { cle: "plomberie",   nom: "Plomberie et ECS",            court: "Plomberie",    icone: "gouttes",     couleur: "#1f7a6e", metier: true },
-  { cle: "vrd",         nom: "VRD et assainissement",       court: "VRD",          icone: "reseau",      couleur: "#7a6249", metier: true },
-  { cle: "thermique",   nom: "Thermique et réglementation", court: "Thermique",    icone: "thermometre", couleur: "#c4562f", metier: true },
-  { cle: "securite",    nom: "Sécurité incendie",           court: "SSI",          icone: "bouclier",    couleur: "#c62828", metier: true },
-  { cle: "electricite", nom: "Électricité",                 court: "Électricité",  icone: "eclair",      couleur: "#b17e00", metier: true },
-  { cle: "carbone",     nom: "Carbone et environnement",    court: "Carbone",      icone: "nuage",       couleur: "#557a3a", metier: true },
-  { cle: "paysage",     nom: "Paysage et aménagement",      court: "Paysage",      icone: "feuille",     couleur: "#4e8a2f", metier: true },
-  { cle: "structure",   nom: "Structure",                   court: "Structure",    icone: "immeuble",    couleur: "#5f6a74", metier: true },
-  { cle: "bim",         nom: "BIM et maquette numérique",   court: "BIM",          icone: "grille",      couleur: "#9450a5", metier: true },
-  { cle: "utilitaire",  nom: "Utilitaires",                 court: "Utilitaires",  icone: "calculatrice",couleur: "#6b6f76", metier: true },
-  { cle: "ressources",  nom: "Ressources et référentiels",  court: "Ressources",   icone: "livre",       couleur: "#6b5ba6" }
+  { cle: "chauffage",   nom: "Chauffage",                   court: "Chauffage",    icone: "flamme",      couleur: "#3e8fb8", metier: true, en: { nom: "Heating", court: "Heating" } },
+  { cle: "climatisation", nom: "Climatisation et froid",    court: "Climatisation",icone: "flocon",      couleur: "#4a6fb0", metier: true, en: { nom: "Cooling and refrigeration", court: "Cooling" } },
+  { cle: "ventilation", nom: "Ventilation",                 court: "Ventilation",  icone: "vent",        couleur: "#2f7f92", metier: true, en: { nom: "Ventilation", court: "Ventilation" } },
+  { cle: "plomberie",   nom: "Plomberie et ECS",            court: "Plomberie",    icone: "gouttes",     couleur: "#1f7a6e", metier: true, en: { nom: "Plumbing and DHW", court: "Plumbing" } },
+  { cle: "vrd",         nom: "VRD et assainissement",       court: "VRD",          icone: "reseau",      couleur: "#7a6249", metier: true, en: { nom: "Civils and drainage", court: "Civils" } },
+  { cle: "thermique",   nom: "Thermique et réglementation", court: "Thermique",    icone: "thermometre", couleur: "#c4562f", metier: true, en: { nom: "Building physics and regulations", court: "Thermal" } },
+  { cle: "securite",    nom: "Sécurité incendie",           court: "SSI",          icone: "bouclier",    couleur: "#c62828", metier: true, en: { nom: "Fire safety", court: "Fire" } },
+  { cle: "electricite", nom: "Électricité",                 court: "Électricité",  icone: "eclair",      couleur: "#b17e00", metier: true, en: { nom: "Electrical", court: "Electrical" } },
+  { cle: "carbone",     nom: "Carbone et environnement",    court: "Carbone",      icone: "nuage",       couleur: "#557a3a", metier: true, en: { nom: "Carbon and environment", court: "Carbon" } },
+  { cle: "paysage",     nom: "Paysage et aménagement",      court: "Paysage",      icone: "feuille",     couleur: "#4e8a2f", metier: true, en: { nom: "Landscape and site", court: "Landscape" } },
+  { cle: "structure",   nom: "Structure",                   court: "Structure",    icone: "immeuble",    couleur: "#5f6a74", metier: true, en: { nom: "Structure", court: "Structure" } },
+  { cle: "bim",         nom: "BIM et maquette numérique",   court: "BIM",          icone: "grille",      couleur: "#9450a5", metier: true, en: { nom: "BIM and digital models", court: "BIM" } },
+  { cle: "utilitaire",  nom: "Utilitaires",                 court: "Utilitaires",  icone: "calculatrice",couleur: "#6b6f76", metier: true, en: { nom: "General tools", court: "General" } },
+  { cle: "ressources",  nom: "Ressources et référentiels",  court: "Ressources",   icone: "livre",       couleur: "#6b5ba6", en: { nom: "Resources and references", court: "Resources" } }
 ];
 
 /* ---------------------------------------------------------------------
@@ -664,11 +681,11 @@ const CATEGORIES = [
    --------------------------------------------------------------------- */
 
 const SOUS_CATEGORIES = [
-  { cle: "reglementation", categorie: "ressources", nom: "Réglementation", court: "Réglementation", icone: "livre" },
-  { cle: "donnees",        categorie: "ressources", nom: "Données et bases", court: "Données", icone: "base_donnees" },
-  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", court: "Documentation", icone: "regle" },
-  { cle: "services",       categorie: "ressources", nom: "Services et outils du quotidien", court: "Services", icone: "grille" },
-  { cle: "b27",            categorie: "ressources", nom: "Le bureau d'études",     court: "B27",           icone: "immeuble" }
+  { cle: "reglementation", categorie: "ressources", nom: "Réglementation", court: "Réglementation", icone: "livre", en: { nom: "Regulations", court: "Regulations" } },
+  { cle: "donnees",        categorie: "ressources", nom: "Données et bases", court: "Données", icone: "base_donnees", en: { nom: "Data and databases", court: "Data" } },
+  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", court: "Documentation", icone: "regle", en: { nom: "Technical documentation", court: "Documentation" } },
+  { cle: "services",       categorie: "ressources", nom: "Services et outils du quotidien", court: "Services", icone: "grille", en: { nom: "Everyday services and tools", court: "Services" } },
+  { cle: "b27",            categorie: "ressources", nom: "Le bureau d'études",     court: "B27",           icone: "immeuble", en: { nom: "The practice", court: "B27" } }
 ];
 
 /* ---------------------------------------------------------------------
@@ -683,6 +700,15 @@ const REGLAGES = {
   // L'accroche est la phrase sous le titre du portail. Chaîne vide : elle
   // disparaît.
   accroche: "Les outils et les ressources du bureau d'études, ouverts à tous. Rien à installer, aucun compte.",
+
+  // La traduction du portail. Seul le portail se traduit : les fiches de
+  // ressources gardent leur nom et leur description en français, puisqu'elles
+  // mènent à des sites français.
+  en: {
+    titre: "B27 Tools",
+    sousTitre: "The tools and resources portal of the engineering practice",
+    accroche: "The tools and resources of the engineering practice, open to all. Nothing to install, no account."
+  },
 
   // Tuile météo du portail. Données réelles d'Open-Meteo (open-meteo.com),
   // sans clé et sans compte : c'est un service de données météo ouvert,

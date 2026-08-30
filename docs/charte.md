@@ -126,7 +126,13 @@ Le portail répond à ce qu'on lui fait, à l'oeil et à l'oreille. Cinq gestes 
 
 ## Les langues
 
-Un bouton monde à côté des réglages ouvre le menu des langues. Seul le français vit ; l'anglais, l'allemand, le chinois, le japonais et l'arabe sont des emplacements posés, visibles et marqués « bientôt » : la promesse d'un portail ouvert à tous se lit déjà dans l'interface, la mécanique de traduction attendra les traductions.
+Un bouton monde à côté des réglages ouvre le menu des langues. Le français et l'anglais vivent ; l'allemand, le chinois, le japonais et l'arabe restent des emplacements posés, visibles et marqués bientôt.
+
+**Le portail se traduit, pas les sites qu'il pointe.** Le cadre, nos propres outils, les métiers et les domaines passent en anglais ; les fiches de ressources gardent leur nom et leur description en français, puisqu'elles mènent à des sites français et qu'une description traduite promettrait un contenu qui n'existe pas. C'est aussi ce qui rend la traduction tenable : une trentaine de phrases de contenu, pas trois cents.
+
+**Deux sources, et c'est voulu.** Le vocabulaire de l'interface vit dans `hub.js`, dans un dictionnaire dont la clé est la phrase française : le code continue de s'écrire en français, une chaîne sans traduction retombe d'elle-même sur l'original, et rien ne casse si l'on en oublie une. Le contenu du catalogue se traduit dans `catalogue.js`, sur chaque fiche, dans un objet `en` posé à côté du français, pour que ce fichier reste le seul à faire vivre. Ajouter une langue, c'est ajouter une entrée au dictionnaire et un objet par fiche.
+
+**Changer de langue recharge la page.** Tout se construit à l'exécution, sommaire et écouteurs compris : reconstruire à chaud demanderait de défaire et refaire des liaisons que rien n'oblige à toucher. Le choix vit dans le navigateur comme le thème, et il est posé sur la balise `html` avant le premier rendu.
 
 ## Ce qui ne bouge pas
 

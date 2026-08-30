@@ -2,6 +2,20 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-30, le portail parle anglais
+
+Le menu des langues portait cinq emplacements morts depuis la v7. L'anglais vit maintenant, et lui seul : une deuxième langue bien faite vaut mieux que cinq à moitié, et c'est la seule dont un client étranger a vraiment l'usage.
+
+**Le portail se traduit, pas les sites qu'il pointe.** La consigne était nette et elle rend la chose tenable : le cadre, nos propres outils, les quatorze métiers et les cinq domaines passent en anglais ; les dix-sept fiches de ressources gardent leur nom et leur description en français, puisqu'elles mènent à des sites français et qu'une description traduite promettrait un contenu qui n'existe pas. Une trentaine de phrases de contenu au lieu de trois cents.
+
+**Deux sources, et c'est voulu.** Le vocabulaire de l'interface vit dans hub.js, dans un dictionnaire dont la clé est la phrase française : le code continue de s'écrire en français, une chaîne sans traduction retombe d'elle-même sur l'original, et rien ne casse si l'on en oublie une. Le contenu du catalogue se traduit dans catalogue.js, sur chaque fiche, dans un objet en posé à côté du français, pour que ce fichier reste le seul à faire vivre. Le validateur a appris à accepter ce champ.
+
+**Changer de langue recharge la page**, et c'est une économie plutôt qu'une paresse : tout se construit à l'exécution, sommaire et écouteurs compris, et reconstruire à chaud demanderait de défaire et refaire des liaisons que rien n'oblige à toucher. Le choix vit dans le navigateur comme le thème, posé sur la balise html avant le premier rendu.
+
+Trois pièges rencontrés, tous du même genre. Le dictionnaire porte les phrases françaises comme clés : une première passe automatique a enveloppé ses propres clés d'appels à la fonction de traduction, et le fichier ne se lisait plus ; il a fallu scinder le fichier et ne toucher qu'à ce qui suit le dictionnaire. Beaucoup de phrases vivent au milieu d'une chaîne HTML plutôt qu'isolées, il faut alors fermer la chaîne et la rouvrir. Et en posant les marqueurs de traduction sur les titres de rayon, j'ai effacé leur texte français : vérifié dans les deux langues, cette fois.
+
+Vérifié en anglais : titre, accroche, recherche, rayons, métiers, domaines, cartes de nos outils, compteurs, badges, entête, tuile météo avec ses mesures et son temps, calendrier avec ses mois et ses semaines, panneau détaillé, À propos, libellés d'accessibilité. Les fiches de ressources restent en français, comme voulu. Retour en français : rien n'a bougé. Console vide, contrôle du catalogue au vert.
+
 ## 2026-08-30, les prête-noms s'en vont, le catalogue s'étoffe
 
 Reproche fondé, et il fallait le faire : le portail annonçait des applications sous des noms que personne n'avait validés. Cinq étaient des prête-noms que j'avais inventés pour tenir la place d'un métier vide, quatre venaient d'une feuille de route lue un peu vite. Un portail public n'annonce que ce que la maison a nommé.
