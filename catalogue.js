@@ -2,9 +2,8 @@
    catalogue.js : le seul fichier à modifier pour faire vivre le portail.
    =====================================================================
 
-   Le portail se lit en deux rayons, nos outils et les ressources, plus la
-   fiche de contact et, en pied de page, la signature de l'éditeur (réglée
-   dans REGLAGES.editeur, tout en bas). Les rayons se déroulent
+   Le portail se lit en deux rayons, nos outils et les ressources, tous deux
+   en cartes. Les rayons se déroulent
    en groupes, un par métier pour les outils et un par domaine pour les
    ressources, et un sommaire fixé à droite de l'écran mène au groupe
    choisi. Ajouter quelque chose, c'est ajouter
@@ -146,6 +145,172 @@ const PORTES = [
     maj: "2026-08-29"
   },
 
+  /* Les outils de la feuille de route, pas encore déployés : leurs fiches
+     sont posées d'avance, statut a-venir, et il n'y aura que l'url et le
+     statut à changer au moment de publier. Seuls figurent ici des noms
+     donnés par la maison. Quatre fiches portaient des noms d'application
+     que personne n'avait validés, déduits ou inventés au fil des
+     sessions : elles sont devenues des cartes "À venir", plus bas. Le
+     pitch de RefriSelect et de RTex Tool reste déduit du nom, à corriger
+     si la déduction est fausse. */
+
+  {
+    id: "refriselect",
+    nom: "RefriSelect",
+    pitch: "Sélection et comparaison des fluides frigorifiques d'une installation de froid.",
+    url: "",
+    categorie: "climatisation",
+    statut: "a-venir",
+    type: "outil",
+    icone: "flocon",
+    tags: ["fluides frigorigènes", "froid", "F-Gas"],
+    maj: "2026-08-30"
+  },
+
+  /* L'étiquette DPE. Le pitch et l'url restent à remplir : l'outil est
+     nommé par la maison, ce qu'il fait exactement n'a pas été dit ici. */
+  {
+    id: "etiquette-dpe",
+    nom: "Étiquette DPE",
+    pitch: "Étiquette énergie et climat d'un bâtiment.",
+    url: "",
+    categorie: "thermique",
+    statut: "a-venir",
+    type: "outil",
+    icone: "jauge",
+    tags: ["DPE", "étiquette énergie", "classe"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "desenfumage",
+    nom: "Désenfumage",
+    pitch: "Dimensionnement du désenfumage : amenées d'air et évacuations, selon l'IT 246.",
+    url: "",
+    categorie: "securite",
+    statut: "a-venir",
+    type: "outil",
+    icone: "vent",
+    tags: ["désenfumage", "IT 246", "SSI"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "a-venir-carbone",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "carbone",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "rtex-tool",
+    nom: "RTex Tool",
+    pitch: "Application de la RT existant à une rénovation, élément par élément.",
+    url: "",
+    categorie: "thermique",
+    statut: "a-venir",
+    type: "outil",
+    icone: "livre",
+    tags: ["RT existant", "rénovation"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "a-venir-utilitaire",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "utilitaire",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
+  /* Chaque métier de la maison a au moins une carte, même sans projet
+     encore décidé : c'est un choix d'affichage, le portail montre que le
+     métier existe et que des outils y viendront.
+
+     CES CARTES NE PORTENT AUCUN NOM D'OUTIL, et c'est la leçon d'une
+     erreur. Elles ont d'abord été des prête-noms, des applications
+     plausibles du métier inventées pour tenir la place : un portail public
+     annonçait ainsi des outils que personne n'avait décidés, sous des noms
+     que personne n'avait validés. Une carte qui attend se contente
+     désormais de dire qu'elle attend. Remplacer l'une d'elles, c'est
+     remplir son nom, son pitch, son icône et son url. */
+
+  {
+    id: "a-venir-vrd",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "vrd",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "a-venir-electricite",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "electricite",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "a-venir-paysage",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "paysage",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "a-venir-structure",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "structure",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "a-venir-bim",
+    nom: "À venir",
+    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
+    url: "",
+    categorie: "bim",
+    statut: "a-venir",
+    type: "outil",
+    icone: "horloge",
+    tags: ["à venir", "en préparation"],
+    maj: "2026-08-30"
+  },
+
   /* ---- Ressources et référentiels ----------------------------------
      Sites extérieurs, que nous ne maintenons pas. Assez nombreux pour
      mériter des sous-dossiers : c'est la catégorie qui montre le mieux
@@ -208,6 +373,48 @@ const PORTES = [
   },
 
   {
+    id: "geoportail",
+    nom: "Géoportail",
+    pitch: "Les cartes de l'IGN : cadastre, photos aériennes, altimétrie, zonages.",
+    url: "https://www.geoportail.gouv.fr",
+    categorie: "ressources",
+    sousCategorie: "donnees",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "position",
+    tags: ["IGN", "cartes", "altimétrie", "zonages"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "cadastre",
+    nom: "Cadastre",
+    pitch: "Le plan cadastral, parcelle par parcelle, sur fond de photo aérienne.",
+    url: "https://cadastre.data.gouv.fr/map?style=ortho",
+    categorie: "ressources",
+    sousCategorie: "donnees",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "regle",
+    tags: ["cadastre", "parcelles", "orthophoto"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "bimobject",
+    nom: "BIMobject",
+    pitch: "Bibliothèque d'objets BIM des fabricants, à charger dans une maquette.",
+    url: "https://www.bimobject.com",
+    categorie: "ressources",
+    sousCategorie: "donnees",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "grille",
+    tags: ["BIM", "objets", "fabricants", "maquette"],
+    maj: "2026-08-30"
+  },
+
+  {
     id: "costic",
     nom: "COSTIC",
     pitch: "Guides et abaques du centre technique génie climatique et sanitaire.",
@@ -233,37 +440,134 @@ const PORTES = [
     icone: "valider",
     tags: ["avis technique", "ATec", "DTA", "produits"],
     maj: "2026-08-29"
-  }
+  },
 
-];
-
-/* ---------------------------------------------------------------------
-   ANNUAIRE
-
-   Fiches de contact. Elles occupent leur propre dossier dans le hall : ce
-   ne sont pas des portes, on ne clique pas dessus pour aller ailleurs, on
-   y prend une adresse ou un numéro. Tableau vide : le dossier disparaît.
-
-   Gabarit :
-     { id: "slug", nom: "Prénom Nom", role: "Fonction", agence: "Dijon",
-       mail: "prenom.nom@b27.fr", tel: "+33 3 80 00 00 00",
-       sujets: ["ce sur quoi on peut le solliciter"] }
-
-   Le téléphone s'écrit au format international (+33...) pour rester
-   cliquable depuis un mobile. Les champs role, agence, tel et sujets sont
-   facultatifs : ce qui manque n'est simplement pas affiché.
-   --------------------------------------------------------------------- */
-
-const CONTACTS = [
   {
-    id: "marius-amalric",
-    nom: "Marius Amalric",
-    role: "Ingénieur BET fluides",
-    agence: "",
-    mail: "mamalric@b27.fr",
-    tel: "",
-    sujets: ["Les outils de ce hub", "Un bug", "Une idée d'outil"]
+    id: "acermi",
+    nom: "ACERMI",
+    pitch: "Les certificats des isolants : résistance thermique et caractéristiques certifiées.",
+    url: "https://www.acermi.com",
+    categorie: "ressources",
+    sousCategorie: "technique",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "bouclier",
+    tags: ["isolants", "certification", "lambda", "résistance"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "batipedia",
+    nom: "Batipedia",
+    pitch: "Les DTU, normes et règles de l'art du bâtiment, en accès abonné.",
+    url: "https://www.batipedia.com",
+    categorie: "ressources",
+    sousCategorie: "technique",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "livre",
+    tags: ["DTU", "normes", "règles de l'art"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "aicvf",
+    nom: "AICVF",
+    pitch: "L'association des ingénieurs en climatique, ventilation et froid.",
+    url: "https://aicvf.org",
+    categorie: "ressources",
+    sousCategorie: "technique",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "ondes",
+    tags: ["AICVF", "association", "CVC"],
+    maj: "2026-08-30"
+  },
+
+  /* ---- Services et outils du quotidien -----------------------------
+     Ce qu'on ouvre en travaillant, sans que ce soit une référence
+     technique. ATTENTION : les trois services Zoho demandent un compte
+     d'entreprise, ils ne s'ouvrent pas pour un visiteur extérieur. La
+     charte veut qu'un portail public ne montre pas ce qui est réservé à
+     l'interne, et B27 Mobility en était sorti pour cette raison. Ils sont
+     ici parce qu'ils ont été demandés ; à déplacer ou à retirer si le
+     portail doit rester entièrement ouvrable par un client. */
+
+  {
+    id: "zoho-projects",
+    nom: "Zoho Projects",
+    pitch: "Le suivi des projets et des tâches. Demande un compte d'entreprise.",
+    url: "https://www.zoho.com/projects/",
+    categorie: "ressources",
+    sousCategorie: "services",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "calendrier",
+    tags: ["Zoho", "projets", "tâches", "interne"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "zoho-expense",
+    nom: "Zoho Expense",
+    pitch: "Les notes de frais et les déplacements. Demande un compte d'entreprise.",
+    url: "https://www.zoho.com/expense/",
+    categorie: "ressources",
+    sousCategorie: "services",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "calculatrice",
+    tags: ["Zoho", "notes de frais", "interne"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "zoho-people",
+    nom: "Zoho People",
+    pitch: "Les congés, les absences et le dossier du personnel. Demande un compte d'entreprise.",
+    url: "https://www.zoho.com/people/",
+    categorie: "ressources",
+    sousCategorie: "services",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "personne",
+    tags: ["Zoho", "congés", "RH", "interne"],
+    maj: "2026-08-30"
+  },
+
+  {
+    id: "swisstransfer",
+    nom: "SwissTransfer",
+    pitch: "Envoi de fichiers lourds, jusqu'à 50 Go, sans compte.",
+    url: "https://www.swisstransfer.com",
+    categorie: "ressources",
+    sousCategorie: "services",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "dossier",
+    tags: ["fichiers", "transfert", "pièces jointes"],
+    maj: "2026-08-30"
+  },
+
+  // Le site de l'entreprise. Il a d'abord été rangé dans "Nos outils", où il
+  // se donnait pour un outil que nous fabriquons, puis en signature de pied
+  // de page, puis retiré. Il revient là où il est juste : c'est un site
+  // extérieur au portail, comme Légifrance ou l'ADEME, et les ressources
+  // sont faites pour ça. Il ferme le rayon, et donc la page.
+  {
+    id: "site-b27",
+    nom: "B27",
+    pitch: "Le site de l'entreprise : métiers, agences, réalisations, actualités.",
+    url: "https://www.b27.fr",
+    categorie: "ressources",
+    sousCategorie: "b27",
+    statut: "en-ligne",
+    type: "lien",
+    icone: "immeuble",
+    tags: ["B27", "entreprise", "agences", "réalisations"],
+    maj: "2026-08-30"
   }
+
 ];
 
 /* ---------------------------------------------------------------------
@@ -362,7 +666,9 @@ const CATEGORIES = [
 const SOUS_CATEGORIES = [
   { cle: "reglementation", categorie: "ressources", nom: "Réglementation", court: "Réglementation", icone: "livre" },
   { cle: "donnees",        categorie: "ressources", nom: "Données et bases", court: "Données", icone: "base_donnees" },
-  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", court: "Documentation", icone: "regle" }
+  { cle: "technique",      categorie: "ressources", nom: "Documentation technique", court: "Documentation", icone: "regle" },
+  { cle: "services",       categorie: "ressources", nom: "Services et outils du quotidien", court: "Services", icone: "grille" },
+  { cle: "b27",            categorie: "ressources", nom: "Le bureau d'études",     court: "B27",           icone: "immeuble" }
 ];
 
 /* ---------------------------------------------------------------------
@@ -378,17 +684,6 @@ const REGLAGES = {
   // disparaît.
   accroche: "Les outils et les ressources du bureau d'études, ouverts à tous. Rien à installer, aucun compte.",
 
-  // L'éditeur du portail, en signature de pied de page. Le site de
-  // l'entreprise n'est pas un outil que nous fabriquons : rangé avec eux, il
-  // passait pour l'un d'eux. Il signe la page au lieu d'y prendre une carte.
-  // url vide : la signature disparaît.
-  editeur: {
-    nom: "B27",
-    pitch: "Le site de l'entreprise : métiers, agences, réalisations, actualités.",
-    url: "https://www.b27.fr",
-    lien: "b27.fr"
-  },
-
   // Tuile météo du portail. Données réelles d'Open-Meteo (open-meteo.com),
   // sans clé et sans compte : c'est un service de données météo ouvert,
   // gratuit pour un usage non commercial, qui autorise l'appel direct depuis
@@ -402,9 +697,9 @@ const REGLAGES = {
     lon: 5.041
   },
 
-  // La recherche n'apparaît qu'à partir de ce nombre d'entrées, contacts
-  // compris. En dessous elle encombre plus qu'elle n'aide : le portail
-  // tient déjà tout entier sous les yeux.
+  // La recherche n'apparaît qu'à partir de ce nombre d'entrées. En dessous
+  // elle encombre plus qu'elle n'aide : le portail tient déjà tout entier
+  // sous les yeux.
   seuilFiltres: 6
 };
 

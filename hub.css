@@ -124,13 +124,20 @@ a:hover{text-decoration:underline}
 .apparait{animation:lever .55s var(--courbe) backwards;animation-delay:calc(var(--i,0)*60ms)}
 
 /* ========================================================== L'ANCRE ==
-   La pilule fixe en haut au centre, invisible tant qu'on est en haut de la
-   page : le logo et le titre du héros viennent s'y poser au défilement.
-   Elle glisse depuis le bord, elle ne surgit pas. */
+   La pastille fixe en haut au centre, invisible tant qu'on est en haut de
+   la page : l'emblème du héros vient s'y poser au défilement. Elle glisse
+   depuis le bord, elle ne surgit pas.
+
+   L'EMBLÈME SEUL, SANS LE TITRE. Le nom du rayon se lit juste dessous, et
+   deux textes empilés en auraient fait une étiquette là où il ne faut
+   qu'un repère : la marque tient toute seule, et ce qui doit être lu à cet
+   endroit, c'est où l'on se trouve. La pastille devient donc ronde, un
+   disque de la taille du bouton, et le nom du rayon prend la place que le
+   titre occupait. */
 .ancre{
   position:fixed;top:14px;left:50%;z-index:28;cursor:pointer;
-  display:flex;align-items:center;gap:8px;padding:9px 16px 9px 13px;
-  background:var(--carte);border:1px solid var(--ligne);border-radius:99px;
+  display:grid;place-items:center;width:42px;height:42px;padding:0;
+  background:var(--carte);border:1px solid var(--ligne);border-radius:50%;
   color:var(--encre);font:inherit;backdrop-filter:blur(12px);
   box-shadow:0 8px 26px rgba(0,0,0,.3);
   transform:translate(-50%,-160%);opacity:0;pointer-events:none;
@@ -140,7 +147,80 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .ancre:hover{border-color:var(--ligne-forte)}
 .ancre-logo{display:inline-flex;color:var(--accent)}
 [data-theme="light"] .ancre-logo{color:#5f7f1f}
-.ancre b{font-size:13px;font-weight:800;letter-spacing:-.2px}
+
+/* ======================================================== L'INVITE ==
+   Une souris dessinée en bas de l'écran d'entrée, sa molette qui descend
+   lentement : le portail se déroule au cran, encore faut-il le savoir, et
+   un premier écran qui tient tout entier sous les yeux ne dit pas de lui
+   même qu'il y a une suite.
+
+   Pas un mot, et c'est voulu : "faites défiler" serait une consigne, la
+   forme est une invitation. Elle emprunte le vocabulaire de la page,
+   rectangle arrondi et pastille, comme tout le reste. Elle s'efface au
+   premier cran, ayant alors fait son travail, et pendant une recherche, où
+   elle n'aurait plus rien à promettre.
+
+   Elle ne se montre qu'aux pointeurs fins : une souris dessinée sur un
+   téléphone désignerait un objet que le visiteur n'a pas en main, et le
+   geste de faire glisser du doigt n'a de toute façon pas besoin qu'on
+   l'apprenne. Un poste qui demande moins d'animations garde la souris,
+   immobile : le dessin suffit à dire la molette. */
+.invite{
+  position:fixed;left:50%;bottom:26px;z-index:26;transform:translateX(-50%);
+  width:23px;height:36px;border-radius:12px;
+  border:1.6px solid var(--discret);
+  opacity:.5;pointer-events:none;
+  transition:opacity .45s var(--courbe);
+}
+.invite span{
+  position:absolute;left:50%;top:7px;margin-left:-1.5px;
+  width:3px;height:6px;border-radius:2px;background:var(--discret);
+  animation:molette 2.4s var(--courbe) infinite;
+}
+@keyframes molette{
+  0%,10%  {transform:translateY(0);opacity:0}
+  24%     {opacity:1}
+  58%     {transform:translateY(13px);opacity:0}
+  100%    {transform:translateY(13px);opacity:0}
+}
+body.defile .invite,body.cherche .invite{opacity:0}
+@media (hover:none),(pointer:coarse){
+  .invite{display:none}
+}
+
+/* ==================================================== ENTÊTE DE RAYON ==
+   Le nom du rayon où l'on se trouve, posé sous la pilule d'ancrage.
+
+   Les titres "Nos outils" et "Ressources" ont quitté le fil de la page. Ils
+   y restaient à pleine encre pendant que tout s'estompait autour, seuls
+   éclairés au milieu d'un écran de fantômes, et rien ne justifiait qu'un
+   titre de rayon échappe au foyer. Ils se lisent maintenant toujours au
+   même endroit, et changent par un glissement quand on passe d'un rayon à
+   l'autre : le sortant part dans le sens où l'on défile, l'entrant arrive
+   du bord opposé, et le mouvement dit le passage.
+
+   Il a pris la place du titre du portail, qui encombrait la pastille sans
+   rien apprendre à qui est déjà sur la page : à cet endroit, ce qui doit
+   se lire, c'est où l'on se trouve. Il en prend donc le poids, quinze
+   pixels en capitales à pleine encre, et non plus le murmure gris d'un
+   titre de groupe.
+
+   Ils restent dans le document pour sa structure, simplement retirés à
+   l'oeil. Sans magnétisme, pendant une recherche ou sur un poste qui
+   demande moins d'animations, ils reprennent leur place dans la page et
+   l'entête ne s'affiche pas. Le vocabulaire est celui des titres de groupe,
+   capitales espacées en gris discret : c'est la même chose, un cran plus
+   haut. */
+.entete-rayon{
+  position:fixed;top:66px;left:50%;z-index:27;transform:translateX(-50%);
+  font-size:15px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;
+  color:var(--encre);white-space:nowrap;pointer-events:none;
+  opacity:0;translate:0 0;
+  transition:opacity .22s var(--courbe),translate .22s var(--courbe);
+}
+body.aimante.defile .entete-rayon{opacity:1}
+body.aimante.defile .entete-rayon.sort{opacity:0;translate:0 calc(var(--d,1) * -12px)}
+body.aimante.defile .entete-rayon.entre{opacity:0;translate:0 calc(var(--d,1) * 12px);transition:none}
 
 /* ================================================== BOUTONS DU HAUT == */
 .haut{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:30}
@@ -187,6 +267,23 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
   text-align:center;
   padding:clamp(56px,9vh,104px) 0 34px;
   display:flex;flex-direction:column;align-items:center;
+}
+/* L'ENTRÉE OCCUPE L'ÉCRAN ENTIER, et son contenu se tient en son milieu :
+   l'emblème, le titre, l'accroche et la recherche, rien d'autre. Le
+   catalogue commence sous la ligne de flottaison, le premier cran de
+   molette y descend, et le haut de page devient un écran comme les autres
+   du carrousel plutôt qu'un en-tête à moitié dépassé par un titre de
+   rayon.
+
+   À partir de 1240 px seulement, là où les tuiles vivantes sont ancrées
+   dans le coin haut gauche : en dessous elles reprennent leur place sous
+   la recherche et appartiennent à ce premier écran, qu'un en-tête pleine
+   hauteur pousserait dehors. */
+@media (min-width:1240px){
+  .entree{
+    min-height:100vh;min-height:100svh;
+    justify-content:center;padding:32px 0;
+  }
 }
 
 /* L'emblème : le monogramme B27 sur une plaque de verre, une aura verte
@@ -346,66 +443,168 @@ body.defile .ancre{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .cal-auj{background:var(--accent);color:var(--accent-encre);font-weight:800}
 
 /* ========================================================== SOMMAIRE ==
-   La table de la page, fixée à droite : tous les métiers de la maison,
-   ceux qui ont des outils cliquables, ceux qui n'en ont pas encore
-   estompés avec une pastille en pointillé, puis les domaines de
-   ressources et le contact. Un clic descend au groupe, le repère suit le
+   La table de la page, fixée à droite : une colonne de bulles, une par
+   métier de la maison, puis les domaines de ressources et le contact,
+   séparés par un filet. Un clic descend au groupe, le repère suit le
    défilement. La page se déroule, c'est sa nature, et le sommaire donne
-   la vue d'ensemble : c'est lui qui a remplacé la ruche d'hexagones,
-   retirée parce qu'elle introduisait une forme étrangère à la charte et
-   cachait le catalogue derrière un clic.
+   la vue d'ensemble.
 
-   Sur écran moyen, les noms se replient et il ne reste que les pastilles
-   de couleur ; sous 1240 px il disparaît, le défilement suffit. Pendant
-   une recherche il s'efface : ses repères pointeraient des groupes à
-   moitié vidés. */
+   LE RAIL EST UNE GOUTTE. Son fond n'est pas une boîte mais trois formes
+   fondues par le filtre #fonduSommaire (index.html) : la pilule du rail,
+   une bosse qui suit la bulle visée, et le fond de l'étiquette qui porte
+   le nom. Le filtre floute puis re-contraste l'alpha : deux formes assez
+   proches fusionnent en une seule silhouette organique, et l'étiquette
+   semble sortir du rail au lieu de flotter à côté. Tout ce qui entre dans
+   cette silhouette doit être de la même couleur pleine (--carte-pleine),
+   le fondu d'alpha ne pardonnant pas la translucidité ; l'ombre est un
+   drop-shadow posé après le filtre, elle épouse la silhouette fusionnée.
+
+   Les bulles sont magnétiques : à l'approche du curseur, chacune grossit
+   selon sa distance, en vague, la plus proche jusqu'à deux fois et
+   demie. Le grossissement est un transform posé en variable --g par
+   hub.js : il ne déplace rien, la colonne ne bouge pas. Si le poste
+   demande moins d'animations, la vague et la goutte sont coupées et le
+   nom apparaît en bulle simple au survol ; la même bulle simple sert au
+   clavier, sur le focus.
+
+   Un métier encore vide garde sa bulle, en pointillé : le portail montre
+   les métiers de la maison avant d'avoir écrit leurs outils. Sous
+   1240 px le sommaire disparaît, le défilement suffit ; pendant une
+   recherche il s'efface, ses repères pointeraient des groupes à moitié
+   vidés. */
 .sommaire{
-  position:fixed;top:50%;right:16px;transform:translateY(-50%);z-index:25;
-  display:none;flex-direction:column;gap:1px;
-  max-height:calc(100vh - 150px);overflow-y:auto;overscroll-behavior:contain;
-  padding:8px;border-radius:var(--rayon-m);
-  background:var(--carte);border:1px solid var(--ligne);backdrop-filter:blur(10px);
+  /* La teinte de la goutte. La carte pleine du thème sombre se confond
+     avec le fond de page : la goutte prend un cran de plus, le clair
+     garde son blanc. */
+  --goutte:#1d2415;
+  position:fixed;top:50%;right:14px;transform:translateY(-50%);z-index:25;
+  display:none;flex-direction:column;align-items:flex-end;gap:3px;
+  /* la marge gauche est un tablier : la vague se déclenche un peu avant
+     que le curseur ne touche les bulles */
+  padding:10px 6px 10px 30px;
 }
 body.cherche .sommaire{display:none}
-.som-ligne{
-  display:flex;align-items:center;gap:9px;padding:5px 8px;border:0;border-radius:7px;
-  background:none;color:var(--encre-2);font:inherit;font-size:12px;font-weight:600;
-  cursor:pointer;text-align:left;white-space:nowrap;
-  transition:background var(--vitesse),color var(--vitesse);
+
+/* ---- la goutte : le fond fusionné du rail, de la bosse et de l'étiquette */
+.som-goo{
+  position:absolute;top:-30px;bottom:-30px;right:0;left:-280px;z-index:-1;
+  pointer-events:none;
+  filter:url(#fonduSommaire) drop-shadow(0 10px 26px rgba(0,0,0,.34));
 }
-.som-ligne:hover{background:color-mix(in srgb,var(--c,#95c03d) 10%,transparent);color:var(--encre)}
-.som-ligne.actif{background:color-mix(in srgb,var(--c,#95c03d) 16%,transparent);color:var(--encre)}
-.som-puce{width:9px;height:9px;flex:none;border-radius:3px;background:var(--c,#95c03d)}
+[data-theme="light"] .som-goo{filter:url(#fonduSommaire) drop-shadow(0 10px 22px rgba(30,40,15,.16))}
+[data-theme="light"] .sommaire{--goutte:#ffffff}
+.som-rail{
+  position:absolute;top:30px;bottom:30px;right:0;width:34px;
+  border-radius:99px;background:var(--goutte);
+}
+/* La bosse déborde franchement du rail (56 px pour un rail de 34) : c'est
+   elle qui fait le renflement visible autour de la bulle visée, et son
+   chevauchement avec l'étiquette fabrique le col organique de la fusion.
+   Toutes deux glissent le long du rail, la position transitionne comme le
+   reste : le bloc suit la souris avec un temps de retard élastique, il ne
+   se téléporte pas. Les grossissements dépassent légèrement leur cible
+   avant de s'y poser, par la courbe à rebond. */
+.som-bosse{
+  position:absolute;right:-11px;top:var(--by,0);width:56px;height:56px;border-radius:50%;
+  background:var(--goutte);
+  transform:translateY(-50%) scale(var(--b,0));
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),top .16s ease-out;
+}
+.som-badge{
+  position:absolute;right:30px;top:var(--by,0);
+  transform:translateY(-50%) scale(var(--e,0));transform-origin:right center;
+  background:var(--goutte);border-radius:99px;padding:8px 16px 8px 15px;
+  white-space:nowrap;font-size:13px;font-weight:650;color:var(--encre);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),top .16s ease-out;
+}
+
+/* ---- les bulles */
+.som-ligne{
+  position:relative;display:grid;place-items:center;
+  width:22px;height:20px;padding:0;border:0;background:none;cursor:pointer;
+}
+.som-puce{
+  width:10px;height:10px;border-radius:50%;background:var(--c,#95c03d);
+  transform:scale(var(--g,1));
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow var(--vitesse);
+}
+/* La bulle bat une fois quand le foyer arrive sur son groupe : l'oeil est
+   dans la page, le sommaire lui dit où il vient d'atterrir. L'animation
+   rejoue à chaque pose de la classe, il n'y a rien à réarmer. */
+.som-ligne.actif .som-puce{
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--c,#95c03d) 32%,transparent);
+  animation:battement .34s var(--courbe);
+}
+@keyframes battement{
+  0%   {transform:scale(var(--g,1))}
+  40%  {transform:scale(calc(var(--g,1) * 1.5))}
+  100% {transform:scale(var(--g,1))}
+}
 /* Un métier encore vide se montre mais ne mène nulle part. */
-.som-ligne.vide{color:var(--discret);cursor:default}
-.som-ligne.vide:hover{background:none;color:var(--discret)}
+.som-ligne.vide{cursor:default}
 .som-ligne.vide .som-puce{background:none;border:1.5px dashed color-mix(in srgb,var(--c,#95c03d) 60%,transparent)}
+
+/* La bulle simple : le nom au survol quand la vague est coupée
+   (prefers-reduced-motion), et sur le focus clavier. Quand la vague est
+   active, c'est l'étiquette de la goutte qui porte le nom, celle-ci se
+   tait pour ne pas doubler. */
+.som-nom{
+  position:absolute;right:calc(100% + 12px);top:50%;
+  transform:translateY(-50%) translateX(5px) scale(.94);
+  white-space:nowrap;font-size:12px;font-weight:650;color:var(--encre);
+  background:var(--carte-pleine);border:1px solid var(--ligne-forte);border-radius:99px;
+  padding:5px 12px;box-shadow:var(--ombre);
+  opacity:0;pointer-events:none;
+  transition:opacity .16s ease-out,transform .16s ease-out;
+}
+.som-ligne:hover .som-nom,.som-ligne:focus-visible .som-nom{
+  opacity:1;transform:translateY(-50%);
+}
+.sommaire.vague .som-ligne:hover .som-nom{opacity:0;transform:translateY(-50%) translateX(5px) scale(.94)}
+.sommaire.vague .som-ligne:focus-visible .som-nom{opacity:1;transform:translateY(-50%)}
+.som-ligne.vide .som-nom{color:var(--discret)}
 /* Un filet sépare les outils, les ressources et le contact. */
-.som-debut{margin-top:9px;position:relative}
-.som-debut::before{content:"";position:absolute;top:-5px;left:8px;right:8px;height:1px;background:var(--ligne)}
+.som-debut{margin-top:9px}
+.som-debut::before{content:"";position:absolute;top:-6px;left:3px;right:3px;height:1px;background:var(--ligne)}
 
 @media (min-width:1240px){
   .sommaire{display:flex}
-  .som-nom{display:none}
-}
-/* Assez de marge pour les noms : (1460 - 1080) / 2 = 190 px à droite. */
-@media (min-width:1460px){
-  .som-nom{display:inline}
 }
 
 /* ============================================================ RAYONS == */
 .rayon{max-width:1080px;margin:44px auto 0}
 .rayon h2{
   margin:0 0 16px;font-size:19px;font-weight:800;letter-spacing:-.4px;
-  display:flex;align-items:baseline;gap:10px;
+  display:flex;align-items:baseline;justify-content:center;gap:10px;
 }
 .rayon h2 span{font-size:12.5px;font-weight:500;color:var(--discret);letter-spacing:.2px}
+/* Le titre de rayon quitte le fil de la page quand le magnétisme est en
+   place : il se lit en entête. Retiré à l'oeil, pas du document. */
+body.aimante .rayon > h2{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;
+}
 
 /* ---- cartes d'outil. La couleur de la pastille d'icône vient des
    conventions de lot B27 : un ingénieur y reconnaît le code couleur de
    ses plans. Le reflet qui suit la souris est peint en --mx/--my par
    hub.js : le genre de détail qui se sent plus qu'il ne se voit. */
-.grille-outils{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+/* LES CARTES SE CENTRENT, ET C'EST POURQUOI CE N'EST PLUS UNE GRILLE. En
+   grille, les colonnes d'un métier à une seule carte existaient quand même,
+   vides, et occupaient leur place : la carte restait collée à gauche avec
+   les trois quarts de la largeur en vide à sa droite. Le repli des colonnes
+   vides (auto-fit) ne suffit pas non plus, le nombre de colonnes s'y
+   comptant sur le plafond de largeur dès qu'il est défini, ce qui en coûtait
+   une au passage : quatre cartes ne tenaient plus sur une rangée.
+
+   En flexbox, une rangée pleine se partage la largeur comme avant, sans
+   dépasser 250 px par carte, et une rangée courte se centre. Un métier à une
+   carte la pose au milieu de la page, un métier à quatre occupe la largeur.
+   Le plafond est ce qui empêche la carte solitaire de s'étirer sur toute la
+   page au lieu de se centrer ; c'est lui aussi qui garde la même largeur de
+   carte d'un métier à l'autre. */
+.grille-outils{display:flex;flex-wrap:wrap;justify-content:center;gap:13px}
+.grille-outils > *{flex:1 1 240px;max-width:250px}
 #groupesOutils .groupe{margin:0 0 22px}
 #groupesOutils .groupe:last-child{margin-bottom:0}
 .carte{
@@ -437,6 +636,8 @@ a.carte:hover::after{opacity:1}
   transition:opacity var(--vitesse),transform var(--vitesse);
 }
 a.carte:hover .carte-sortie{opacity:1;transform:none}
+/* Une carte enfoncée s'enfonce : le doigt doit sentir qu'il a touché. */
+a.carte:active{transform:translateY(-1px) scale(.988);transition-duration:.08s}
 .carte-nom{font-size:15.5px;font-weight:700;letter-spacing:-.2px;line-height:1.25}
 .carte-pitch{margin:0;font-size:13px;color:var(--encre-2);line-height:1.5}
 .carte.attente{--opacite:.62;opacity:var(--opacite)}
@@ -447,83 +648,123 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 }
 .badge.beta{color:var(--attention);border-color:color-mix(in srgb,var(--attention) 45%,transparent)}
 
-/* ---- ressources : un annuaire de rangées compactes, groupées. */
+/* ---- les groupes, dans les deux rayons. Les ressources se lisent comme
+   les outils, en cartes : la page n'a qu'un objet, et les rangées
+   compactes pleine largeur qui leur étaient réservées ont disparu avec
+   leur forme à part. */
 .groupe{margin:0 0 18px}
+/* Le titre se centre avec sa grille : une étiquette à gauche au-dessus
+   d'une carte au milieu se lirait comme un défaut, pas comme un choix. La
+   boîte se resserre sur son texte et se centre par ses marges, ce qui la
+   met aussi à l'abri du grossissement du magnétisme, qui déborderait de la
+   page si elle occupait toute la largeur du groupe. */
 .groupe h3{
-  margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  margin:0 auto 8px;font-size:11.5px;font-weight:700;letter-spacing:1.4px;
   text-transform:uppercase;color:var(--discret);
   display:flex;align-items:center;gap:9px;
+  width:fit-content;
 }
 /* La couleur du lot remonte du contenu jusqu'au titre du groupe : on lit le
    métier avant d'avoir lu son nom. */
 .groupe-puce{width:9px;height:9px;flex:none;border-radius:3px;background:var(--c,#95c03d)}
-.rangs{display:flex;flex-direction:column;gap:7px}
-.rang{
-  display:flex;align-items:center;gap:13px;padding:12px 16px;
-  border-radius:var(--rayon-m);background:var(--carte);border:1px solid var(--ligne);
-  backdrop-filter:blur(10px);color:var(--encre);
-  transition:transform var(--vitesse) var(--courbe),border-color var(--vitesse);
-}
-.rang:hover{text-decoration:none;transform:translateX(5px);border-color:var(--ligne-forte)}
-.rang-puce{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;background:var(--c,#6b5ba6);color:#fff}
-.rang-texte{min-width:0;display:flex;flex-direction:column;gap:1px}
-.rang-nom{font-size:14px;font-weight:650}
-.rang-pitch{font-size:12px;color:var(--discret);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rang-sortie{margin-left:auto;color:var(--discret);opacity:0;transition:opacity var(--vitesse)}
-.rang:hover .rang-sortie{opacity:1}
-
-/* ---- contact */
-.grille-contact{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
-.fiche{
-  display:flex;align-items:center;gap:14px;padding:16px 18px;
-  border-radius:var(--rayon-g);background:var(--carte);border:1px solid var(--ligne);
-  backdrop-filter:blur(10px);
-}
-.fiche-puce{display:grid;place-items:center;width:44px;height:44px;flex:none;border-radius:50%;background:var(--carte-pleine);border:1px solid var(--ligne-forte);color:var(--accent)}
-[data-theme="light"] .fiche-puce{color:#5f7f1f}
-.fiche-texte{display:flex;flex-direction:column;gap:1px;min-width:0}
-.fiche-nom{font-size:14.5px;font-weight:700}
-.fiche-role{font-size:12px;color:var(--discret)}
-.fiche-mail{font-size:12.5px}
-
-/* ---- signature de l'éditeur. Volontairement sans fond de carte : un
-   simple filet en travers de la page, la marque à gauche, le lien à
-   droite. C'est ce qui la distingue au premier regard d'une carte du
-   rayon des outils, où le site de l'entreprise passait pour un des
-   nôtres. */
-.signature{max-width:1080px;margin:76px auto 0;padding-top:8px;border-top:1px solid var(--ligne)}
-.signature[hidden]{display:none}
-.signature-lien{
-  display:flex;align-items:center;gap:16px;padding:20px 4px;color:var(--encre);
-}
-.signature-lien:hover{text-decoration:none}
-.signature-logo{
-  display:grid;place-items:center;width:54px;height:54px;flex:none;
-  border-radius:16px;color:var(--accent);
-  background:linear-gradient(160deg,#222c12,#101707);
-  border:1px solid var(--ligne-forte);
-  transition:border-color var(--vitesse),box-shadow var(--vitesse);
-}
-[data-theme="light"] .signature-logo{color:#5f7f1f;background:linear-gradient(160deg,#eef4e0,#ffffff)}
-.signature-lien:hover .signature-logo{border-color:var(--accent);box-shadow:var(--lueur)}
-.signature-texte{display:flex;flex-direction:column;gap:2px;min-width:0}
-.signature-quoi{
-  font-size:10.5px;font-weight:700;letter-spacing:1.4px;
-  text-transform:uppercase;color:var(--discret);
-}
-.signature-nom{font-size:16px;font-weight:800;letter-spacing:-.2px}
-.signature-pitch{font-size:12.5px;color:var(--encre-2);line-height:1.45}
-.signature-cta{
-  margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:7px;
-  padding:9px 15px;border-radius:99px;border:1px solid var(--ligne);
-  font-size:13px;font-weight:650;color:var(--lien);
-  transition:border-color var(--vitesse),transform var(--vitesse) var(--courbe);
-}
-.signature-lien:hover .signature-cta{border-color:var(--ligne-forte);transform:translateX(4px)}
 
 .rien{
   max-width:1080px;margin:48px auto 0;text-align:center;
   color:var(--discret);font-size:14px;
+}
+
+/* ======================================================= MAGNÉTISME ==
+   LE DÉROULÉ A UN FOYER. La page se déroule, c'est sa nature : elle a
+   maintenant un point de netteté qui descend avec elle. Le groupe où l'on
+   se trouve se tient en avant, un peu plus grand et à pleine encre, pendant
+   que le reste recule et s'estompe en attendant son tour. On ne lit plus
+   une liste, on lit ce qu'on regarde.
+
+   C'est la vague magnétique du sommaire, la même cloche de Gauss et le même
+   grossissement par transform, mais couchée le long de la page au lieu de la
+   colonne des bulles. Le vocabulaire était déjà là, il n'a pas fallu en
+   inventer un deuxième.
+
+   hub.js pose l'intensité de chaque groupe en --f, de 0 pour le plus
+   lointain à 1 pour celui du foyer, et c'est ici que --f devient une
+   opacité, une échelle et une encre. Rien d'autre ne bouge : ni marge, ni
+   hauteur, ni position, la mise en page ne se déforme jamais sous le
+   défilement. Le titre du groupe prend un grossissement de plus et sa
+   pastille s'entoure d'un halo à la couleur du lot : le métier qu'on a
+   désigné au sommaire se lit de loin quand on y arrive.
+
+   La classe vit sur body : sans elle plus rien ne s'applique, et c'est ainsi
+   que la recherche rend toute la page à la même encre. Un poste qui demande
+   moins d'animations ne la reçoit jamais.
+   ===================================================================== */
+:root{
+  --aimant-fond:.06;     /* l'opacité d'un groupe au plus loin du foyer */
+  --aimant-loin:.88;     /* son échelle, franchement en retrait */
+  --aimant-pres:1.04;    /* l'échelle du groupe au foyer */
+  --aimant-titre:.16;    /* le supplément de grossissement de son titre */
+  --aimant-flou:5px;     /* le flou de ce qui est hors foyer */
+}
+body.aimante .aimant{
+  opacity:calc(var(--aimant-fond) + (1 - var(--aimant-fond)) * var(--f,1));
+  transform:scale(calc(var(--aimant-loin) + (var(--aimant-pres) - var(--aimant-loin)) * var(--f,1)));
+}
+/* LES CRANS NE SONT PAS EN CSS, ET C'EST UNE LEÇON PAYÉE. scroll-snap posé
+   sur la page donnait un défilement qu'on n'arrive pas à jauger : le seuil
+   d'un point d'accroche est à mi-chemin du suivant, si bien qu'un petit
+   cran de molette se fait ramener en arrière, on se croit bloqué, et un
+   coup un peu vif part loin puis atterrit sur le point le plus proche de
+   l'endroit où il s'est arrêté, cinq métiers plus bas. Ni "proximity" ni
+   "mandatory" n'y changent rien : aucun des deux ne sait avancer d'un cran
+   et d'un seul. C'est hub.js qui tient la molette maintenant, et le cran
+   est franc, un groupe par cran. */
+/* Le grossissement du foyer a un plafond : la moitié de la largeur d'un
+   groupe multipliée par l'échelle doit tenir dans les 22 px de gouttière
+   du portail, soit 1,042 au maximum. Au-delà, la page déborde à droite en
+   fenêtre juste assez large pour le gabarit. Ce qui s'éloigne, en
+   revanche, peut rapetisser autant qu'on veut : c'est de ce côté que se
+   gagne le contraste de taille.
+
+   LE FLOU NE SE POSE QUE SUR CE QUI EST FRANCHEMENT HORS DU FOYER, et
+   c'est hub.js qui pose la classe. Un filtre, même blur(0), isole ce qu'il
+   y a derrière l'élément : posé sur le groupe au foyer, il ferait perdre
+   à ses cartes le verre de leur backdrop-filter, précisément là où on le
+   regarde. Hors foyer, l'isolation ne se voit pas, l'opacité ayant déjà
+   fait le travail.
+
+   LE LOINTAIN N'EST PAS CLIQUABLE, et c'est la même classe qui le dit. Une
+   carte à six centièmes d'opacité sous cinq pixels de flou ne se lit pas :
+   la cliquer ne peut être qu'un accident, et ouvrir un outil qu'on n'a pas
+   pu lire est le pire des accidents. Seul le groupe au foyer reçoit le
+   curseur. Le clavier, lui, garde sa route : la tabulation atteint toujours
+   les cartes du lointain, et hub.js ramène leur groupe au foyer dès qu'une
+   d'elles prend le focus, sans quoi on naviguerait à l'aveugle. */
+body.aimante .aimant.flou{
+  filter:blur(calc((1 - var(--f,1)) * var(--aimant-flou)));
+  pointer-events:none;
+}
+/* LA BUTÉE. En bout de course, la page ne bougeait pas et ne disait rien :
+   on ne savait pas si le cran avait raté ou s'il n'y avait plus rien après.
+   Le groupe au foyer se déporte de onze pixels dans le sens contraire au
+   geste et revient, comme un tiroir qui bute. Le déplacement passe par
+   translate et non par transform, qui porte déjà le grossissement du
+   magnétisme : une animation sur transform le remplacerait, et le groupe
+   perdrait sa taille le temps du rebond. */
+@keyframes butee{
+  0%   {translate:0 0}
+  38%  {translate:0 var(--butee,0)}
+  100% {translate:0 0}
+}
+body.aimante .aimant.bute{animation:butee .32s var(--courbe)}
+/* Le titre grossit depuis son centre, comme sa grille : il est centré, il
+   doit gonfler sur place. Sa boîte, resserrée sur son texte par la règle de
+   base, garde le grossissement loin des bords de la page. */
+body.aimante .aimant > h3{
+  transform:scale(calc(1 + var(--aimant-titre) * var(--f,1)));
+  transform-origin:center;
+  color:color-mix(in srgb,var(--encre) calc(var(--f,1) * 100%),var(--discret));
+}
+body.aimante .aimant > h3 .groupe-puce{
+  box-shadow:0 0 0 calc(var(--f,1) * 6px) color-mix(in srgb,var(--c,#95c03d) calc(var(--f,1) * 34%),transparent);
 }
 
 /* ============================================================ MODALE == */
@@ -571,16 +812,19 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 .modale-corps > :nth-child(7){animation-delay:300ms}
 .modale-corps > :nth-child(n+8){animation-delay:340ms}
 .modale-tete{
-  display:flex;align-items:center;gap:10px;padding:16px 20px;
+  display:flex;align-items:center;gap:10px;padding:20px 26px;
   border-bottom:1px solid var(--ligne);flex:none;
 }
 .modale-tete h2{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .modale-tete .espace{flex:1}
-.modale-corps{padding:18px 20px 22px;overflow-y:auto;flex:1;min-height:0}
-.stats-groupe{margin:0 0 18px}
+.modale-corps{padding:24px 26px 30px;overflow-y:auto;flex:1;min-height:0}
+/* Les sections d'un panneau respirent : une marge franche entre elles vaut
+   mieux qu'un filet, et le titre se détache de ce qu'il annonce. */
+.stats-groupe{margin:0 0 30px}
+.stats-groupe:last-child{margin-bottom:0}
 .stats-groupe h3{
-  margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:1.2px;
-  text-transform:uppercase;color:var(--discret);display:flex;align-items:center;gap:7px;
+  margin:0 0 14px;font-size:12px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--discret);display:flex;align-items:center;gap:8px;
 }
 .stats-liste{margin:0;display:grid;gap:5px}
 .stats-liste div{display:flex;justify-content:space-between;gap:14px}
@@ -637,44 +881,55 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 /* ===================================================== MÉTÉO DÉTAIL ==
    Le panneau ouvert d'un clic sur la tuile : le moment présent en grand,
    les prochaines heures, la semaine, le soleil, l'air. Et le composeur,
-   qui décide de ce que la petite tuile affiche. */
-.modale-large{width:min(680px,calc(100vw - 32px))}
-.md-actuel{display:flex;align-items:center;gap:16px;margin:0 0 6px}
-.md-actuel .meteo-icone .ico{width:44px;height:44px}
-.md-temp{font-size:38px;font-weight:800;letter-spacing:-1.5px;line-height:1;font-variant-numeric:tabular-nums}
-.md-temp small{font-size:17px;font-weight:600;color:var(--encre-2);vertical-align:13px}
-.md-quoi{display:flex;flex-direction:column;gap:2px}
-.md-libelle{font-size:15px;font-weight:700}
-.md-sous{font-size:12px;color:var(--discret)}
+   qui décide de ce que la petite tuile affiche.
+
+   IL EST LARGE ET IL RESPIRE. Serré, il donnait dix mesures empilées, huit
+   heures et sept jours dans la largeur d'une carte de visite, et l'oeil ne
+   savait plus où se poser : on lisait un tableau, pas un bulletin. La
+   largeur passe à 880 pixels et la hauteur à 86 % de l'écran, les mesures
+   ont des cases où l'on tient debout, les heures cessent de se pousser du
+   coude, et les sections sont séparées d'une marge franche plutôt que de se
+   toucher. Rien n'a changé de ce qui est dit, seulement de la place pour le
+   lire. */
+.modale-large{width:min(880px,calc(100vw - 40px));max-height:min(86vh,900px)}
+.md-actuel{display:flex;align-items:center;gap:20px;margin:0 0 4px}
+.md-actuel .meteo-icone .ico{width:52px;height:52px}
+.md-temp{font-size:44px;font-weight:800;letter-spacing:-1.8px;line-height:1;font-variant-numeric:tabular-nums}
+.md-temp small{font-size:19px;font-weight:600;color:var(--encre-2);vertical-align:15px}
+.md-quoi{display:flex;flex-direction:column;gap:3px}
+.md-libelle{font-size:16px;font-weight:700}
+.md-sous{font-size:12.5px;color:var(--discret)}
 .md-grille{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:7px;margin:12px 0 0;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));
+  gap:12px;margin:20px 0 30px;
 }
+/* Le bloc des mesures n'est pas une section : il lui faut sa marge de pied
+   à lui pour ne pas coller au titre qui suit. */
 .md-grille div{
-  display:flex;flex-direction:column;gap:1px;padding:9px 12px;
-  border:1px solid var(--ligne);border-radius:10px;background:var(--carte);
+  display:flex;flex-direction:column;gap:4px;padding:14px 16px;
+  border:1px solid var(--ligne);border-radius:12px;background:var(--carte);
 }
-.md-grille dt{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--discret)}
-.md-grille dd{margin:0;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.md-grille dt{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--discret)}
+.md-grille dd{margin:0;font-size:15.5px;font-weight:700;font-variant-numeric:tabular-nums}
 .md-heures{
-  display:flex;gap:4px;overflow-x:auto;padding:2px 0 6px;
+  display:flex;gap:10px;overflow-x:auto;padding:2px 0 10px;
   scrollbar-width:thin;
 }
 .md-heure{
-  flex:1 0 58px;display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:9px 4px;border:1px solid var(--ligne);border-radius:10px;
-  font-size:11.5px;font-variant-numeric:tabular-nums;
+  flex:1 0 74px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:13px 6px;border:1px solid var(--ligne);border-radius:12px;
+  font-size:12px;font-variant-numeric:tabular-nums;
 }
 .md-heure .ico{color:var(--accent)}
 [data-theme="light"] .md-heure .ico{color:#5f7f1f}
-.md-heure b{font-size:13px}
+.md-heure b{font-size:14.5px}
 .md-heure .quand{color:var(--discret)}
 .md-heure .pluie{color:var(--discret);font-size:10.5px}
-.md-jours{display:flex;flex-direction:column;gap:4px}
+.md-jours{display:flex;flex-direction:column;gap:8px}
 .md-jour{
-  display:grid;grid-template-columns:44px 22px 1fr auto auto;gap:10px;align-items:center;
-  padding:8px 12px;border:1px solid var(--ligne);border-radius:10px;
-  font-size:12.5px;font-variant-numeric:tabular-nums;
+  display:grid;grid-template-columns:48px 24px 1fr auto auto;gap:14px;align-items:center;
+  padding:13px 16px;border:1px solid var(--ligne);border-radius:12px;
+  font-size:13px;font-variant-numeric:tabular-nums;
 }
 .md-jour .ico{color:var(--accent)}
 [data-theme="light"] .md-jour .ico{color:#5f7f1f}
@@ -684,14 +939,17 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 .md-jour b{white-space:nowrap}
 .md-jour b small{color:var(--discret);font-weight:600}
 .aqi{
-  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
-  padding:3px 10px;border-radius:99px;border:1px solid var(--ligne-forte);
+  display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;
+  padding:5px 12px;border-radius:99px;border:1px solid var(--ligne-forte);
 }
 .aqi i{width:8px;height:8px;border-radius:50%;background:var(--c,#95c03d);font-style:normal}
-.md-composer{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;margin:8px 0 0}
+.md-composer{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:10px 26px;margin:12px 0 0;
+}
 .md-composer label{
-  display:flex;align-items:center;gap:8px;font-size:13px;color:var(--encre-2);
-  cursor:pointer;padding:3px 0;
+  display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--encre-2);
+  cursor:pointer;padding:6px 0;
 }
 .md-composer input{
   appearance:none;-webkit-appearance:none;
@@ -710,12 +968,15 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
 .md-composer input:checked::before{transform:rotate(-45deg) scale(1)}
 .md-composer input:hover{border-color:var(--accent)}
 .md-composer input:disabled + span{opacity:.45}
-.md-note{margin:10px 0 0;font-size:10.5px;color:var(--discret);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.md-note{margin:18px 0 0;font-size:11px;color:var(--discret);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .md-note a{color:inherit;text-decoration:underline;text-decoration-color:var(--ligne-forte)}
 #tuileMeteo{cursor:pointer}
 
 /* ============================================================ ÉTROIT == */
 @media (max-width:720px){
+  /* Une fenêtre étroite ne tient qu'un groupe ou deux : le magnétisme y
+     estomperait la moitié de ce qu'on est venu lire. Il s'adoucit. */
+  :root{--aimant-fond:.18;--aimant-loin:.94;--aimant-pres:1.022;--aimant-titre:.09;--aimant-flou:3px}
   .portail{padding:0 14px 84px}
   .entree{padding-top:44px}
   .embleme{width:96px;height:96px;border-radius:24px}
@@ -723,11 +984,16 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   .quete-touche{display:none}
   .tuiles-vives{grid-template-columns:1fr}
   .rayon{margin-top:36px}
-  .grille-outils{grid-template-columns:1fr}
-  .rang-pitch{white-space:normal}
-  .signature{margin-top:56px}
-  .signature-lien{flex-wrap:wrap;gap:13px}
-  .signature-cta{margin-left:0;width:100%;justify-content:center}
+  /* La carte reprend toute la largeur : le plafond qui sert au centrage
+     n'a plus de sens quand il n'y a qu'une colonne possible. */
+  .grille-outils > *{max-width:none;flex-basis:100%}
+  /* Le panneau météo resserre ses marges et sa semaine : à cette largeur,
+     la ligne d'un jour ne tient pas ses cinq colonnes. Le détail pluie et
+     vent, le moins essentiel des cinq, laisse la place au reste. */
+  .modale-tete{padding:16px 18px}
+  .modale-corps{padding:20px 18px 24px}
+  .md-jour{grid-template-columns:42px 20px 1fr auto;gap:9px;padding:11px 12px;font-size:12.5px}
+  .md-jour .pluie{display:none}
 }
 
 /* ============================================================ PAPIER == */
@@ -735,6 +1001,11 @@ a.carte:hover .carte-sortie{opacity:1;transform:none}
   #fond,.haut,.noprint{display:none !important}
   html{background:#fff}
   body{color:#000}
-  .carte,.rang,.fiche{border:1px solid #bbb;background:#fff;box-shadow:none}
+  .carte{border:1px solid #bbb;background:#fff;box-shadow:none}
   .titre-portail{-webkit-background-clip:initial;background:none;color:#000}
+  /* Sur papier, pas de foyer : tout se lit à la même encre, dans la taille
+     et la couleur de repos. */
+  .aimant,.aimant > h3{opacity:1 !important;transform:none !important;filter:none !important}
+  .aimant > h3{color:var(--discret) !important}
+  .aimant > h3 .groupe-puce{box-shadow:none !important}
 }

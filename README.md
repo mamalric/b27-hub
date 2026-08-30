@@ -2,7 +2,7 @@
 
 Le portail des outils et ressources du bureau d'études B27. Un seul lien à transmettre — à un collègue, à un client, à n'importe qui.
 
-Tout est centré sous le logo : la recherche, une tuile météo en données réelles, un calendrier en semaines ISO, puis deux rayons, nos outils et les ressources, la fiche de contact et, en pied, la signature de l'éditeur. Les deux rayons se déroulent en groupes, un par métier, et un sommaire fixé à droite de l'écran descend au groupe choisi. Un champ d'écoulement animé, calculé en local, occupe le fond : des lignes de flux, comme l'air et l'eau qui sont le métier de la maison. Pas de compte, pas de portail de connexion.
+Tout est centré sous le logo : la recherche, une tuile météo en données réelles, un calendrier en semaines ISO, puis deux rayons en cartes, nos outils et les ressources, celles-ci se terminant sur le site de l'entreprise. Les deux rayons se déroulent en groupes, un par métier, et un sommaire fixé à droite de l'écran descend au groupe choisi. Un champ d'écoulement animé, calculé en local, occupe le fond : des lignes de flux, comme l'air et l'eau qui sont le métier de la maison. Pas de compte, pas de portail de connexion.
 
 En ligne : https://mamalric.github.io/b27-hub/
 
@@ -21,7 +21,7 @@ python tests/verifier_catalogue.py
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Ossature de la page, presque vide : tout est construit à l'exécution. |
-| `catalogue.js` | Outils, ressources, contact, catégories, réglages et signature de l'éditeur. Le seul fichier à faire vivre. |
+| `catalogue.js` | Outils, ressources, catégories et réglages. Le seul fichier à faire vivre. |
 | `hub.js` | Logo, icônes, thème, champ d'écoulement, météo, calendrier, rayons, recherche, panneau À propos. |
 | `hub.css` | La peau du portail : sombre par défaut, thème clair à un clic. |
 | `signalement.js` | La pastille "Signaler un problème", autonome et réutilisable ailleurs. |

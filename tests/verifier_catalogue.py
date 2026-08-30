@@ -40,7 +40,6 @@ LONGUEUR_PITCH_MAX = 140
 CHAMPS_PORTE = {"id", "nom", "pitch", "url", "categorie", "statut", "type", "icone", "tags", "maj"}
 # sousCategorie est facultatif : une porte sans sous-dossier reste valable.
 CHAMPS_PORTE_FACULTATIFS = {"sousCategorie"}
-CHAMPS_CONTACT = {"id", "nom", "role", "agence", "mail", "tel", "sujets"}
 
 # Fonds contre lesquels une couleur de tuile doit tenir. Le glyphe est blanc,
 # et la tuile est un aplat posé sur la page : une teinte trop claire efface le
@@ -193,7 +192,6 @@ def controler():
 
     source = retirer_commentaires(FICHIER_CATALOGUE.read_text(encoding="utf-8"))
     portes = extraire_litteral(source, "PORTES")
-    contacts = extraire_litteral(source, "CONTACTS")
     categories = extraire_litteral(source, "CATEGORIES")
     sous_categories = extraire_litteral(source, "SOUS_CATEGORIES")
     reglages = extraire_litteral(source, "REGLAGES")
@@ -261,22 +259,6 @@ def controler():
         if not meteo.get("ville"):
             avertissements.append("REGLAGES.meteo : pas de nom de ville, la tuile affichera "
                                   "le lieu sans le nommer.")
-
-    # --- signature de l'éditeur, en pied de page
-    editeur = reglages.get("editeur")
-    if isinstance(editeur, dict):
-        url = editeur.get("url") or ""
-        if not url:
-            avertissements.append("REGLAGES.editeur : pas d'url, la signature de pied de page "
-                                  "ne s'affichera pas.")
-        elif not url.startswith(("https://", "http://")):
-            erreurs.append("REGLAGES.editeur : url '%s' sans schéma http ou https, la signature "
-                           "sera muette." % url)
-        elif url.startswith("http://"):
-            avertissements.append("REGLAGES.editeur : url en http, préférer https.")
-        if url and not editeur.get("nom"):
-            avertissements.append("REGLAGES.editeur : pas de nom, la signature affichera "
-                                  'le repli "B27".')
 
     # --- signalement
     if signalement.get("actif"):
@@ -372,31 +354,12 @@ def controler():
             avertissements.append("%s : %d mots-clés, la carte n'en affiche que 4 (les autres restent "
                                   "cherchables)." % (ou, len(tags)))
 
-    # --- annuaire
-    ids_contacts = []
-    for i, c in enumerate(contacts, 1):
-        ou = "contact %d (%s)" % (i, c.get("nom") or c.get("id") or "sans nom")
-        inconnus = set(c) - CHAMPS_CONTACT
-        if inconnus:
-            avertissements.append("%s : champ(s) ignoré(s) : %s." % (ou, ", ".join(sorted(inconnus))))
-        if not c.get("nom"):
-            erreurs.append("%s : champ 'nom' manquant." % ou)
-        if c.get("id") in ids_contacts:
-            erreurs.append("%s : id '%s' déjà utilisé." % (ou, c.get("id")))
-        ids_contacts.append(c.get("id"))
-        if not c.get("mail") and not c.get("tel"):
-            erreurs.append("%s : ni mail ni téléphone, la fiche n'offre aucun moyen de joindre." % ou)
-        if c.get("mail") and "@" not in c["mail"]:
-            erreurs.append("%s : adresse '%s' sans arobase." % (ou, c["mail"]))
-        if c.get("tel") and not re.fullmatch(r"\+?[\d\s.\-()]{6,}", c["tel"]):
-            avertissements.append("%s : téléphone '%s' d'aspect inhabituel, il doit rester cliquable." % (ou, c["tel"]))
-
-    return portes, contacts, categories, sous_categories, erreurs, avertissements
+    return portes, categories, sous_categories, erreurs, avertissements
 
 
 def main():
     try:
-        portes, contacts, categories, sous_categories, erreurs, avertissements = controler()
+        portes, categories, sous_categories, erreurs, avertissements = controler()
     except Exception as exc:                      # noqa: BLE001
         print("Lecture impossible : %s" % exc)
         return 1
@@ -407,9 +370,9 @@ def main():
     sous_utilisees = {o.get("sousCategorie") for o in portes if o.get("sousCategorie")}
     print("Catalogue : %d porte(s), %d ouverte(s), %d ressource(s) extérieure(s), "
           "%d catégorie(s) utilisée(s) sur %d déclarée(s), "
-          "%d sous-dossier(s) utilisé(s) sur %d déclaré(s), %d fiche(s) d'annuaire."
+          "%d sous-dossier(s) utilisé(s) sur %d déclaré(s)."
           % (len(portes), len(ouvertes), len(liens), len(peuplees), len(categories),
-             len(sous_utilisees), len(sous_categories), len(contacts)))
+             len(sous_utilisees), len(sous_categories)))
 
     for a in avertissements:
         print("  avertissement : %s" % a)

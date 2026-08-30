@@ -2,6 +2,304 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-30, les prête-noms s'en vont, le catalogue s'étoffe
+
+Reproche fondé, et il fallait le faire : le portail annonçait des applications sous des noms que personne n'avait validés. Cinq étaient des prête-noms que j'avais inventés pour tenir la place d'un métier vide, quatre venaient d'une feuille de route lue un peu vite. Un portail public n'annonce que ce que la maison a nommé.
+
+**Neuf fiches perdent leur nom.** Sept deviennent des cartes "À venir", une par métier sans projet décidé : VRD, électricité, carbone, paysage, structure, BIM, utilitaires. Elles ne disent plus qu'une chose, qu'elles attendent, et remplacer l'une d'elles c'est remplir son nom, son pitch, son icône et son url. Les deux dernières, les calculettes de résistance thermique et de confort d'été, disparaissent sans remplaçante : le métier thermique porte désormais RTex Tool et l'étiquette DPE, il n'a plus besoin d'une carte d'attente.
+
+**L'étiquette DPE entre dans le lot thermique**, en statut a-venir. Son pitch reste à écrire et son url à donner : l'outil est nommé par la maison, ce qu'il fait exactement n'a pas été dit, et je me garde de le deviner une fois de plus.
+
+**Dix liens entrent dans les ressources**, en deux temps. Les données et bases accueillent BIMobject, le Géoportail de l'IGN et le cadastre d'Etalab ; la documentation technique, Batipedia, l'AICVF et l'ACERMI. Les quatre derniers ouvrent un sous-dossier, Services et outils du quotidien : ce qu'on ouvre en travaillant sans que ce soit une référence technique, les trois Zoho et SwissTransfer.
+
+Les dix adresses ont été appelées une à une, et trois d'entre elles ont dit quelque chose. Batipedia redirige vers sa page de connexion, ce que son pitch annonce désormais. L'AICVF redirige vers son domaine sans www, adopté du coup. Et le lien du cadastre est celui qui a été donné, vue carte sur fond de photo aérienne, plutôt que la page d'accueil du service : c'est la vue qui sert.
+
+**Une réserve, notée dans le catalogue et dans la fiche.** Zoho Projects, Expense et People demandent un compte d'entreprise et ne s'ouvrent pas pour un visiteur extérieur. La charte veut qu'un portail public ne montre pas ce qui est réservé à l'interne, et B27 Mobility en était sorti pour exactement cette raison. Ils sont là parce qu'ils ont été demandés, et leur pitch le dit ; il reste à trancher si le portail doit rester entièrement ouvrable par un client.
+
+Le catalogue passe de vingt-cinq à trente-quatre portes, dont dix-sept ressources, et le compteur annonce dix-sept outils et dix-sept ressources. Contrôle du catalogue au vert, aucune anomalie relevée par le contrôle embarqué, console vide.
+
+## 2026-08-30, le panneau météo prend de l'air
+
+"Aère mieux cette fenêtre météo, accepte des espaces plus importants entre les éléments, élargis-la, rends-la plus agréable à naviguer."
+
+Le panneau était serré parce qu'il avait grandi par ajouts successifs sans que sa largeur bouge : dix mesures, vingt-quatre heures, sept jours, le soleil, l'air et le composeur dans 680 pixels. On y lisait un tableau, pas un bulletin.
+
+Il passe à 880 pixels de large et sa hauteur maximale de 78 à 86 % de l'écran, ce qui fait 861 pixels de haut au lieu de 720 : la moitié du contenu tient sous les yeux au lieu du tiers. Les cases de mesure passent de neuf à quatorze pixels de rembourrage et de sept à douze d'écart, les heures de quatre à dix, les jours de quatre à huit avec une ligne à treize pixels de rembourrage au lieu de huit. Les sections d'un panneau sont séparées de trente pixels au lieu de dix-huit, leur titre se détachant de quatorze au lieu de huit. Le composeur passe de deux à trois colonnes, la largeur le permettant.
+
+Deux détails trouvés en vérifiant. Le bloc des mesures n'est pas une section et n'avait donc pas de marge de pied : il collait au titre suivant, il en a une maintenant. Et sous 720 px, la ligne d'un jour ne tenait plus ses cinq colonnes, mon élargissement des écarts ayant coûté vingt-deux pixels à une ligne qui n'en avait pas de reste : le détail pluie et vent, le moins essentiel des cinq, s'efface à cette largeur.
+
+Vérifié à 1440 par 1032 : panneau de 854 sur 861, quatre colonnes de mesures à 195 pixels, huit heures qui remplissent la largeur sans défiler, sept jours au large, composeur à trois colonnes. À 375 px : une mesure par ligne, aucun débordement horizontal hormis la bande des heures, qui défile par construction. Console vide.
+
+## 2026-08-30, la molette ne déverrouille pas le son
+
+"Je n'ai plus de son avec la molette." Ce n'était pas une régression du carrousel mais une règle du navigateur que j'avais mal lue en écrivant le synthétiseur.
+
+Le navigateur interdit tout son avant un geste d'activation, et tous les gestes n'en sont pas : un clic, une touche, un toucher comptent, la molette non. Un visiteur qui ne fait que dérouler laissait donc le contexte audio suspendu, et les notes programmées à son horloge, qui n'avance pas dans cet état, se perdaient sans bruit. Pire, chaque tentative consommait l'intervalle de quarante millisecondes qui espace les sons, si bien que la première note après déverrouillage pouvait être écartée à son tour.
+
+Trois corrections. Le déverrouillage est accroché aux gestes qui en ont le pouvoir, posé en capture sur la fenêtre et laissé en place, un contexte pouvant être resuspendu par le système en cours de route. Une note demandée contexte fermé n'est plus programmée dans le vide : elle repart dès que le contexte s'ouvre, une seule reprise en attente à la fois. Et une note qui n'a pas sonné ne consomme plus l'intervalle.
+
+Reste la limite, qui n'est pas de mon ressort : sur une page fraîche, tant que rien n'a été cliqué ni tapé, la molette reste muette. Un seul clic n'importe où suffit pour toute la visite.
+
+Vérifié en simulant un contexte verrouillé : aucune note programmée, intervalle non consommé, reprise en attente ; à l'ouverture, la note part. Molette contexte ouvert, elle sonne. Un pointerdown appelle bien la reprise. Console vide.
+
+## 2026-08-30, le sautillement du grand coup de molette
+
+"Quand je fais un grand coup de molette, la tuile sautille plusieurs fois avant que je me retrouve instantanément dix tuiles plus loin." Deux fautes en une, et la description les décrit toutes les deux.
+
+**Le sautillement venait du navigateur.** Un scrollTo en smooth relance son animation à chaque nouvelle cible : sur une volée de crans, la page repartait en accélérant à chaque fois, d’où les à-coups, puis sautait d’un bloc à la dernière cible quand la volée s’arrêtait. Le glissement est donc tenu par la page : la position rejoint la cible d’un cinquième de l’écart par image, exactement l’inertie de la molette des panneaux, au même coefficient. Le portail n’a plus qu’une façon de glisser, et une cible qui bouge en plein vol ne fait qu’allonger la course.
+
+**Les dix tuiles venaient de la borne par secousse.** Elle ne tenait pas la route : un coup vif n’envoie pas un événement mais une rafale, et deux crans par événement en faisaient dix ou quinze pour un seul geste. Borner la rafale n’aurait pas suffi non plus, cela aurait fixé une distance maximale par geste au lieu de laisser aller loin qui tourne longtemps. Une cadence règle les deux : un cran toutes les cent dix millisecondes au plus, soit environ neuf par seconde tant qu’on tourne. Elle ne prend rien à personne, elle étale ce qui arrive trop vite pour être vu.
+
+**Et le test a trouvé une troisième faute que je n’attendais pas** : le glissement s’arrêtait deux pixels court. La position de défilement est quantifiée, un pas amorti de moins d’un pixel se perd à l’arrondi, et l’amortissement n’avançait plus. Les quatre derniers pixels se posent maintenant d’un coup, ce qui ne se voit pas et rend l’axe exact, lui qui se mesure à la règle.
+
+Vérifié : quinze événements de molette en rafale serrée ne donnent qu’un cran, les mêmes étalés à cent trente millisecondes en donnent un chacun, une pichenette isolée part tout de suite. La courbe de glissement mesurée image par image, 263 puis 205, 160, 125, 97, 76 pixels : monotone, amortie, sans redémarrage. Atterrissage à zéro pixel d’écart sur quatre distances, un, trois, sept et douze arrêts, en vingt-deux à vingt-huit images quelle que soit la distance. Axe des cartes toujours à 389 ou 390 pixels. Console vide.
+
+Note de terrain : le glissement s’appuyant sur requestAnimationFrame, un onglet caché le suspend, et la page reprend sa course à son retour. C’est ce qui rend la vérification impossible dans le volet d’aperçu masqué, où la courbe a dû être déroulée à la main.
+
+## 2026-08-30, la pastille rend sa place à la catégorie
+
+"Garde uniquement le logo B27 dans la pastille, et mets mieux en valeur la catégorie."
+
+Les deux demandes n'en font qu'une. La pastille d'ancrage portait le logo et le titre du portail, et le nom du rayon se lisait juste dessous en gris discret : deux textes empilés, dont l'un n'apprenait rien à qui est déjà sur la page. À cet endroit de l'écran, savoir où l'on se trouve vaut mieux que relire le nom du site.
+
+Le titre sort donc de la pastille, qui devient un disque de quarante-deux pixels portant le seul emblème, un peu plus grand qu'avant puisqu'il y est seul. Et le nom du rayon prend la place et le poids qu'occupait le titre : quinze pixels au lieu de douze, graisse huit cents, deux virgule quatre d'espacement, à pleine encre au lieu du gris. Ce n'est plus le murmure d'un titre de groupe, c'est le repère principal du haut de page.
+
+Vérifié à 1440 par 1032 : pastille de quarante-deux sur quarante-deux, sans texte, et catégorie à soixante-six pixels du haut, toutes deux centrées sur l'axe de la page. Console vide.
+
+## 2026-08-30, l'entre-deux de la vitesse
+
+"Il n'y a pas d'entre-deux dans tes modifs, tu peux pas faire ça ?" Remarque juste sur ma façon de corriger : au retour précédent j'étais passé du blocage complet, un métier par demi-seconde, à la liberté complète, quatre métiers pour un seul coup de molette. J'ai demandé lequel des réglages devait trouver son milieu plutôt que de deviner : c'est la vitesse du défilement.
+
+La borne de volée passe de quatre à deux. Sans borne, un geste vif fait de la page un ascenseur et on ne sait plus où l'on est ; avec une borne trop basse, on retrouve le traînage. Deux, c'est ce qu'un coup franc doit rendre.
+
+Et la distinction qui fait tout : **la borne tient la secousse, pas la cadence.** Marteler la molette reste sans limite, chaque coup valant son dû, et le clavier n'est pas touché. Ce n'est pas la vitesse qui était de trop, c'est le fait qu'un seul geste puisse traverser un quart du catalogue.
+
+Vérifié, avant et après : coup ample de 420 pixels, quatre métiers puis deux ; secousse de 3000 pixels, quatre puis deux ; quatre coups de molette, quatre dans les deux cas ; dix coups, dix ; huit pressions de flèche, huit. Le demi-cran ne fait toujours rien, le reliquat ne repart toujours pas. Console vide.
+
+## 2026-08-30, le carrousel rend la vitesse qu'on lui donne
+
+"Je ne peux pas spammer les flèches du clavier, c'est décevant : les techniciens sont des gens pressés avec les outils numériques, si ça ne peut pas aller vite c'est frustrant. Et quand je donne de gros coups de molette, j'aimerais que ça suive."
+
+La faute est à moi et elle est nette. Le repos de quatre cent vingt millisecondes, posé pour qu'une secousse un peu longue n'enchaîne pas des crans qu'on n'a pas voulus, mangeait tout ce qui arrivait pendant le glissement. Le remède était pire que le mal : on ne pouvait plus enchaîner du tout.
+
+**Les crans se comptent maintenant depuis là où l'on va, pas depuis là où l'on est.** L'arrêt visé est retenu, le cran suivant part de lui, et le glissement se contente de rattraper une cible qui a bougé sous lui. Cinq pressions coup sur coup valent cinq métiers. La visée périme au bout de sept dixièmes de seconde et s'efface à l'arrivée, de sorte qu'un défilement venu d'ailleurs, une tabulation ou un doigt sur l'écran, ne laisse pas de trace.
+
+**Et la molette rend toute sa secousse.** Elle accumule, chaque tranche de cent pixels vaut un cran, et une secousse en vaut donc plusieurs d'un seul coup. Le seuil descend de cent quatre-vingts à cent, un cran de molette ordinaire valant un métier là où il en fallait deux ou trois. La volée est bornée à quatre, pour qu'un événement de pavé tactile ne téléporte pas la page d'un bout à l'autre.
+
+Un test a trouvé un défaut que je n'avais pas prévu : le reliquat d'une secousse énorme se mettait en réserve, et six pichenettes ultérieures traversaient la page entière. Ce qui dépasse la volée est désormais perdu.
+
+Vérifié par événements synthétiques, dix-sept arrêts : demi-cran zéro métier, pichenette un, deux coups deux, gros coup de 420 pixels quatre, secousse de 3000 pixels quatre aussi, pichenette suivante un seul. Clavier : une pression un métier, cinq pressions cinq, douze pressions douze, cinq en avant puis trois en arrière deux. La butée rebondit toujours en bout de course. Console vide.
+
+Leçon : une résistance qui protège d'un accident rare ne vaut pas d'empêcher le geste courant. La borne de volée protège du même accident sans rien coûter à qui va vite.
+
+## 2026-08-30, le portail répond au geste, à l'oeil et à l'oreille
+
+"Ajoute des retours visuels et audio quand on réalise une action, ça doit rester minimaliste, subtil et élégant à l'oreille."
+
+**Cinq gestes ont un retour, et cinq seulement** : cran vers le bas, cran vers le haut, passage d'un rayon à l'autre, butée en bout de course, sélection. Au-delà, ce serait du bruit, et le mot de la demande était minimaliste.
+
+**Rien n'est enregistré, tout est synthétisé.** L'API Web Audio construit chaque son à la volée, ce qui est la même règle que le fond calculé plutôt que dessiné : pas un fichier, pas une dépendance, et le portail continue de fonctionner depuis le disque. Chaque son est une sinusoïde de quelques centièmes de seconde, prise dans une gamme pentatonique où deux notes quelconques sonnent ensemble, donc sans accord à éviter, adoucie par un passe-bas à 2400 hertz et enveloppée d'une attaque de quatre millisecondes et d'une extinction exponentielle. Un créneau net claquerait, une coupure sèche ferait un clic. Le volume tourne autour de trois centièmes, celui d'un objet qu'on pose sur une table. Deux sons ne se collent jamais, quarante millisecondes les séparent au minimum. Ce qui descend sonne un ré, ce qui remonte un sol : le geste s'entend dans la hauteur.
+
+**Le son est allumé par défaut, et c'est un choix à assumer.** Le navigateur interdit tout son avant un geste du visiteur, et c'est une bonne loi : le contexte audio n'est créé qu'au premier geste, jamais au chargement, si bien que le premier son entendu est toujours la conséquence d'une action. Un bouton du haut coupe tout, le choix vit dans le navigateur comme le thème, et le bouton se confirme lui-même : allumer le son fait un son, l'éteindre se tait, parce que le clic passe en délégation après que le bouton a changé d'état. Si l'usage montre que c'est de trop sur un portail qu'on ouvre en réunion, la valeur par défaut se retourne en une ligne.
+
+**Trois retours à l'oeil répondent aux mêmes gestes.** La butée déporte le groupe au foyer de onze pixels dans le sens contraire au geste et le ramène : avant, la page ne bougeait pas et ne disait rien, on ne savait pas si le cran avait raté ou s'il n'y avait plus rien après. Le déport passe par la propriété translate et non par transform, qui porte déjà le grossissement du magnétisme : une animation sur transform le remplacerait, et le groupe perdrait sa taille le temps du rebond. La bulle du sommaire bat une fois quand le foyer arrive sur son groupe, l'oeil étant dans la page et non dans le sommaire. Et une carte enfoncée s'enfonce.
+
+Vérifié en espionnant le synthétiseur : cran bas 587 hertz sur 75 millisecondes, cran haut 784, passage 659 puis 880 en intervalle montant, sélection 880, butée 262 sur 140 millisecondes. Deux appels collés ne jouent qu'une note. Le bouton coupé ne joue plus rien et son propre clic reste muet, rallumé il rejoue et le choix est en mémoire. À l'oeil : classe de butée posée avec son déport de onze pixels, animation en cours, grossissement du magnétisme intact pendant le rebond, classe nettoyée après. Console vide.
+
+## 2026-08-30, le clavier prend les crans, et une souris invite à dérouler
+
+**"J'aimerais que les flèches du clavier fassent passer d'un métier à l'autre, alors que là ça fait juste un mini décalage."** Elles défilaient nativement, quelques dizaines de pixels par pression : la page bougeait sans jamais changer de métier, et le magnétisme rattrapait ce décalage sans qu'il mène nulle part. Les flèches haut et bas, les touches page, début et fin passent donc par les mêmes arrêts que la molette. Une touche est une intention discrète : elle vaut un cran entier et n'a rien à accumuler, contrairement à la molette qui doit d'abord vaincre une résistance. La répétition de la touche est tenue par le même repos, soit un peu plus de deux métiers par seconde à touche enfoncée.
+
+Le passage a permis de sortir deux fonctions du cran : aller à un arrêt donné, et trouver l'arrêt où l'on se trouve. La molette, le clavier et le clic au sommaire s'en servent tous les trois, et le repos qui empêche l'enchaînement involontaire est tenu à un seul endroit.
+
+Vérifié par événements clavier : Bas quatre fois, quatre métiers d'affilée ; Haut deux fois, deux retours ; Fin sur le dernier groupe, Début en haut de page. Une flèche pressée dans le champ de recherche n'est pas reprise, le navigateur garde sa touche.
+
+**"Ajoute une indication visuelle pour inciter à glisser la molette, sans écrire du texte."** Une souris dessinée en bas de l'écran d'entrée, sa molette qui descend lentement, deux secondes et demie par passage avec une pause entre deux. Pas un mot, et c'est le fond de la demande : "faites défiler" serait une consigne, la forme est une invitation. Elle emprunte le vocabulaire de la page, rectangle arrondi et pastille, comme tout le reste.
+
+Elle s'efface au premier cran, ayant alors fait son travail, et pendant une recherche où elle n'aurait plus rien à promettre. Elle ne se montre qu'aux pointeurs fins : une souris dessinée sur un téléphone désignerait un objet que le visiteur n'a pas en main, et le geste de faire glisser du doigt n'a pas besoin qu'on l'apprenne. Un poste qui demande moins d'animations garde la souris, immobile, le dessin suffisant à dire la molette.
+
+Vérifié : centrée sur l'axe de la page à vingt-six pixels du bas, opacité 0,5 en haut de page, 0 dès le premier cran comme pendant une recherche.
+
+## 2026-08-30, le lointain devient inerte
+
+"Je peux cliquer sur les tuiles qui sont en arrière-plan." Défaut réel, et de la pire espèce : ouvrir un outil qu'on n'a pas pu lire. Une carte à six centièmes d'opacité sous cinq pixels de flou ne se lit pas, la cliquer ne peut être qu'un accident.
+
+Le remède tient dans la classe qui portait déjà le flou : hors foyer, le groupe ne reçoit plus le curseur. Rien de nouveau à décider, la frontière du net et du flou était déjà la bonne.
+
+**Le clavier, lui, garde sa route**, et il fallait s'en occuper dans le même mouvement : la tabulation atteint toujours les cartes du lointain, et elle y serait aveugle. Une carte qui prend le focus amène donc son groupe au foyer, à l'arrêt même où la molette l'aurait posé. Un clic ne déclenche rien de ce mécanisme, la carte cliquée étant forcément celle du groupe au foyer, donc déjà à sa place.
+
+Vérifié à un arrêt du milieu : la carte du groupe au foyer répond au point de contact, les quatre groupes voisins visibles ne répondent plus. Le focus clavier sur la carte la plus lointaine, celle de B27, vise 4376, qui est un arrêt du carrousel. Pendant une recherche, le magnétisme se retirant, tout redevient cliquable. Console vide.
+
+## 2026-08-30, le site de l'entreprise trouve enfin sa place
+
+"Repositionne le site B27 dans une tuile dans ressources." La demande précédente disait de le supprimer, celle-ci de le remettre ailleurs : c'était un déplacement en deux temps, et j'avais pris le premier pour une fin.
+
+Il aura mis trois versions à trouver sa place, et le chemin se comprend. Dans "Nos outils, fabriqués ici", il prenait la carte, la couleur de lot et le compteur d'un outil que nous fabriquons, ce qu'il n'est pas. En signature de pied de page, il n'était plus un outil mais du mobilier, et le pied de page avec lui. Il est maintenant une carte des ressources, sous un nouveau sous-dossier "Le bureau d'études", en dernier groupe du rayon et donc de la page. C'est là qu'il est juste : les ressources sont des sites extérieurs au portail, Légifrance, l'ADEME, le CSTB, et le site de la maison en est un. Il hérite du violet des ressources comme les autres sous-dossiers.
+
+Vérifié : vingt-cinq portes au catalogue dont sept ressources, dix-sept groupes et dix-huit arrêts, le dernier arrêt sur le groupe B27 avec l'entête "Ressources", la carte pointant sur b27.fr. Et l'axe tient : titres de 345 à 346 pixels, cartes de 389 à 390, la nouvelle carte comprise. Contrôle du catalogue au vert, console vide.
+
+## 2026-08-30, la signature s'en va, et la bulle cliquée rend le focus
+
+Deux demandes courtes.
+
+**Le site de l'entreprise quitte le portail pour de bon.** Il avait déjà quitté le rayon des outils en v10, où il prenait une carte, une couleur de lot et une ligne du compteur en se donnant pour un outil de la maison ; il signait la page en pied depuis. Il est retiré tout à fait : le pied de page, la fonction qui le construisait, le bloc `REGLAGES.editeur` du catalogue, le contrôle du validateur et les règles de style partent ensemble, rien n'est laissé en sommeil. Conséquence à assumer, et elle est notée dans la charte : le portail ne nomme plus son éditeur et ne renvoie plus au site de l'entreprise. La pastille de signalement reste la seule voie pour écrire.
+
+**Une bulle du sommaire cliquée à la souris rend le focus.** L'anneau vert et l'étiquette du nom restaient posés après le clic, alors que le nom vient d'être lu et que le groupe est déjà au foyer. Ce sont des repères de clavier, pas de souris : `ev.detail` vaut zéro sur une activation au clavier et au moins un sur un clic, ce qui suffit à distinguer les deux. Le clavier garde donc son anneau et son étiquette, la souris les perd.
+
+## 2026-08-30, la règle sur l'écran, et deux fautes plutôt qu'une
+
+"J'ai mis une règle sur mon écran : les cartes ne finissent pas sur le même axe horizontal d'un cran à l'autre, et c'est d'autant plus vrai sur la fin dans les ressources." Vérification chiffrée, position à l'écran de la première carte à chacun des dix-huit arrêts : de 327 à 588 pixels. Deux cent soixante et un pixels d'écart, et l'utilisateur les avait vus à l'oeil avant de les mesurer.
+
+**Première faute, les arrêts centraient le groupe.** Un métier à une carte et un métier à quatre n'ont pas la même hauteur ; centrer la boîte donne un centre stable et fait bouger tout ce qu'elle contient. Les arrêts visent maintenant le haut du groupe, un repère franc : le titre tombe toujours à la même ligne, la rangée de cartes commence toujours à la même, et la hauteur du groupe n'a plus d'effet que sur ce qui dépasse en dessous. La mire remonte de la mi-hauteur au tiers de l'écran, puisqu'elle désigne désormais un haut et non un milieu, et l'indice continu se calcule sur les hauts.
+
+**Seconde faute, et c'est celle qui expliquait la fin des ressources : la glissade.** La mire glissait vers le bas sur le dernier écran de défilement pour aller chercher le dernier groupe, que la course ne permettait plus d'atteindre. Le foyer arrivait bien, mais une mire qui se déplace déplace ce qu'elle vise : les cinq derniers groupes se posaient de plus en plus bas, 362, 421, 478, 535, 588. La correction précédente, celle qui remontait la mire pour placer les arrêts, avait rendu le foyer juste sans rien régler de la position à l'écran, et je ne l'avais pas vu parce que je vérifiais le foyer, pas l'axe.
+
+La glissade est retirée. À sa place, la page se donne la course qu'il lui faut : une rallonge en pied du corps, calculée au strict nécessaire, cent huit pixels sur un écran de 900 et cent quatre-vingt-quinze sur un de 1032. La mire redevient une simple addition, la position de défilement plus la part d'écran qui la surplombe, et son chemin inverse une simple soustraction. Tout le calcul de droite affine disparaît avec, ainsi que l'arrêt de pied de page : la rallonge fait tomber l'arrêt du dernier groupe pile sur la fin de la course, signature visible.
+
+Vérifié à 1440 par 900 : titres de 300 à 301 pixels, cartes de 344 à 345, à tous les arrêts, tous les groupes au foyer à 1,000. À 1440 par 1032 : titres 345 à 346, cartes 389 à 390, signature entièrement visible au dernier arrêt. Le pixel d'écart est l'arrondi.
+
+Leçon, et elle vaut d'être écrite : vérifier que le bon groupe s'allume ne dit rien de l'endroit où il s'allume. Deux mesures, pas une.
+
+## 2026-08-30, les titres de rayon montent en entête
+
+"Ici je ne devrais pas voir Ressources apparaître." La capture est sans ambiguïté : le foyer est sur Utilitaires, tout l'écran est estompé et flou, et le titre "Ressources sites de référence" trône en pleine encre au milieu des fantômes. La cause est simple, et c'est une pièce oubliée : les titres de rayon ne sont pas des unités du magnétisme, ils n'ont donc jamais reçu d'intensité et ne se sont jamais estompés. Rien ne justifiait qu'un titre de rayon échappe au foyer.
+
+La demande suivante donne la solution plutôt qu'un pansement : que ces titres se lisent en entête, avec une animation de déplacement au passage de l'un à l'autre. Ils quittent donc le fil de la page pour une ligne fixe sous la pilule d'ancrage, capitales espacées comme un titre de groupe, un cran plus haut. Le changement est un glissement : le sortant part dans le sens où l'on défile, l'entrant arrive du bord opposé, deux cent vingt millisecondes chacun. Le sens vient de la comparaison avec la position du passage précédent, et le nom retenu en dataset fait foi, de sorte que deux passages coup sur coup se règlent sur le dernier et non sur celui du milieu.
+
+Les titres restent dans le document pour sa structure, simplement retirés à l'oeil, et reprennent leur place dès que le magnétisme se retire : pendant une recherche, où les résultats ont besoin de leurs deux en-têtes, et sur un poste qui demande moins d'animations, où l'entête ne s'affiche pas.
+
+Vérifié aux dix-huit arrêts : l'entête dit "Nos outils" sur les treize groupes de métiers et bascule sur "Ressources" au premier groupe de ressources, le titre en page mesure un pixel sur un, l'entête est centré sur l'axe de la page à soixante pixels du haut. Leçon de test rappelée au passage : le volet d'aperçu masqué gèle les transitions CSS, une opacité lue à mi-course y vaut zéro ; il faut couper la transition pour lire l'état visé.
+
+## 2026-08-30, les arrêts remontent la mire, et l'entrée prend l'écran
+
+"Ça marche mais ça bug sur la fin avec les ressources." Mesuré avant de toucher quoi que ce soit, et le chiffre est sans appel : à l'arrêt qui devait poser Réglementation au foyer, Données et bases suivait à 0,830, deux groupes lisibles à la fois ; à l'arrêt suivant, Données tombait à 0,268 et c'est Documentation technique qui prenait le foyer. Autrement dit, un groupe de ressources n'avait plus d'arrêt à lui, jamais seul en pleine encre.
+
+La cause était dans ma propre couture. La mire glisse en fin de page pour aller chercher le dernier groupe, mais les arrêts se calculaient en soustrayant bêtement une demi-hauteur d'écran au centre du groupe, sans tenir compte de cette glissade. Sur le dernier écran de défilement, là où vivent justement les trois groupes de ressources, les deux calculs divergeaient de cent soixante-sept pixels.
+
+**La mire est une droite de la position de défilement**, `y + V` dans la course normale et `y * k + b` dans la glissade, et il suffisait de le dire une fois. Les deux coefficients sont retenus à la mesure, la mire les lit, et une fonction fait le chemin inverse : de la mire vers la position de défilement. Les arrêts de la molette et la cible d'un clic au sommaire passent tous les deux par elle. Vérifié à 1440 par 900 : les dix-huit arrêts posent chacun leur groupe à 1,000 avec le voisin à 0,085, les seize groupes ont chacun le leur, et le clic sur Données et bases vise 3785, qui est un arrêt au pixel près.
+
+**Et l'entrée occupe maintenant l'écran entier**, demande de la même session : ne plus voir le titre "Nos outils" en haut de page, et avoir l'emblème, le titre et la recherche bien centrés. Elle se tient en son milieu, mesuré à 449 pixels pour un écran de 900, et le titre de rayon est passé à 944, sous la ligne de flottaison. Le haut de page devient ainsi un écran comme les autres du carrousel. À partir de 1240 px seulement : en dessous, les tuiles vivantes reprennent leur place sous la recherche et appartiennent à ce premier écran, qu'un en-tête pleine hauteur pousserait dehors.
+
+## 2026-08-30, scroll-snap retiré, la molette passe à la main
+
+"Ça ne va pas du tout, je n'arrive pas à jauger la molette. Des fois ça reste bloqué, des fois je saute cinq métiers d'un coup."
+
+Le diagnostic est dans la mécanique de `scroll-snap` et il est sans appel. Le seuil d'un point d'accroche est à mi-chemin du suivant : un petit cran de molette se fait donc ramener en arrière, et on se croit bloqué. Un coup un peu vif, lui, part avec son inertie, s'arrête loin, et le navigateur l'accroche au point le plus proche de là où il s'est arrêté, cinq métiers plus bas. Les deux symptômes viennent de la même règle, et ni `proximity` ni `mandatory` n'en sortent : aucun des deux ne sait avancer d'un cran et d'un seul. Un défilement qu'on n'arrive pas à jauger est pire que pas de cran du tout. Retiré.
+
+**hub.js tient la molette.** La page ne défile plus librement à la molette : elle va d'arrêt en arrêt, un par groupe, plus le haut de page et le pied. Tant que la molette n'a pas accumulé 180 pixels dans le même sens, rien ne bouge d'un pixel, et c'est la résistance qui se sent ; le seuil franchi, la page glisse d'un cran et ignore la molette pendant les 420 ms du glissement, sans quoi la fin d'un geste un peu long enchaînerait les crans. Changer de sens repart de zéro : on ne franchit pas un cran par accumulation de va-et-vient. Le zoom du navigateur (Ctrl + molette) et un panneau ouvert, qui a son propre moteur, passent à travers sans être touchés. Le clavier n'est pas repris : il reste le défilement libre, la sortie de secours, et le magnétisme le suit sans broncher.
+
+Vérifié par événements de molette synthétiques, cent pixels par cran : molette 1, rien ; molette 2, un arrêt ; molette 3, rien ; molette 4, un arrêt et le foyer avance d'exactement un métier. Symétrique en remontant. Jamais deux arrêts d'un coup, jamais de retour en arrière. Le glissement doux ne s'exécute pas dans le volet d'aperçu, qui ne sait pas faire de `behavior: "smooth"` : la mécanique a été vérifiée en forçant le saut sec, ce qui ne change que l'animation.
+
+**Et le foyer devient exclusif**, seconde demande de la même phrase : ne plus voir du tout, ou de très loin, les métiers voisins. Le fond descend de 0,20 à 0,06 d'opacité, le flou monte de 2 à 5 pixels, l'échelle au loin de 0,93 à 0,88, et la cloche se resserre encore, écart type de 0,62 à 0,45 groupe. Le métier voisin tombe à 0,085 d'intensité, soit 14 % d'opacité sous 4,6 pixels de flou ; le suivant a disparu. On ne lit qu'un métier à la fois. Vérifié à l'oeil : le groupe au foyer est net et seul lisible, ses voisins sont des fantômes.
+
+## 2026-08-30, le dernier groupe sortait du champ, et le déroulé prend des crans
+
+Deux retours d'affilée, et le second est le plus intéressant des deux.
+
+**"Je ne peux pas descendre plus bas, la dernière ligne reste floue."** Diagnostic net : la ligne de mire est posée à mi-hauteur d'écran, et en fin de page le défilement bute avant de l'avoir amenée sur le dernier groupe. Elle plafonne environ deux cents pixels au-dessus de son centre, l'avant-dernier groupe garde donc le foyer et le dernier reste estompé quoi qu'on fasse, sans plus rien à dérouler pour aller le chercher. Je croyais ce cas couvert par la normalisation au maximum, notée telle quelle dans le commentaire du module : elle garantit qu'un groupe est net, pas que celui-là puisse l'être. L'erreur valait d'être payée, le commentaire dit maintenant la nuance.
+
+Le remède est une mire qui glisse : sur le dernier écran de défilement, elle descend d'autant plus qu'il reste peu à dérouler, jusqu'à couvrir le bas du dernier groupe quand la page est au bout. Le glissement se répartit sur un écran entier, ou sur toute la course si elle est plus courte, si bien qu'en haut de page il ne joue pas. La fin de la course est retenue à la mesure plutôt que relue à chaque trame, comme les centres. Vérifié en bas de page : dernier groupe à 1,000, opacité pleine, aucun flou.
+
+**"J'aimerais qu'il y ait des accroches, des crans."** Plusieurs crans de molette qui restent sur un métier, puis on passe au suivant, avec un côté aimanté qu'il faut forcer. C'est du `scroll-snap` natif, et il n'y avait aucune raison d'écrire un moteur de molette pour ça : un point d'accroche au centre de chaque groupe, `proximity` et non `mandatory`. La nuance fait tout. En `mandatory`, un seul cran saute au métier suivant, ce qui est un carrousel, pas une résistance ; en `proximity`, un cran se fait ramener sur le métier où l'on est et il en faut deux ou trois pour décrocher. C'est cette résistance qui se sent.
+
+Mesuré, le pas d'un groupe valant 236 px : poussée de 40 px, retour à zéro ; 80 px, retour à zéro ; 120 px, on décroche et on atterrit exactement sur le groupe suivant. Le seuil est à mi-chemin, soit deux crans d'une molette ordinaire, trois d'une molette fine.
+
+Deux conséquences réglées avec. **Le haut de page devient un cran lui aussi** (`scroll-snap-align: start` sur l'en-tête), sans quoi le premier tour de molette arracherait le visiteur à l'en-tête pour le coller au premier métier, et la pilule d'ancrage ne pourrait plus y revenir sans être aussitôt reprise. **Et la mire descend de 42 à 50 % de la hauteur d'écran**, parce que `scroll-snap-align: center` pose le centre du groupe au milieu de l'écran : les deux doivent viser le même point, sans quoi la page s'arrêterait à un endroit et le foyer se poserait à un autre. Ce n'est plus un réglage libre, et les deux fichiers se le disent en commentaire.
+
+Vérifié : à la position d'accroche de trois groupes pris au hasard dans la page, le groupe visé est à 1,000 et tient le foyer, l'écart entre la position d'accroche et la cible du clic au sommaire est de zéro pixel, le haut de page reste à zéro avec le premier métier au foyer. Pendant une recherche, `scroll-snap-type` retombe à `none` avec le magnétisme et la page défile librement ; un poste qui demande moins d'animations ne reçoit ni l'un ni l'autre. Console vide.
+
+## 2026-08-30, une seule carte pour les deux rayons, et le contact s'en va
+
+Deux demandes en une : rendre les ressources dans le même style que les métiers, et supprimer la section contact.
+
+**Les ressources passent en cartes.** Elles vivaient en rangées compactes pleine largeur, une forme à elles, héritée du temps où elles étaient un annuaire de liens plutôt qu'un rayon. Rien ne le justifiait : un nom, une phrase, une pastille à la couleur du domaine et un lien qui sort, c'est exactement ce que porte une carte d'outil. `html_ressource` disparaît, `html_outil` devient `html_carte` et sert les deux rayons, la seule différence restante étant l'icône par défaut, le livre pour une ressource et la grille pour un outil, qui de toute façon ne sert que si le catalogue en oublie une. Les six ressources ont toutes un statut en ligne et leur propre icône : elles ressortent cliquables et sans badge, comme avant. Tout le CSS des rangées part avec, `.rangs` et ses sept règles.
+
+**Le contact quitte le portail.** La section, la grille, les fiches, le tableau `CONTACTS` du catalogue et son bloc de documentation, l'entrée du sommaire, le compteur, la ligne du panneau À propos, le contrôle d'annuaire du validateur et ses champs : tout est retiré plutôt que laissé en sommeil, `catalogue.js` étant le seul fichier à faire vivre et une donnée morte s'y verrait. Qui édite le portail se lit dans la signature en pied de page, et la pastille de signalement reste la voie pour écrire. Le seuil d'apparition de la recherche ne compte plus que les portes.
+
+Vérifié : plus une seule `.rang` dans la page, six cartes de ressources, seize groupes au sommaire comme au magnétisme, un seul filet de séparation là où il y en avait deux, compteur à "18 outils · 6 ressources", signature en fin de page, contrôle du catalogue au vert sans sa ligne d'annuaire, console vide et pas de débordement.
+
+## 2026-08-30, le catalogue rejoint l'axe du logo
+
+Capture à l'appui : "peux-tu les centrer au milieu plutôt ?" Le magnétisme, en désignant un métier à la fois, avait rendu visible ce que la page traînait depuis toujours : un métier à une seule carte la collait à gauche, avec les trois quarts de la largeur en vide à sa droite.
+
+La cause était la grille. `repeat(auto-fill, minmax(240px, 1fr))` réserve quatre colonnes quel que soit le nombre de cartes, et les colonnes vides occupent leur place. Premier essai, `auto-fit`, qui replie les colonnes vides : il centre bien la carte solitaire, mais il en coûte une au passage, quatre cartes ne tenant plus sur une rangée. La raison est dans la spécification : le nombre de répétitions se compte sur la fonction de dimensionnement maximale dès qu'elle est définie, donc sur le plafond de 250 px et non sur le minimum de 240, et il n'en rentre plus que trois. Mesuré à l'écran avant de comprendre pourquoi.
+
+**Les cartes passent donc en flexbox**, `flex: 1 1 240px` plafonné à 250 px, `justify-content: center`. Une rangée pleine se partage la largeur exactement comme avant, une rangée courte se centre, et le plafond est ce qui empêche la carte solitaire de s'étirer sur toute la page au lieu de se centrer. C'est lui aussi qui garde la même largeur de carte d'un métier à l'autre. Même traitement pour la fiche de contact, seule de son espèce elle aussi.
+
+**Et les titres suivent**, sans quoi le résultat se lirait comme un défaut : une étiquette à gauche au-dessus d'une carte au milieu. Titres de groupe et titres de rayon se centrent, ce qui donne enfin à la page l'axe unique que la charte annonçait depuis la refonte en portail, "tout est centré sous le logo". La boîte du titre de groupe se resserre déjà sur son texte pour le magnétisme ; elle se centre maintenant par ses marges, et le grossissement du foyer part de son centre au lieu de son bord gauche.
+
+Vérifié à 1440 px : carte solitaire centrée au pixel sur l'axe de la page (590..850, milieu 720), son titre aussi (662..778), les quatre cartes de plomberie sur une seule rangée centrée (238..1202), fiche de contact centrée, titres de rayon centrés, rangées de ressources inchangées sur toute la largeur. À 900 px, trois cartes sur la première rangée et la quatrième centrée dessous. En fenêtre étroite la carte reprend toute la largeur, le plafond n'ayant plus de sens à une colonne. Aucun débordement horizontal de 375 à 1440 px, recherche et magnétisme intacts, console vide.
+
+## 2026-08-30, le foyer, plus fort
+
+"Peux-tu amplifier l'animation." Tous les curseurs montent d'un cran, et il en manquait un.
+
+Le fond passe de 0,34 à 0,20 d'opacité, l'échelle au loin de 0,972 à 0,93, le titre de 9 à 16 % de grossissement, le halo de la pastille de 4 à 6 px. La cloche se resserre, écart type de 0,78 à 0,62 groupe, et l'aimantation se durcit, de 0,62 à 0,78 : le profil passe de 0,44 à 0,27 sur le voisin immédiat, le foyer s'attarde plus longtemps puis bascule plus vite. En fenêtre étroite tout cela reste d'un cran en dessous.
+
+**L'échelle au foyer, elle, ne monte que de 1,028 à 1,040, et c'est un plafond, pas un choix de goût.** La moitié d'un groupe grossi doit tenir dans les 22 px de gouttière du portail, ce qui donne 1,042 au maximum ; au-delà, la page déborde à droite dès que la fenêtre fait juste la largeur du gabarit. Le contraste de taille se gagne donc de l'autre côté, sur ce qui s'éloigne, où rien n'interdit de rapetisser. Vérifié à 1124 px, la largeur la plus serrée : groupe au foyer de 23 à 1101, rien ne dépasse.
+
+**Le flou manquait.** C'est lui qui dit vraiment l'arrière-plan, et l'utilisateur avait employé le mot dès la première demande, "comme fondu". Deux pixels au plus, un seul en fenêtre étroite. Il ne se pose pas en calcul continu mais par une classe posée par hub.js, et le groupe au foyer n'en porte aucun : un filtre, même `blur(0)`, isole ce qu'il y a derrière l'élément, et les cartes du groupe regardé y perdraient le verre de leur `backdrop-filter`. Hors foyer l'isolation ne se voit pas, l'opacité ayant déjà tout mangé. Effet de bord favorable : un groupe flouté rend son `backdrop-filter` inopérant, donc gratuit.
+
+Vérifié à l'oeil dans les deux thèmes, profil 0,006 / 0,272 / 1,000 / 0,272 / 0,006 : le groupe au foyer est net et seul net, ses voisins sont flous et à moitié effacés, le reste a disparu. Pas de débordement de 375 à 1280 px, seize groupes sur dix-sept portent la classe de flou et le dix-septième est bien celui du foyer, console vide.
+
+Le coût processeur graphique du flou n'a pas pu être mesuré : le volet d'aperçu gèle requestAnimationFrame dès qu'il se cache, et une boucle de mesure sur les trames n'y aboutit pas. C'est le seul poste qui coûte quelque chose, et `--aimant-flou: 0` l'éteint sans rien casser.
+
+## 2026-08-30, le déroulé a un foyer
+
+Demande de l'utilisateur : "une sorte de magnétisme grossissant au fur et à mesure qu'on descend la page", avec son exemple, cliquer Ventilation et voir Ventilation en plus gros, le reste grisonnant, comme fondu.
+
+C'est la vague du sommaire, couchée. Rien de nouveau n'a été inventé : la même cloche de Gauss, le même grossissement par transform, la même variable posée par hub.js et traduite par hub.css. La leçon de la ruche s'applique donc telle quelle, et c'est ce qui a décidé de la forme.
+
+**Le foyer se calcule en indice, pas en pixels.** Une ligne de mire à 42 % de la hauteur de l'écran est projetée sur la suite des centres de groupes, ce qui donne une position continue entre deux indices ; la distance passe dans la cloche d'écart type 0,78 groupe et chaque groupe reçoit son intensité en `--f`. En pixels, la vague aurait été large sur un métier à six cartes et sèche sur un métier à une carte. Deux détails font le magnétisme plutôt qu'un dégradé : la part fractionnaire est tirée vers l'entier le plus proche par une sinusoïde, le foyer s'attarde sur un groupe puis bascule vite ; et les intensités sont ramenées à leur maximum, ce qui garantit toujours exactement un groupe à pleine encre, en haut de page où la mire tombe encore dans l'en-tête comme en bas où le défilement bute avant d'avoir centré le dernier. Cette normalisation a un second effet, voulu : le groupe au foyer est à opacité exactement 1, donc sans contexte d'isolation, donc ses cartes gardent leur verre.
+
+**Le clic du sommaire pose le groupe au foyer**, il ne le pose plus à 76 px du haut. Un groupe assez haut pour couvrir la mire garde son titre en haut de l'écran, un groupe court se centre sur la mire, sinon c'est son voisin qui prendrait le foyer. Et le repère du sommaire suit désormais ce foyer au lieu de se calculer une deuxième fois au tiers haut de l'écran : les deux se contredisaient au bord d'un groupe.
+
+Mesures prises en offsetTop, jamais en getBoundingClientRect : un rectangle rendu est déjà grossi par la vague, la mesure aurait nourri sa propre déformation. Un `ResizeObserver` sur le portail remesure quand la tuile météo arrive ou qu'une recherche vide des groupes. Seuls les groupes dont l'intensité change sont réécrits, les autres ne coûtent rien.
+
+Vérifié : profil 0,037 / 0,440 / 1,000 / 0,440 / 0,037 autour du groupe visé, à l'oeil dans les deux thèmes, titre visiblement plus gros et halo sur la pastille au foyer, cartes voisines fondues. Clic sur Ventilation, groupe centré au pixel sur la mire (haut 193, bas 410, mire 302), foyer et repère du sommaire sur Ventilation. Recherche en cours : classe retirée, opacité 1 et transform none partout. Contrôle du catalogue et syntaxe au vert.
+
+Un débordement horizontal a été trouvé et corrigé au passage : le titre de groupe est un `flex` pleine largeur, et le grossir depuis son bord gauche le poussait de six pixels hors de la page en fenêtre étroite. La boîte se resserre maintenant sur son texte.
+
+Leçon de test, encore une : le volet d'aperçu se détache après chaque `location.reload()`, `innerWidth` retombe à zéro et les captures virent au noir ; il faut le rouvrir. Et le défilement natif ne répond ni à la molette synthétique ni au `behavior: "smooth"`. La vérification à l'oeil s'est donc faite à défilement zéro, en masquant l'en-tête pour faire monter le catalogue et en figeant les intensités le temps de la capture, le `ResizeObserver` repeignant sinon aussitôt.
+
+## 2026-08-30, chaque métier a sa carte, prête-nom compris
+
+L'utilisateur veut un placeholder sur chaque métier, même sans app prévue. Cinq métiers étaient vides : VRD, électricité, paysage, structure, BIM.
+
+Chacun reçoit donc une carte "bientôt" portant un PRÊTE-NOM, un outil plausible du métier inventé pour tenir la place et signalé comme tel en commentaire du catalogue : Rétention et débit de fuite (VRD), Bilan de puissance (électricité), Coefficient de biotope (paysage), Prédimensionnement structure, Contrôle de maquette (BIM). Rien n'oblige à les développer : ils se remplacent par les vrais projets quand ils naissent.
+
+Conséquence : les quatorze groupes s'ouvrent dans la page, les dix-sept bulles du sommaire sont toutes cliquables, plus aucune en pointillé, et le compteur annonce dix-huit outils dont huit seulement en ligne. L'état pointillé du sommaire reste dans le code pour un métier futur déclaré sans carte. Vérifié : le groupe Paysage existe avec sa carte estompée badgée Bientôt, le contrôle du catalogue passe à vingt-quatre portes.
+
+## 2026-08-30, la goutte gonfle pour de vrai
+
+"Ce n'est pas suffisant, tu n'as pas respecté ce que je t'ai dit." Il avait raison, et la capture en gros plan l'a montré : sur sa maquette le rail lui-même se renfle largement autour de la bulle visée, avec des cols concaves marqués ; chez moi la bosse de 38 pixels dépassait d'à peine deux pixels un rail de 34, le rail restait droit et l'étiquette ne faisait que le toucher. L'effet était programmé mais invisible, et une vérification au chiffre ne remplace pas une vérification à l'oeil.
+
+La bosse passe à 56 pixels et déborde de onze le flanc gauche du rail : le renflement se voit. L'étiquette chevauche la bosse de quinze pixels, ce qui fabrique le col organique. Le flou du filtre monte à 7,5 et son contraste suit, pour des cols plus ronds. Et l'ensemble devient élastique : la position de la bosse et de l'étiquette transitionne le long du rail, le bloc suit la souris avec un temps de retard au lieu de se téléporter, et tous les grossissements passent par une courbe à rebond qui dépasse légèrement la cible avant de s'y poser.
+
+Vérifié en capture agrandie, dans les deux thèmes : le rail se gonfle, le nom sort du rail, les cols sont là. Méthode de vérification retenue pour la suite : grossir le volet par transform le temps d'une capture, en posant l'état AVANT d'appliquer le grossissement, les rectangles mesurés après coup étant faussés par l'échelle.
+
+## 2026-08-30, le rail devient une goutte
+
+L'utilisateur envoie une maquette : l'étiquette ne doit pas flotter à côté du rail, elle doit en sortir, le rail se déformant autour de la bulle visée. Et les bulles doivent grossir davantage.
+
+Le fond du sommaire n'est plus une boîte mais une goutte : trois formes de la même couleur pleine, la pilule du rail, une bosse qui suit la bulle visée et l'étiquette du nom, fondues en une seule silhouette par un filtre SVG, flou de six puis contraste d'alpha. Deux formes assez proches fusionnent, et l'étiquette semble sortir du rail avec un col organique, comme sur la maquette. L'ombre est un drop-shadow posé après le filtre : elle épouse la silhouette fusionnée, pas les trois boîtes. Le fondu d'alpha ne pardonnant pas la translucidité, la goutte a sa couleur pleine à elle, un cran plus clair que la carte en thème sombre où le rail se confondait avec la page.
+
+Le grossissement passe de 1,95 à 2,4 au pic, l'écart type resserré d'un tiers pour que la vague reste locale. Vérifié au chiffre : 2,40 sur la bulle visée, 1,78 sur sa voisine, 1,00 au loin, badge au bon nom sur un métier plein comme sur un vide. Les noms au repos disparaissent à toutes les largeurs, le badge de la goutte les remplace ; la bulle simple survit pour le clavier et pour prefers-reduced-motion, qui coupe vague et goutte.
+
+Leçon de test, encore : le panneau d'aperçu masqué gèle aussi les transitions CSS, pas seulement requestAnimationFrame. Une mesure à mi-course n'est pas un bug de la page.
+
+## 2026-08-30, le sommaire prend la vague, et la feuille de route entre au catalogue
+
+Deux demandes de l'utilisateur sur le sommaire fraîchement posé.
+
+**La vague magnétique.** Le sommaire devient une colonne de bulles rondes, sans nom visible au repos. À l'approche du curseur, chaque bulle grossit selon sa distance verticale, en cloche de Gauss d'écart type une bulle et demie : la plus proche double presque (1,95), ses voisines suivent en s'amortissant, et la colonne ne bouge pas puisque tout passe par un transform. La bulle visée déplie son nom dans une bulle-étiquette à sa gauche, "· bientôt" pour un métier vide : on lit ce qu'on va cliquer avant de cliquer. `prefers-reduced-motion` coupe la vague, le nom restant au survol simple. Vérifié au chiffre : profil 1,01 / 1,07 / 1,29 / 1,71 / 1,95 / 1,71 / 1,29 / 1,07 / 1,01 autour de la bulle visée, étiquette juste sur un métier plein comme sur un vide, remise à plat à la sortie.
+
+Leçon de test au passage : le panneau d'aperçu masqué suspend requestAnimationFrame, et la vague ne peut donc pas être testée par événements synthétiques sans shunter temporairement rAF. Ce n'est pas un bug de la page, un onglet réel visible reçoit ses trames.
+
+**Les sept outils de la feuille de route entrent au catalogue** en statut a-venir, cartes estompées "bientôt" : RefriSelect, Calculette résistance thermique, Calculette confort d'été, Désenfumage, Arbitrage carbone ACV, RTex Tool, Livre d'or REX. C'est l'interprétation retenue de "remets tous les placeholders" : la liste vivait dans la prochaine étape de la fiche, elle vit désormais dans le portail. Publier un outil n'est plus qu'une url et un statut à changer. Les pitchs et catégories de RefriSelect (climatisation), RTex Tool (thermique, lu comme RT existant) et du Livre d'or REX (utilitaires) sont déduits du nom et signalés à vérifier, en commentaire du catalogue comme dans la fiche.
+
+Le portail compte dix-neuf portes, huit ouvertes, et neuf métiers sur quatorze ont au moins une carte. Restent vides et en pointillé au sommaire : VRD, électricité, paysage, structure, BIM.
+
 ## 2026-08-30, la page assume de se dérouler : la ruche cède la place au sommaire
 
 Aucune des pistes ne convenait plus, et c'est l'utilisateur qui a mis le doigt sur la contradiction de fond : "l'application est faite pour se dérouler, et on essaie de réduire au maximum, c'est un peu bête". Il a conclu lui-même : revenir aux cartes, qui étaient très bien, et poser un sommaire, à droite.

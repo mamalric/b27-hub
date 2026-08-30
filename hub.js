@@ -20,6 +20,8 @@
    VERSION ET JOURNAL
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v11", date: "2026-08-30", titre: "Le déroulé a un foyer",
+    texte: "La page qui se déroule met en avant ce qu'on regarde : le groupe au foyer se tient un peu plus grand et à pleine encre, son titre grossit, sa pastille prend un halo, et les autres reculent, s'estompent et se floutent en attendant leur tour. Le foyer suit le défilement en vague magnétique, la même cloche que les bulles du sommaire mais couchée le long de la page ; cliquer une bulle du sommaire pose vraiment son métier au foyer. Pendant une recherche et sur un poste qui demande moins d'animations, la page reste à plat. L'entrée occupe l'écran entier, emblème, titre et recherche tenus en son milieu, et le catalogue commence sous la ligne de flottaison. Les titres de rayon quittent le fil de la page pour l'entête, où ils glissent de l'un à l'autre au passage. La molette avance ensuite par crans, un par pichenette et neuf par seconde au plus tant qu'on tourne, et chaque métier se pose au même endroit de l'écran, au pixel près. Les flèches du clavier font de même, un métier par touche. Le portail répond enfin aux gestes, à l'oeil et à l'oreille : cinq sons courts synthétisés en local, un rebond en bout de course, une bulle du sommaire qui bat à l'arrivée, et un bouton pour tout couper. Le foyer est exclusif, ce qui l'entoure passe au lointain, presque effacé et flou. Le catalogue rejoint au passage l'axe du logo, titres et cartes centrés, une rangée pleine se partageant la largeur et une rangée courte se centrant. Les ressources se lisent désormais dans la même carte que les outils, au lieu des rangées compactes qui leur étaient réservées ; la fiche de contact et la signature de pied de page quittent le portail, la pastille de signalement restant la voie pour écrire, et le site de l'entreprise devient une carte des ressources, en dernier groupe de la page." },
   { v: "v10", date: "2026-08-30", titre: "Le sommaire, les métiers, la signature",
     texte: "Le catalogue se groupe par métier et un sommaire fixé à droite de l'écran donne la vue d'ensemble : les treize métiers de B27 s'y lisent, ceux sans outil encore en attente, et le repère suit le défilement. Quatre outils de dimensionnement sont annoncés (eau froide, eaux usées et vannes, eaux pluviales, gaines de ventilation). Le site de l'entreprise quitte le rayon des outils pour signer le pied de page, et B27 Mobility, réservé à l'interne, quitte un portail public." },
   { v: "v9", date: "2026-08-29", titre: "La météo en grand",
@@ -109,6 +111,8 @@ const TRACES_ICONES = {
   lune: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   engrenage: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
   fermer: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  son: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/>',
+  muet: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/>',
   langue: '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>',
   actualiser: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
@@ -192,7 +196,6 @@ function categorie(cle) { return CATEGORIES.find(c => c.cle === cle) || null; }
 function sousCategorie(cle) {
   return (typeof SOUS_CATEGORIES === "undefined" ? [] : SOUS_CATEGORIES).find(s => s.cle === cle) || null;
 }
-function contacts() { return typeof CONTACTS === "undefined" ? [] : CONTACTS; }
 
 /* ---------------------------------------------------------------------
    CONTRÔLE DU CATALOGUE
@@ -242,17 +245,158 @@ function controlerCatalogue() {
     }
   });
 
-  contacts().forEach((c, i) => {
-    const ou = "contact " + (i + 1) + " (" + (c.nom || c.id || "sans nom") + ")";
-    if (!c.nom) anomalies.push(ou + " : champ nom manquant.");
-    if (!c.mail && !c.tel) anomalies.push(ou + " : ni mail ni téléphone, la fiche n'offrirait aucun moyen de joindre.");
-  });
-
   if (anomalies.length) {
     console.warn("Portail B27 : " + anomalies.length + " anomalie(s) dans catalogue.js\n"
       + anomalies.map(a => "  - " + a).join("\n"));
   }
   return anomalies;
+}
+
+/* ---------------------------------------------------------------------
+   LE SON
+
+   Un retour à l'oreille sur ce qu'on fait : un cran de molette, une flèche,
+   un passage d'un rayon à l'autre, une butée en bout de course, une
+   sélection. Tout est synthétisé à la volée par l'API Web Audio, comme le
+   fond est calculé plutôt que dessiné : pas un fichier, pas une
+   dépendance, et le portail continue de fonctionner depuis le disque.
+
+   TRÈS COURT, TRÈS BAS, ET JAMAIS UN ACCORD DÉSAGRÉABLE. Chaque son est une
+   sinusoïde de quelques centièmes de seconde, prise dans une gamme
+   pentatonique où deux notes quelconques sonnent ensemble, adoucie par un
+   passe-bas et enveloppée d'une attaque de quatre millisecondes et d'une
+   extinction exponentielle : un créneau net claquerait. Le volume est celui
+   d'un objet qu'on pose sur une table, pas d'une notification. Deux sons ne
+   se collent jamais, un intervalle minimal les sépare.
+
+   LE NAVIGATEUR INTERDIT TOUT SON AVANT UN GESTE D'ACTIVATION, et tous les
+   gestes n'en sont pas. Un clic, une touche, un toucher déverrouillent le
+   contexte audio ; la molette, non, elle ne compte pas comme activation.
+   Un visiteur qui ne fait que dérouler n'entendait donc rien, le contexte
+   restant suspendu quoi qu'on lui demande, et les notes programmées dans un
+   temps qui n'avance pas se perdaient. Le déverrouillage est donc accroché
+   aux gestes qui en ont le pouvoir, et une note demandée trop tôt n'est pas
+   jetée : elle repart dès que le contexte s'ouvre.
+
+   Le premier son entendu reste la conséquence d'une action, jamais du
+   chargement. Un bouton du haut coupe tout, et le choix vit dans le
+   navigateur comme le thème.
+   --------------------------------------------------------------------- */
+const CLE_SON = "hub_b27_son";
+const SON = { ctx: null, actif: true, dernier: 0, reprise: false };
+
+// Gamme pentatonique majeure, en hertz, plus un do grave pour la butée :
+// deux notes quelconques sonnent ensemble, il n'y a pas d'accord à éviter.
+const SON_NOTES = [261.63, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+
+// Une voix : des notes en [indice, retard, durée, volume]. Ce qui descend
+// sonne plus grave que ce qui remonte, le geste s'entend dans la hauteur.
+const SON_VOIX = {
+  cranBas:  [[2, 0, 0.075, 0.030]],
+  cranHaut: [[4, 0, 0.075, 0.030]],
+  passage:  [[3, 0, 0.105, 0.032], [5, 0.06, 0.135, 0.026]],
+  clic:     [[5, 0, 0.055, 0.034]],
+  butee:    [[0, 0, 0.140, 0.028]]
+};
+
+function sonContexte() {
+  if (SON.ctx) return SON.ctx;
+  const C = window.AudioContext || window.webkitAudioContext;
+  if (!C) return null;
+  try { SON.ctx = new C(); } catch (e) { return null; }   // audio refusé, tant pis
+  return SON.ctx;
+}
+
+// Une note. Le passe-bas arrondit ce qui resterait de mordant dans la
+// sinusoïde, et l'extinction exponentielle évite le clic de coupure.
+function sonNote(freq, duree, volume, retard) {
+  const ctx = SON.ctx;
+  const t = ctx.currentTime + retard;
+  const osc = ctx.createOscillator();
+  const filtre = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(freq, t);
+  filtre.type = "lowpass";
+  filtre.frequency.setValueAtTime(2400, t);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(volume, t + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + duree);
+  osc.connect(filtre); filtre.connect(gain); gain.connect(ctx.destination);
+  osc.start(t);
+  osc.stop(t + duree + 0.03);
+}
+
+function sonJouer(nom) {
+  const voix = SON.actif && SON_VOIX[nom];
+  if (!voix) return;
+  const ctx = sonContexte();
+  if (!ctx) return;
+  /* Contexte encore verrouillé : programmer la note maintenant, dans un
+     temps qui n'avance pas, reviendrait à la perdre. On pousse le contexte
+     et on rejoue la note quand il s'ouvre, une seule reprise en attente à
+     la fois. L'intervalle qui espace les sons n'est pas consommé pour
+     autant : une note qui n'a pas sonné ne compte pas. */
+  if (ctx.state !== "running") {
+    if (!SON.reprise) {
+      SON.reprise = true;
+      ctx.resume().then(() => { SON.reprise = false; sonJouer(nom); })
+                  .catch(() => { SON.reprise = false; });
+    }
+    return;
+  }
+  const maintenant = performance.now();
+  if (maintenant - SON.dernier < 40) return;   // deux sons collés claquent
+  SON.dernier = maintenant;
+  voix.forEach(v => sonNote(SON_NOTES[v[0]], v[2], v[3], v[1]));
+}
+
+/* Le déverrouillage, accroché aux gestes qui comptent comme activation.
+   Il reste posé plutôt que de se retirer au premier passage : un contexte
+   peut être resuspendu par le système en cours de route, et la reprise ne
+   coûte rien sur un contexte déjà ouvert. */
+function sonDeverrouiller() {
+  const ctx = sonContexte();
+  if (ctx && ctx.state !== "running") ctx.resume().catch(() => {});
+}
+
+function sonEtat(actif) {
+  SON.actif = !!actif;
+  const b = $("btnSon");
+  if (!b) return;
+  const quoi = SON.actif ? "Couper le son" : "Activer le son";
+  b.innerHTML = ico(SON.actif ? "son" : "muet", 17);
+  b.setAttribute("aria-label", quoi);
+  b.setAttribute("title", quoi);
+  b.setAttribute("aria-pressed", String(SON.actif));
+}
+
+function initSon() {
+  // Les gestes qui ont le pouvoir de déverrouiller l'audio. La molette n'en
+  // fait pas partie, c'est le navigateur qui en décide : sans un clic ou
+  // une touche quelque part, un visiteur qui ne fait que dérouler resterait
+  // dans le silence.
+  ["pointerdown", "keydown", "touchstart"].forEach(t =>
+    window.addEventListener(t, sonDeverrouiller, { capture: true, passive: true }));
+
+  let memorise = null;
+  try { memorise = localStorage.getItem(CLE_SON); } catch (e) { /* stockage refusé */ }
+  sonEtat(memorise !== "off");
+  $("btnSon").addEventListener("click", () => {
+    sonEtat(!SON.actif);
+    try { localStorage.setItem(CLE_SON, SON.actif ? "on" : "off"); } catch (e) { /* non mémorisé */ }
+  });
+
+  /* Le son de sélection est délégué au document : une carte, une bulle du
+     sommaire, la pilule d'ancrage, un bouton du haut. En délégation, le
+     bouton du son rend lui-même son état avant que le clic n'arrive ici,
+     si bien qu'allumer le son se confirme d'un son et l'éteindre se tait. */
+  document.addEventListener("click", ev => {
+    if (!ev.target || !ev.target.closest) return;
+    if (ev.target.closest("a.carte, .som-ligne[data-cible], .ancre, .bouton-icone, .rang")) {
+      sonJouer("clic");
+    }
+  });
 }
 
 /* ---------------------------------------------------------------------
@@ -1373,7 +1517,7 @@ function peindreCalendrier() {
 /* ---------------------------------------------------------------------
    LES RAYONS
 
-   Deux rayons et une fiche : nos outils, les ressources, le contact.
+   Deux rayons, en cartes tous les deux : nos outils, les ressources.
    Tout vient de catalogue.js. Le tableau s'y appelle PORTES pour des
    raisons historiques ; à l'écran, on parle d'outils et de ressources.
    --------------------------------------------------------------------- */
@@ -1392,14 +1536,23 @@ function html_badge(o) {
   return '<span class="badge' + (o.statut === "beta" ? " beta" : "") + '">' + ech(s.libelle) + "</span>";
 }
 
-function html_outil(o, index) {
+/* LA MEME CARTE POUR LES DEUX RAYONS. Les ressources ont d'abord vécu en
+   rangées compactes pleine largeur, une forme à elles ; elles se lisent
+   maintenant comme les outils, en cartes, et la page n'a plus qu'un objet.
+   Rien ne les distinguait qui justifiât deux dessins : un nom, une phrase,
+   une pastille à la couleur du domaine et un lien qui sort. Seule l'icône
+   par défaut change, le livre pour une ressource et la grille pour un
+   outil, et elle n'a de toute façon à servir que si le catalogue en oublie
+   une. */
+function html_carte(o, index) {
   const s = STATUTS[o.statut] || STATUTS["a-venir"];
   const cat = categorie(o.categorie);
   const c = couleurSure(cat && cat.couleur);
   const cliquable = s.cliquable && o.url;
   const dedans =
       '<div class="carte-tete">'
-    +   '<span class="carte-puce" style="--c:' + c + '">' + ico(o.icone || "grille", 21) + "</span>"
+    +   '<span class="carte-puce" style="--c:' + c + '">'
+    +     ico(o.icone || (estOutil(o) ? "grille" : "livre"), 21) + "</span>"
     +   '<span class="carte-sortie">' + ico("sortie", 15) + "</span>"
     + "</div>"
     + '<span class="carte-nom">' + ech(o.nom) + "</span>"
@@ -1410,21 +1563,6 @@ function html_outil(o, index) {
   return cliquable
     ? "<a" + attrs + ' href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer">' + dedans + "</a>"
     : "<div" + attrs + ">" + dedans + "</div>";
-}
-
-function html_ressource(o, index) {
-  const cat = categorie(o.categorie);
-  const c = couleurSure(cat && cat.couleur);
-  return '<a class="rang apparait" style="--c:' + c + ';--i:' + index + '"'
-    + ' data-cherche="' + ech(clesRecherche(o)) + '"'
-    + ' href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer">'
-    +   '<span class="rang-puce">' + ico(o.icone || "livre", 17) + "</span>"
-    +   '<span class="rang-texte">'
-    +     '<span class="rang-nom">' + ech(o.nom) + "</span>"
-    +     '<span class="rang-pitch">' + ech(o.pitch) + "</span>"
-    +   "</span>"
-    +   '<span class="rang-sortie">' + ico("sortie", 15) + "</span>"
-    + "</a>";
 }
 
 /* ---------------------------------------------------------------------
@@ -1447,7 +1585,7 @@ function html_ressource(o, index) {
    métier avant d'avoir lu son nom. L'identifiant est la cible du
    sommaire. */
 function html_groupe(nom, couleur, dedans, id) {
-  return '<div class="groupe" id="' + ech(id) + '">'
+  return '<div class="groupe aimant" id="' + ech(id) + '">'
     +   '<h3><span class="groupe-puce" style="--c:' + couleurSure(couleur) + '"></span>' + ech(nom) + "</h3>"
     +   dedans
     + "</div>";
@@ -1461,22 +1599,29 @@ const SOMMAIRE = [];
 function construireSommaire() {
   const nav = $("sommaire");
   const entrees = SOMMAIRE.slice();
-  if (contacts().length) {
-    entrees.push({ nom: "Contact", couleur: "", cible: "rayonContact", bloc: "contact" });
-  }
   if (!entrees.length) return;
 
+  // Le fond du rail est une goutte : trois formes de la même couleur
+  // pleine, fondues par le filtre #fonduSommaire. La bosse suit la bulle
+  // visée, le badge porte son nom ; hub.css et initSommaire les animent.
+  const goutte = '<div class="som-goo" aria-hidden="true">'
+    + '<span class="som-rail"></span><span class="som-bosse"></span>'
+    + '<span class="som-badge" id="somBadge"></span></div>';
+
   let blocPrecedent = entrees[0].bloc;
-  nav.innerHTML = entrees.map(e => {
+  nav.innerHTML = goutte + entrees.map(e => {
     const debut = e.bloc !== blocPrecedent ? " som-debut" : "";
     blocPrecedent = e.bloc;
-    const dedans = '<span class="som-puce"></span><span class="som-nom">' + ech(e.nom) + "</span>";
+    // Pas d'attribut title : il doublerait la bulle-étiquette d'une
+    // infobulle native. Le nom vit dans la bulle, lue aussi au clavier.
+    const dedans = '<span class="som-puce"></span>'
+      + '<span class="som-nom">' + ech(e.cible ? e.nom : e.nom + " · bientôt") + "</span>";
     if (!e.cible) {
-      return '<span class="som-ligne vide' + debut + '" style="--c:' + couleurSure(e.couleur) + '"'
-        + ' title="' + ech(e.nom) + " : bientôt" + '">' + dedans + "</span>";
+      return '<span class="som-ligne vide' + debut + '" style="--c:' + couleurSure(e.couleur) + '">'
+        + dedans + "</span>";
     }
     return '<button type="button" class="som-ligne' + debut + '" style="--c:' + couleurSure(e.couleur) + '"'
-      + ' data-cible="' + ech(e.cible) + '" title="' + ech(e.nom) + '">' + dedans + "</button>";
+      + ' data-cible="' + ech(e.cible) + '">' + dedans + "</button>";
   }).join("");
   nav.hidden = false;
 }
@@ -1490,31 +1635,636 @@ function initSommaire() {
   nav.addEventListener("click", ev => {
     const b = ev.target.closest("[data-cible]");
     if (!b) return;
+    // Une bulle cliquée à la souris rend le focus : l'anneau vert et
+    // l'étiquette du nom sont des repères de clavier, ils n'ont rien à
+    // faire là quand on vient de désigner au doigt ce qu'on voulait voir.
+    // ev.detail vaut zéro sur une activation au clavier, qui garde donc
+    // ses repères, et au moins un sur un clic.
+    if (ev.detail) b.blur();
     const cible = $(b.dataset.cible);
     if (!cible) return;
-    window.scrollTo({
-      top: cible.getBoundingClientRect().top + window.scrollY - 76,
-      behavior: reduit ? "auto" : "smooth"
-    });
+    // Le clic ne descend pas seulement au groupe, il le pose sous la ligne
+    // de mire du magnétisme : ce qu'on a désigné arrive au foyer, en avant,
+    // et le reste de la page s'estompe autour. C'est le même chemin que les
+    // arrêts de la molette, donc exactement le même endroit à l'écran.
+    const haut = aimantHaut(cible);
+    const y = AIMANT.actif ? aimantOu(haut) : haut - 76;
+    window.scrollTo({ top: y, behavior: reduit ? "auto" : "smooth" });
   });
 
-  // Le repère suit le défilement : la dernière cible passée au-dessus du
-  // tiers haut de l'écran est le groupe où l'on se trouve.
+  // Le repère marque le groupe où l'on se trouve. Quand le magnétisme du
+  // déroulé est en place, c'est lui qui le désigne : les deux se
+  // contrediraient au bord d'un groupe, et le sommaire doit marquer ce que
+  // la page met en avant, pas un autre calcul. Sans magnétisme, quand le
+  // poste demande moins d'animations, le repère se calcule seul : la
+  // dernière cible passée au-dessus du tiers haut de l'écran.
+  function marquer(cible) {
+    nav.querySelectorAll(".som-ligne").forEach(b =>
+      b.classList.toggle("actif", !!cible && b.dataset.cible === cible));
+  }
+  AIMANT.surFoyer = marquer;
+
   let prevu = false;
   function reperer() {
     prevu = false;
+    if (AIMANT.actif) return;
     const seuil = window.scrollY + innerHeight * 0.3;
     let courant = null;
     nav.querySelectorAll("[data-cible]").forEach(b => {
       const s = $(b.dataset.cible);
       if (s && !s.hidden && s.getBoundingClientRect().top + window.scrollY <= seuil) courant = b;
     });
-    nav.querySelectorAll(".som-ligne").forEach(b => b.classList.toggle("actif", b === courant));
+    marquer(courant ? courant.dataset.cible : null);
   }
   window.addEventListener("scroll", () => {
     if (!prevu) { prevu = true; requestAnimationFrame(reperer); }
   }, { passive: true });
   reperer();
+
+  /* La vague magnétique. À l'approche du curseur, chaque bulle grossit
+     selon sa distance verticale, en cloche de Gauss : la plus proche va
+     jusqu'à deux fois et demie, ses voisines suivent en s'amortissant, et
+     la colonne ne bouge pas puisque tout passe par un transform.
+
+     La goutte suit la même cloche : la bosse du rail gonfle sur la bulle
+     visée, et dès que le curseur est vraiment dessus, le badge se déplie
+     avec son nom, fondu dans le rail par le filtre. L'écart type vaut
+     environ une bulle et demie de pas : en dessous la vague est un
+     à-coup, au-dessus toute la colonne gonfle d'un bloc. Sous
+     prefers-reduced-motion, ni vague ni goutte : le CSS montre le nom en
+     bulle simple au survol et tout reste immobile. */
+  if (!reduit) {
+    nav.classList.add("vague");
+    const goutte = nav.querySelector(".som-goo");
+    const badge = $("somBadge");
+    const lignes = Array.prototype.slice.call(nav.querySelectorAll(".som-ligne"));
+    let sourisY = null, vaguePrevue = false;
+    function vague() {
+      vaguePrevue = false;
+      let proche = null, mini = Infinity, procheY = 0;
+      lignes.forEach(b => {
+        const r = b.getBoundingClientRect();
+        const centre = r.top + r.height / 2;
+        const d = sourisY === null ? Infinity : Math.abs(sourisY - centre);
+        const g = sourisY === null ? 1 : 1 + 1.4 * Math.exp(-(d * d) / 900);
+        b.style.setProperty("--g", g.toFixed(3));
+        if (d < mini) { mini = d; proche = b; procheY = centre; }
+      });
+      const presence = sourisY === null ? 0 : Math.exp(-(mini * mini) / 900);
+      if (proche && presence > 0.5) {
+        badge.textContent = proche.querySelector(".som-nom").textContent;
+      }
+      if (proche) {
+        goutte.style.setProperty("--by", (procheY - goutte.getBoundingClientRect().top) + "px");
+      }
+      goutte.style.setProperty("--b", (presence > 0.12 ? presence : 0).toFixed(3));
+      goutte.style.setProperty("--e", presence > 0.5 ? "1" : "0");
+    }
+    nav.addEventListener("mousemove", ev => {
+      sourisY = ev.clientY;
+      if (!vaguePrevue) { vaguePrevue = true; requestAnimationFrame(vague); }
+    });
+    nav.addEventListener("mouseleave", () => { sourisY = null; requestAnimationFrame(vague); });
+  }
+}
+
+/* ---------------------------------------------------------------------
+   LE MAGNÉTISME DU DÉROULÉ
+
+   La page se déroule, c'est sa nature, et le déroulé a maintenant un
+   foyer : le groupe où l'on se trouve se tient en avant, un peu plus grand
+   et à pleine encre, pendant que le reste recule et s'estompe en attendant
+   son tour. On ne lit plus une liste, on lit ce qu'on regarde, et cliquer
+   une bulle du sommaire amène vraiment son métier au foyer.
+
+   C'est la vague magnétique du sommaire, la même cloche de Gauss, mais
+   couchée le long de la page au lieu de la colonne des bulles. Le
+   vocabulaire était déjà là, il n'a pas fallu en inventer un deuxième.
+   hub.css tient les valeurs, hub.js ne pose qu'un nombre par groupe.
+
+   LE FOYER SE CALCULE EN INDICE, PAS EN PIXELS. La ligne de mire, posée à
+   un tiers de la hauteur d'écran, est projetée sur la suite des hauts de
+   groupes : elle donne une position continue entre deux indices. La
+   distance passe dans la cloche, chaque groupe reçoit son intensité en
+   variable --f, et le CSS en fait une opacité, une échelle et une encre. En
+   indice plutôt qu'en pixels, parce qu'un métier à une carte et un métier à
+   six n'ont pas la même hauteur : mesurée en pixels, la vague serait large
+   sur les grands groupes et sèche sur les petits, alors qu'elle doit valoir
+   la même chose partout dans la page.
+
+   DEUX DÉTAILS FONT LE MAGNÉTISME plutôt qu'un simple dégradé. La part
+   fractionnaire de la position est tirée vers l'entier le plus proche : le
+   foyer s'attarde sur un groupe puis bascule vite sur le suivant, comme une
+   bille qui colle à un aimant avant de sauter au suivant. Et les intensités
+   sont ramenées à leur maximum : il y a toujours exactement un groupe à
+   pleine encre, jamais une page entière estompée.
+
+   LES DEUX BOUTS DE LA PAGE DEMANDENT CHACUN LEUR SOIN. En haut, la mire
+   tombe encore dans l'en-tête, au-dessus du premier groupe : elle se cale
+   sur lui, il a le foyer d'entrée de jeu. En bas, le défilement bute avant
+   de l'avoir amenée sur le dernier, qui resterait estompé sans plus rien à
+   dérouler pour aller le chercher ; sur le dernier écran de défilement, la
+   mire glisse donc vers le bas jusqu'à couvrir le bas du dernier groupe.
+   Que le maximum ramène toujours un groupe à pleine encre ne suffisait pas,
+   et l'erreur valait d'être payée : il garantit qu'un groupe est net, pas
+   que celui-là puisse l'être.
+
+   LA MOLETTE AVANCE D'UN GROUPE, ET D'UN SEUL. La page ne défile plus
+   librement à la molette : elle va d'arrêt en arrêt, un par groupe, plus le
+   haut de page et le pied. Tant que la molette n'a pas accumulé de quoi
+   décrocher, rien ne bouge du tout ; le seuil franchi, la page glisse d'un
+   cran et ignore la molette le temps du glissement. C'est franc et ça se
+   jauge : deux ou trois crans par métier, jamais un de plus, jamais un
+   retour en arrière.
+
+   scroll-snap avait été essayé pour ça et retiré, la leçon vaut d'être
+   gardée : le seuil d'un point d'accroche est à mi-chemin du suivant, si
+   bien qu'un petit cran de molette se fait ramener en arrière, on se croit
+   bloqué, et un coup un peu vif part loin puis atterrit sur le point le
+   plus proche de l'endroit où il s'est arrêté, cinq métiers plus bas. Ni
+   "proximity" ni "mandatory" ne savent avancer d'un cran et d'un seul.
+
+   Le clavier avance de la même façon, d'un métier par touche : flèches,
+   touches page, début et fin. Il défilait nativement de quelques dizaines
+   de pixels, ce qui décalait la page sans jamais changer de métier.
+
+   TOUT PASSE PAR TRANSFORM ET OPACITY : aucune hauteur, aucune marge ne
+   change, la mise en page ne se déforme pas sous le défilement. Les
+   positions se mesurent en offsetTop, jamais en getBoundingClientRect : un
+   rectangle rendu est déjà grossi par la vague, la mesure nourrirait sa
+   propre déformation. Et seuls les groupes dont l'intensité change vraiment
+   sont réécrits, les autres, au loin, ne coûtent rien.
+   --------------------------------------------------------------------- */
+/* LA MIRE SE POSE SUR LE HAUT DU GROUPE, PAS SUR SON CENTRE, et c'est une
+   correction payée à la règle posée sur l'écran. Centrer le groupe donnait
+   un centre stable mais des cartes qui glissaient d'un cran à l'autre : un
+   métier à une carte et un métier à quatre n'ont pas la même hauteur, et
+   centrer la boîte fait bouger tout ce qu'elle contient. Le haut du groupe,
+   lui, est un repère franc : le titre tombe toujours à la même ligne, la
+   rangée de cartes commence toujours à la même, la hauteur du groupe
+   n'ayant plus d'effet que sur ce qui dépasse en dessous.
+
+   La valeur n'est pas libre : c'est là que les arrêts de la molette posent
+   le haut d'un groupe, et la mire doit viser le même endroit, sans quoi la
+   page s'arrêterait à un endroit et le foyer se poserait à un autre. Un
+   tiers de la hauteur d'écran laisse au groupe courant la place de se
+   déployer vers le bas et au précédent celle de s'estomper au-dessus. */
+const AIMANT_MIRE = 0.34;    // la ligne de mire, en hauteur d'écran
+const AIMANT_ECART = 0.45;   // l'écart type de la cloche, en groupes
+const AIMANT_COLLE = 0.78;   // la force qui tire le foyer vers un groupe entier
+const AIMANT_NET = 0.9;      // au-dessus, le groupe est au foyer et ne se floute pas
+const AIMANT_CRAN = 100;     // molette à accumuler, en pixels, pour un cran
+const AIMANT_CADENCE = 110;  // ms au minimum entre deux crans venus de la molette
+const AIMANT_VISEE = 700;    // ms au bout desquelles l'arrêt visé n'a plus cours
+const AIMANT_SUIVI = 0.22;   // part de l'écart rattrapée par image de glissement
+
+const AIMANT = {
+  unites: [],      // { el, ancre, cible, rayon, f }, dans l'ordre de la page
+  arrets: [],      // les positions de défilement où la molette s'arrête
+  bout: 0,         // la fin de la course de défilement, retenue à la mesure
+  mireV: 0,        // la part d'écran au-dessus de la mire, retenue à la mesure
+  rallonge: 0,     // la course ajoutée en pied pour que le dernier groupe s'y pose
+  sens: 1,         // le sens du dernier défilement, pour le glissement de l'entête
+  dernierY: 0,     // la position au passage précédent, qui donne ce sens
+  vise: null,      // l'arrêt visé, qui peut être devant la position réelle
+  viseQuand: 0,    // quand il a été posé, pour le laisser périmer
+  anime: 0,        // l'image demandée pour le glissement en cours, 0 si repos
+  actif: false,    // le poste accepte les animations et la page a des groupes
+  foyer: null,     // la cible du groupe au foyer, pour le repère du sommaire
+  surFoyer: null   // le rappel que le sommaire vient poser
+};
+
+// La position d'un élément dans la page, hors de toute déformation :
+// getBoundingClientRect rendrait le rectangle déjà grossi par la vague.
+function aimantHaut(el) {
+  let y = 0;
+  for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
+  return y;
+}
+
+// La suite des groupes et leurs centres, mesurés une fois pour toutes
+// jusqu'au prochain changement de mise en page. Un groupe caché, par la
+// recherche ou par un rayon vide, ne compte pas.
+function aimantMesurer() {
+  AIMANT.unites = [];
+  document.querySelectorAll(".aimant").forEach(el => {
+    if (!el.offsetHeight) return;
+    const rayon = el.closest(".rayon");
+    // Le nom du rayon, sans son sous-titre : c'est lui qui se lit en entête.
+    const h2 = rayon ? rayon.querySelector(":scope > h2") : null;
+    const brut = h2 ? (h2.firstChild && h2.firstChild.nodeType === 3
+                       ? h2.firstChild.nodeValue : h2.textContent) : "";
+    const haut = aimantHaut(el);
+    AIMANT.unites.push({
+      el: el,
+      ancre: haut,                       // le haut du groupe, ce que la mire vise
+      cible: el.classList.contains("groupe") ? el.id : (rayon ? rayon.id : ""),
+      rayon: (brut || "").trim(),
+      f: null
+    });
+  });
+  /* LA PAGE SE DONNE LA COURSE QU'IL LUI FAUT, et c'est une correction
+     payée à la règle posée sur l'écran. Le dernier groupe doit pouvoir se
+     poser sous la mire comme les autres, or la page s'arrête bien avant :
+     ce qui le suit, la marge de pied, ne fait pas une hauteur d'écran. La première réponse avait été de faire glisser la mire
+     vers le bas en fin de page, et c'était la mauvaise : le foyer arrivait
+     bien sur le dernier groupe, mais la mire n'étant plus à la même hauteur
+     d'écran, les derniers groupes se posaient de plus en plus bas, jusqu'à
+     deux cent soixante pixels d'écart avec les premiers.
+
+     La bonne réponse est de rallonger la page du strict nécessaire. La mire
+     reste alors à hauteur fixe d'un bout à l'autre, tout groupe se pose au
+     même endroit à l'écran, et le dernier arrêt tombe sur la fin de la
+     course. La rallonge se pose en pied du corps, sous tout le reste : elle n'entre pas dans la mesure des groupes, qui la
+     précèdent, et n'agite donc pas l'observateur de mise en page. */
+  const V = innerHeight * AIMANT_MIRE;
+  const dernier = AIMANT.unites[AIMANT.unites.length - 1];
+  const posee = AIMANT.rallonge || 0;
+  const naturelle = document.documentElement.scrollHeight - posee;
+  const voulue = dernier && document.body.classList.contains("aimante")
+    ? Math.max(0, Math.round(dernier.ancre + innerHeight - V - naturelle))
+    : 0;
+  if (voulue !== posee) {
+    AIMANT.rallonge = voulue;
+    document.body.style.paddingBottom = voulue ? voulue + "px" : "";
+  }
+  AIMANT.mireV = V;
+  // La fin de la course, retenue ici : elle ne change qu'avec la mise en
+  // page, et la lire à chaque trame coûterait un calcul de mise en page.
+  AIMANT.bout = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+
+  /* Les arrêts de la molette : le haut de page, puis chaque groupe posé
+     sous la mire. Le haut de page en est un à part entière, sinon le
+     premier cran arracherait le visiteur à l'en-tête sans qu'il puisse y
+     revenir à la molette. Le dernier groupe ferme la marche et il n'y a
+     rien à ajouter derrière : la rallonge fait tomber son arrêt sur la fin
+     de la course. Deux groupes qui butent sur la même position ne comptent
+     que pour un arrêt, un cran devant toujours déplacer la page. */
+  AIMANT.arrets = [0];
+  AIMANT.unites.forEach(u => {
+    const y = Math.round(aimantOu(u.ancre));
+    if (y > AIMANT.arrets[AIMANT.arrets.length - 1] + 8) AIMANT.arrets.push(y);
+  });
+}
+
+/* L'ARRÊT VISÉ, ET POURQUOI IL EXISTE. Un premier jet ignorait molette et
+   clavier pendant le glissement, pour qu'une secousse un peu longue
+   n'enchaîne pas des crans qu'on n'a pas voulus. Le remède était pire que
+   le mal : on ne pouvait plus enchaîner du tout, et un technicien pressé
+   qui martèle la flèche n'avançait que d'un métier par demi-seconde.
+
+   Les crans se comptent donc depuis là où l'on va, pas depuis là où l'on
+   est. Cinq pressions coup sur coup valent cinq métiers, le glissement se
+   contentant de rattraper la cible qui a bougé sous lui. La visée périme
+   au bout de sept dixièmes de seconde, de sorte qu'un défilement venu
+   d'ailleurs, une tabulation ou un doigt sur l'écran, ne laisse pas de
+   trace. */
+function aimantVise() {
+  if (AIMANT.vise !== null && performance.now() - AIMANT.viseQuand > AIMANT_VISEE) {
+    AIMANT.vise = null;
+  }
+  return AIMANT.vise;
+}
+
+// D'où compter le prochain cran : l'arrêt visé s'il vaut encore, la
+// position réelle sinon.
+function aimantDepart() {
+  const v = aimantVise();
+  return v !== null ? v : aimantArret();
+}
+
+/* Aller à un arrêt donné. Un indice hors des bornes n'est pas refusé, il
+   est ramené dedans : un geste ample doit finir sa course contre le bout
+   plutôt que d'être annulé. C'est seulement quand on y est déjà que ça
+   bute. */
+function aimantAller(i) {
+  const a = AIMANT.arrets;
+  if (a.length < 2) return;
+  const j = Math.max(0, Math.min(a.length - 1, i));
+  const v = aimantVise();
+  if (j === v || (v === null && Math.abs(a[j] - window.scrollY) < 2)) {
+    if (i !== j) aimantButee(i < 0 ? -1 : 1);
+    return;
+  }
+  AIMANT.vise = j;
+  AIMANT.viseQuand = performance.now();
+  sonJouer(a[j] > window.scrollY ? "cranBas" : "cranHaut");
+  if (!AIMANT.anime) AIMANT.anime = requestAnimationFrame(aimantGlisser);
+}
+
+/* LE GLISSEMENT EST TENU ICI, ET NON PAR LE NAVIGATEUR. Un scrollTo en
+   "smooth" relance son animation à chaque nouvelle cible : sur une volée de
+   crans, la page repart en accélérant à chaque fois, ce qui se voit comme un
+   sautillement, puis saute d'un bloc à la dernière cible quand la volée
+   s'arrête. Ici la cible peut bouger sous le glissement sans rien casser :
+   la position la rejoint d'un cinquième de l'écart par image, et une cible
+   qui s'éloigne ne fait qu'allonger la course, sans à-coup ni redémarrage.
+
+   C'est l'inertie de la molette des panneaux, au même coefficient : le
+   portail n'a qu'une façon de glisser. */
+function aimantGlisser() {
+  const cible = AIMANT.arrets[AIMANT.vise];
+  if (cible === undefined) { AIMANT.anime = 0; return; }
+  const ecart = cible - window.scrollY;
+  const pas = ecart * AIMANT_SUIVI;
+  // Sous le pixel, l'amortissement n'avance plus : la position de
+  // défilement est quantifiée et un pas de moins d'un pixel se perd à
+  // l'arrondi, le glissement s'arrêtant alors deux pixels court. On pose
+  // la cible d'un coup, les quatre derniers pixels ne se voient pas et
+  // l'axe, lui, se mesure à la règle.
+  if (Math.abs(pas) < 1) {
+    AIMANT.anime = 0;
+    window.scrollTo(0, cible);
+    return;
+  }
+  window.scrollTo(0, window.scrollY + pas);
+  AIMANT.anime = requestAnimationFrame(aimantGlisser);
+}
+
+/* La butée : le groupe au foyer se déporte de onze pixels dans le sens
+   contraire au geste et revient, comme un tiroir qui bute. Le déplacement
+   passe par la propriété translate, pas par transform : celui-ci porte déjà
+   le grossissement du magnétisme, une animation le remplacerait et le
+   groupe perdrait sa taille le temps du rebond. */
+function aimantButee(sens) {
+  sonJouer("butee");
+  const u = AIMANT.unites.find(x => x.cible === AIMANT.foyer);
+  if (!u) return;
+  u.el.style.setProperty("--butee", (sens > 0 ? -11 : 11) + "px");
+  u.el.classList.remove("bute");
+  void u.el.offsetWidth;          // sans ce calcul forcé, l'animation ne rejoue pas
+  u.el.classList.add("bute");
+  clearTimeout(AIMANT.minuteurButee);
+  AIMANT.minuteurButee = setTimeout(() => u.el.classList.remove("bute"), 340);
+}
+
+// L'arrêt où l'on se trouve : le plus proche de la position courante.
+function aimantArret() {
+  let i = 0, mini = Infinity;
+  AIMANT.arrets.forEach((v, k) => {
+    const d = Math.abs(v - window.scrollY);
+    if (d < mini) { mini = d; i = k; }
+  });
+  return i;
+}
+
+// Un ou plusieurs crans, dans le sens du signe : la page glisse à l'arrêt
+// qui se trouve autant de rangs plus loin.
+function aimantCran(pas) {
+  if (AIMANT.arrets.length < 2) return;
+  aimantAller(aimantDepart() + pas);
+}
+
+/* LA MOLETTE A UNE CADENCE, ET C'EST TOUT CE QUI LA BORNE. Elle accumule,
+   et une tranche de AIMANT_CRAN pixels vaut un cran : une pichenette en
+   donne un tout de suite, et un coup vif en donne un tous les
+   AIMANT_CADENCE, soit environ neuf par seconde tant qu'on tourne.
+
+   La cadence a remplacé une borne par secousse, qui ne tenait pas la
+   route : un coup vif n'envoie pas un événement mais une rafale, et deux
+   crans par événement en faisaient dix ou quinze pour un seul geste, la
+   page traversant dix métiers d'un bloc. Borner la rafale n'aurait pas
+   suffi non plus, elle aurait fixé une distance maximale par geste au lieu
+   de laisser aller loin qui tourne longtemps. Une cadence, elle, ne prend
+   rien à personne : elle étale simplement ce qui arrive trop vite pour
+   être vu.
+
+   Le seuil franchi pendant l'attente n'est pas jeté, il reste armé : dès
+   que la cadence rouvre, le cran part. Ce qui dépasse ce seuil est perdu,
+   sans quoi une rafale se mettrait en réserve et repartirait toute seule.
+   Changer de sens repart de zéro, on ne franchit pas un cran par
+   accumulation de va-et-vient.
+
+   Le zoom du navigateur (Ctrl + molette) et un panneau ouvert, qui a son
+   propre moteur de molette, passent à travers sans être touchés. */
+function initAimantMolette() {
+  let cumul = 0, sensPrec = 0, quand = 0;
+  window.addEventListener("wheel", ev => {
+    if (!document.body.classList.contains("aimante")) return;
+    if (ev.ctrlKey) return;
+    if (document.querySelector(".modale[open]")) return;
+    ev.preventDefault();
+    const dy = ev.deltaMode === 1 ? ev.deltaY * 16
+             : ev.deltaMode === 2 ? ev.deltaY * innerHeight
+             : ev.deltaY;
+    if (!dy) return;
+    const sens = dy > 0 ? 1 : -1;
+    if (sens !== sensPrec) { cumul = 0; sensPrec = sens; }
+    cumul += dy;
+    if (Math.abs(cumul) < AIMANT_CRAN) return;
+    const t = performance.now();
+    if (t - quand < AIMANT_CADENCE) { cumul = sens * AIMANT_CRAN; return; }
+    quand = t;
+    cumul = 0;
+    aimantCran(sens);
+  }, { passive: false });
+}
+
+/* LE CLAVIER AVANCE COMME LA MOLETTE, d'un métier par touche. Les flèches
+   haut et bas, les touches page, début et fin : une pression, un cran. Il
+   défilait nativement de quelques dizaines de pixels, ce qui décalait la
+   page sans jamais changer de métier, un déplacement qui ne mène nulle
+   part ; une touche est une intention discrète, elle mérite un cran entier
+   et n'a rien à accumuler. Rien ne la retient non plus : marteler la flèche
+   avance d'autant de métiers, la visée comptant les crans plus vite que le
+   glissement ne les rattrape. Un technicien pressé doit pouvoir l'être.
+
+   Rien n'est repris quand on écrit dans la recherche, quand un panneau est
+   ouvert, ni quand une touche de commande accompagne la flèche : ces
+   raccourcis appartiennent au navigateur. La tabulation n'est pas touchée
+   non plus, elle garde son rôle et amène au foyer le groupe qu'elle
+   atteint. */
+function initAimantClavier() {
+  const crans = { ArrowDown: 1, ArrowUp: -1, PageDown: 1, PageUp: -1 };
+  document.addEventListener("keydown", ev => {
+    if (!document.body.classList.contains("aimante")) return;
+    if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
+    if (document.querySelector(".modale[open]")) return;
+    const ou = document.activeElement;
+    if (ou && /^(INPUT|TEXTAREA|SELECT)$/.test(ou.tagName)) return;
+    if (ev.key === "Home" || ev.key === "End") {
+      ev.preventDefault();
+      aimantAller(ev.key === "Home" ? 0 : AIMANT.arrets.length - 1);
+      return;
+    }
+    const sens = crans[ev.key];
+    if (!sens) return;
+    ev.preventDefault();
+    aimantCran(sens);
+  });
+}
+
+/* La ligne de mire, en position de page : la position de défilement plus
+   la part d'écran qui la surplombe, et rien d'autre. Elle est à hauteur
+   fixe d'un bout à l'autre de la page, et c'est cette fixité qui garantit
+   qu'un groupe se pose toujours au même endroit à l'écran. La page se
+   rallonge en pied plutôt que de la faire glisser. */
+function aimantMire() {
+  return window.scrollY + AIMANT.mireV;
+}
+
+/* Le chemin inverse : la position de défilement qui pose la mire sur un
+   point donné de la page. C'est elle qui place les arrêts de la molette et
+   la cible d'un clic au sommaire, pour que la page s'arrête exactement là
+   où le groupe s'allume. */
+function aimantOu(cible) {
+  return Math.max(0, Math.min(AIMANT.bout, cible - AIMANT.mireV));
+}
+
+// La ligne de mire projetée sur la suite des ancres : un indice continu.
+// Au-dessus du premier groupe ou sous le dernier elle se cale sur
+// l'extrémité, sans quoi ni le premier ni le dernier n'aurait droit au
+// foyer, l'un parce que la mire tombe encore dans l'en-tête, l'autre parce
+// que le défilement bute avant de l'avoir atteint.
+function aimantIndice(mire) {
+  const u = AIMANT.unites;
+  if (mire <= u[0].ancre) return 0;
+  for (let i = 0; i < u.length - 1; i++) {
+    if (mire <= u[i + 1].ancre) {
+      const pas = u[i + 1].ancre - u[i].ancre;
+      return pas > 0 ? i + (mire - u[i].ancre) / pas : i;
+    }
+  }
+  return u.length - 1;
+}
+
+// L'aimantation : la part fractionnaire est tirée vers l'entier le plus
+// proche par une sinusoïde. La fonction reste croissante, sa pente valant
+// au minimum 1 - AIMANT_COLLE : le foyer ne recule jamais quand on descend,
+// il ralentit sur un groupe puis passe vite au suivant.
+function aimantColler(p) {
+  const i = Math.floor(p), f = p - i;
+  return i + f - AIMANT_COLLE * Math.sin(2 * Math.PI * f) / (2 * Math.PI);
+}
+
+/* Le nom du rayon en entête. Il ne change qu'au passage d'un rayon à
+   l'autre, et le changement est un glissement : le sortant part dans le
+   sens où l'on défile, l'entrant arrive du bord opposé. Le premier nom se
+   pose sans animation, il n'a rien à remplacer. Le nom retenu en dataset
+   est celui qui fait foi : deux passages coup sur coup se règlent sur le
+   dernier, pas sur celui du milieu. */
+function aimantEntete(nom) {
+  const el = $("enteteRayon");
+  if (!el || el.dataset.nom === nom) return;
+  const premier = el.dataset.nom === undefined;
+  el.dataset.nom = nom;
+  if (premier) { el.textContent = nom; return; }
+  sonJouer("passage");
+  el.style.setProperty("--d", AIMANT.sens >= 0 ? "1" : "-1");
+  el.classList.add("sort");
+  clearTimeout(AIMANT.minuteur);
+  AIMANT.minuteur = setTimeout(() => {
+    el.textContent = el.dataset.nom;
+    el.classList.add("entre");
+    el.classList.remove("sort");
+    void el.offsetWidth;     // sans ce calcul forcé, le retour ne s'anime pas
+    el.classList.remove("entre");
+  }, 220);
+}
+
+function aimantPeindre() {
+  const u = AIMANT.unites;
+  if (!u.length) return;
+  const y = window.scrollY;
+  if (y !== AIMANT.dernierY) { AIMANT.sens = y > AIMANT.dernierY ? 1 : -1; AIMANT.dernierY = y; }
+  // Arrivé à l'arrêt visé, la visée n'a plus de raison d'être : le cran
+  // suivant repart de la position réelle. Pas tant que le glissement court,
+  // en revanche : il vise cette même valeur, la lui retirer le laisserait à
+  // un ou deux pixels de l'axe, et cet axe se mesure à la règle.
+  if (!AIMANT.anime && AIMANT.vise !== null
+      && Math.abs(y - (AIMANT.arrets[AIMANT.vise] || 0)) < 2) {
+    AIMANT.vise = null;
+  }
+  const p = aimantColler(aimantIndice(aimantMire()));
+  const deux = 2 * AIMANT_ECART * AIMANT_ECART;
+  let sommet = 0, gagnant = null;
+  const poids = u.map((g, i) => {
+    const w = Math.exp(-((i - p) * (i - p)) / deux);
+    if (w > sommet) { sommet = w; gagnant = g; }
+    return w;
+  });
+  u.forEach((g, i) => {
+    // Ramenées au maximum : le groupe du foyer vaut exactement 1, donc une
+    // opacité pleine, donc ses cartes gardent leur verre. Un groupe dont
+    // l'intensité n'a pas bougé n'est pas réécrit.
+    const f = (poids[i] / sommet).toFixed(3);
+    if (f === g.f) return;
+    g.f = f;
+    g.el.style.setProperty("--f", f);
+    // Le flou est une classe, pas un calcul continu : un filtre, même
+    // blur(0), isole ce qu'il y a derrière l'élément, et le groupe au
+    // foyer y perdrait le verre de ses cartes. Il n'en porte donc aucun.
+    g.el.classList.toggle("flou", +f < AIMANT_NET);
+  });
+  const cible = gagnant ? gagnant.cible : null;
+  if (cible !== AIMANT.foyer) {
+    AIMANT.foyer = cible;
+    if (AIMANT.surFoyer) AIMANT.surFoyer(cible);
+  }
+  aimantEntete(gagnant ? gagnant.rayon : "");
+}
+
+function initAimant() {
+  // Un poste qui demande moins d'animations garde la page à plat : un effet
+  // attaché au défilement est exactement ce que la préférence vise.
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  aimantMesurer();
+  if (AIMANT.unites.length < 2) return;   // un seul groupe n'a personne à estomper
+
+  AIMANT.actif = true;
+  document.body.classList.add("aimante");
+  aimantMesurer();          // la rallonge de pied attend que la classe soit posée
+  aimantPeindre();
+  initAimantMolette();
+  initAimantClavier();
+
+  let prevu = false;
+  window.addEventListener("scroll", () => {
+    if (prevu) return;
+    prevu = true;
+    requestAnimationFrame(() => { prevu = false; aimantPeindre(); });
+  }, { passive: true });
+
+  /* Le clavier ne se perd pas dans le lointain. Les cartes hors foyer ne
+     reçoivent plus le curseur, mais la tabulation les atteint toujours, et
+     elle y serait aveugle : six centièmes d'opacité sous cinq pixels de
+     flou. Dès qu'une carte prend le focus, son groupe vient au foyer, à
+     l'arrêt même où la molette l'aurait posé. Un clic ne déclenche rien
+     ici : la carte cliquée est forcément celle du groupe au foyer, donc
+     déjà à sa place. */
+  document.addEventListener("focusin", ev => {
+    if (!document.body.classList.contains("aimante")) return;
+    const el = ev.target.closest && ev.target.closest(".aimant");
+    if (!el) return;
+    const u = AIMANT.unites.find(x => x.el === el);
+    if (!u) return;
+    const y = aimantOu(u.ancre);
+    if (Math.abs(y - window.scrollY) < 2) return;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  });
+
+  const remesurer = () => { aimantMesurer(); aimantPeindre(); };
+  window.addEventListener("resize", remesurer);
+  // La mise en page bouge aussi sans que la fenêtre change ni que la page
+  // défile : la tuile météo qui arrive, une recherche qui vide des groupes,
+  // une police qui finit de charger. La toute première notification est
+  // celle de la pose de l'observateur, elle n'annonce rien de nouveau.
+  if (window.ResizeObserver) {
+    let pose = true;
+    new ResizeObserver(() => {
+      if (pose) { pose = false; return; }
+      remesurer();
+    }).observe(document.querySelector(".portail"));
+  }
+}
+
+// Pendant une recherche, le magnétisme se retire : les résultats se lisent
+// tous à la même encre, et un foyer désignerait des groupes à moitié vidés.
+// C'est la raison qui efface déjà le sommaire.
+function aimantRecherche(cherche) {
+  if (!AIMANT.actif) return;
+  document.body.classList.toggle("aimante", !cherche);
+  if (!cherche) { aimantMesurer(); aimantPeindre(); }
 }
 
 function construireRayons() {
@@ -1546,7 +2296,7 @@ function construireRayons() {
 
     $("groupesOutils").innerHTML = groupes.filter(g => g.portes.length).map(g =>
       html_groupe(g.nom, g.couleur,
-        '<div class="grille-outils">' + g.portes.map(o => html_outil(o, i++)).join("") + "</div>",
+        '<div class="grille-outils">' + g.portes.map(o => html_carte(o, i++)).join("") + "</div>",
         "groupe-" + g.cle)).join("");
     groupes.forEach(g => SOMMAIRE.push({
       nom: g.court || g.nom, couleur: g.couleur,
@@ -1580,7 +2330,7 @@ function construireRayons() {
     let i = 0;
     $("groupesRessources").innerHTML = groupes.map(g =>
       html_groupe(g.nom, g.couleur,
-        '<div class="rangs">' + g.portes.map(o => html_ressource(o, i++)).join("") + "</div>",
+        '<div class="grille-outils">' + g.portes.map(o => html_carte(o, i++)).join("") + "</div>",
         "groupe-r-" + g.cle)).join("");
     groupes.forEach(g => SOMMAIRE.push({
       nom: g.court || g.nom, couleur: g.couleur, cible: "groupe-r-" + g.cle, bloc: "ressources"
@@ -1588,24 +2338,9 @@ function construireRayons() {
     $("rayonRessources").hidden = false;
   }
 
-  if (contacts().length) {
-    $("grilleContact").innerHTML = contacts().map((c, i) =>
-        '<div class="fiche apparait" style="--i:' + i + '" data-cherche="'
-      +   ech(normaliser([c.nom, c.role, c.mail].filter(Boolean).join(" "))) + '">'
-      +   '<span class="fiche-puce">' + ico("personne", 20) + "</span>"
-      +   '<span class="fiche-texte">'
-      +     '<span class="fiche-nom">' + ech(c.nom) + "</span>"
-      +     (c.role ? '<span class="fiche-role">' + ech(c.role) + "</span>" : "")
-      +     (c.mail ? '<a class="fiche-mail" href="mailto:' + ech(c.mail) + '">' + ech(c.mail) + "</a>" : "")
-      +   "</span>"
-      + "</div>").join("");
-    $("rayonContact").hidden = false;
-  }
-
   const morceaux = [];
   if (outils.length) morceaux.push(outils.length + " outil" + (outils.length > 1 ? "s" : ""));
   if (liens.length) morceaux.push(liens.length + " ressource" + (liens.length > 1 ? "s" : ""));
-  if (contacts().length) morceaux.push(contacts().length + " contact" + (contacts().length > 1 ? "s" : ""));
   $("compte").textContent = morceaux.join("  ·  ");
 
   $("devise").textContent = REGLAGES.accroche || "";
@@ -1614,33 +2349,6 @@ function construireRayons() {
   $("titrePortail").textContent = REGLAGES.titre;
   $("embleme").innerHTML = logoB27(58);
   construireSommaire();
-}
-
-/* ---------------------------------------------------------------------
-   SIGNATURE
-
-   Le site de l'entreprise n'est pas un outil que nous fabriquons. Rangé
-   dans le rayon des outils, il en prenait l'apparence et le compteur le
-   comptait comme tel ; il signe désormais la page en pied. Pas de fond de
-   carte, un filet en travers de la page : c'est du mobilier de page, comme
-   l'en-tête, et il reste donc hors du filtre de recherche. Sans url dans
-   REGLAGES.editeur, rien ne s'affiche.
-   --------------------------------------------------------------------- */
-function construireSignature() {
-  const e = (typeof REGLAGES === "object" && REGLAGES.editeur) || null;
-  if (!e || !/^https?:\/\//.test(String(e.url || ""))) return;
-
-  $("signature").innerHTML =
-      '<a class="signature-lien" href="' + ech(e.url) + '" target="_blank" rel="noopener noreferrer">'
-    +   '<span class="signature-logo">' + logoB27(26) + "</span>"
-    +   '<span class="signature-texte">'
-    +     '<span class="signature-quoi">Le portail est édité par</span>'
-    +     '<span class="signature-nom">' + ech(e.nom || "B27") + "</span>"
-    +     (e.pitch ? '<span class="signature-pitch">' + ech(e.pitch) + "</span>" : "")
-    +   "</span>"
-    +   '<span class="signature-cta">' + ech(e.lien || e.url) + ico("sortie", 15) + "</span>"
-    + "</a>";
-  $("signature").hidden = false;
 }
 
 /* ---------------------------------------------------------------------
@@ -1669,13 +2377,14 @@ function filtrer(brut) {
   document.querySelectorAll(".groupe").forEach(g => {
     g.hidden = !g.querySelector("[data-cherche]:not([hidden])");
   });
-  [["rayonOutils", "groupesOutils"], ["rayonRessources", "groupesRessources"],
-   ["rayonContact", "grilleContact"]].forEach(([rayon, dedans]) => {
+  [["rayonOutils", "groupesOutils"],
+   ["rayonRessources", "groupesRessources"]].forEach(([rayon, dedans]) => {
     const vide = !$(dedans).querySelector("[data-cherche]:not([hidden])");
     $(rayon).hidden = vide || !$(dedans).innerHTML;
   });
 
   $("tuilesVives").hidden = !!q;
+  aimantRecherche(!!q);
   $("rienTrouve").hidden = !(q && visibles === 0);
   if (q && visibles === 0) {
     $("rienTrouve").textContent = "Aucun résultat pour « " + brut.trim() + " ».";
@@ -1683,7 +2392,7 @@ function filtrer(brut) {
 }
 
 function initRecherche() {
-  if (PORTES.length + contacts().length < (REGLAGES.seuilFiltres || 0)) return;
+  if (PORTES.length < (REGLAGES.seuilFiltres || 0)) return;
   const champ = $("champRecherche");
   $("quete").hidden = false;
   champ.addEventListener("input", () => filtrer(champ.value));
@@ -1725,8 +2434,10 @@ function initReflets() {
    L'ANCRE
 
    Au défilement, l'entrée du portail ne disparaît pas : elle se transforme.
-   Le logo et le titre viennent se poser dans une pilule fixe en haut au
-   centre, l'emblème du héros s'efface en s'éloignant, et les tuiles
+   L'emblème vient se poser dans une pastille fixe en haut au centre, le
+   titre restant en haut de page : sous la pastille se lit le nom du rayon,
+   et deux textes l'un sur l'autre en auraient fait une étiquette. L'emblème
+   du héros s'efface en s'éloignant, et les tuiles
    vivantes, ancrées, se replient en pastilles — la température d'un côté,
    le numéro de semaine de l'autre. Cliquer sur la pilule ou une pastille
    ramène en haut.
@@ -1738,8 +2449,7 @@ function initReflets() {
 const SEUIL_ANCRE = 260;   // px de défilement avant que la pilule se pose
 
 function initAncre() {
-  $("ancreLogo").innerHTML = logoB27(17);
-  $("ancreTitre").textContent = REGLAGES.titre;
+  $("ancreLogo").innerHTML = logoB27(20);
 
   const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const embleme = $("embleme");
@@ -1789,7 +2499,6 @@ function remplirApropos() {
     + '<dl class="stats-liste">'
     + ligneStat("Nos outils", outils)
     + ligneStat("Ressources", liens)
-    + ligneStat("Contacts", contacts().length)
     + ligneStat("Dernière mise à jour du catalogue", majs.length ? dateFr(majs[majs.length - 1]) : "non renseignée")
     + ligneStat("Thème courant", document.documentElement.dataset.theme === "dark" ? "sombre" : "clair")
     + "</dl></div>";
@@ -1929,13 +2638,14 @@ function initApropos() {
 function init() {
   controlerCatalogue();
   construireRayons();
-  construireSignature();
   peindreCalendrier();
   poserIcones();
   initTheme();
+  initSon();
   initFond();
   initRecherche();
   initSommaire();
+  initAimant();
   initReflets();
   initAncre();
   initApropos();

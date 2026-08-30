@@ -31,19 +31,40 @@
      demande moins d'animations. -->
 <canvas id="fond" aria-hidden="true"></canvas>
 
-<!-- La pilule d'ancrage : le logo et le titre s'y posent au défilement.
-     Cliquer ramène en haut. -->
+<!-- La pilule d'ancrage : l'emblème seul s'y pose au défilement, le nom du
+     rayon se lisant juste dessous. Cliquer ramène en haut. -->
 <button type="button" class="ancre noprint" id="ancre" aria-label="Revenir en haut de la page">
   <span class="ancre-logo" id="ancreLogo"></span>
-  <b id="ancreTitre">Outils B27</b>
 </button>
+
+<!-- L'invite à dérouler : une souris dessinée, sa molette qui descend
+     lentement. Pas un mot, il n'en faut pas : la forme dit le geste, et
+     elle s'efface au premier cran. -->
+<div class="invite noprint" aria-hidden="true"><span></span></div>
+
+<!-- Le nom du rayon où l'on se trouve, sous la pilule d'ancrage. Les
+     titres de rayon ont quitté le fil de la page : ils s'y lisaient à
+     pleine encre au milieu d'un écran estompé. Rempli par hub.js. -->
+<div class="entete-rayon noprint" id="enteteRayon" aria-hidden="true"></div>
 
 <div class="haut noprint">
   <button type="button" class="bouton-icone" id="btnTheme" aria-label="Changer de thème"></button>
+  <button type="button" class="bouton-icone" id="btnSon" aria-label="Couper le son" title="Couper le son"></button>
   <button type="button" class="bouton-icone" id="btnLangue" data-ico="langue" aria-label="Langue"
           title="Langue" aria-haspopup="true" aria-expanded="false"></button>
   <button type="button" class="bouton-icone" id="btnApropos" data-ico="engrenage" aria-label="À propos du portail" title="À propos du portail"></button>
 </div>
+
+<!-- Le filtre "goutte" du sommaire : un flou puis un contraste d'alpha,
+     qui fait fusionner les formes proches en une seule silhouette
+     organique. C'est lui qui fond l'étiquette dans le rail. -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <filter id="fonduSommaire">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="7.5" result="flou"/>
+    <feColorMatrix in="flou" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 23 -11" result="goutte"/>
+    <feComposite in="SourceGraphic" in2="goutte" operator="atop"/>
+  </filter>
+</svg>
 
 <!-- Le sommaire : la table de la page, fixée à droite. Construit par
      hub.js depuis le catalogue ; sous 1240 px il n'apparaît pas. -->
@@ -78,7 +99,8 @@
 
   <!-- Les rayons du portail, construits depuis catalogue.js : les groupes
        se déroulent, un par métier pour les outils, un par domaine pour les
-       ressources. Le sommaire fixé à droite descend au groupe choisi. -->
+       ressources, tous en cartes. Le sommaire fixé à droite descend au
+       groupe choisi. -->
   <section class="rayon" id="rayonOutils" hidden>
     <h2>Nos outils <span>fabriqués ici</span></h2>
     <div id="groupesOutils"></div>
@@ -89,17 +111,7 @@
     <div id="groupesRessources"></div>
   </section>
 
-  <section class="rayon" id="rayonContact" hidden>
-    <h2>Contact</h2>
-    <div class="grille-contact" id="grilleContact"></div>
-  </section>
-
   <p class="rien" id="rienTrouve" hidden></p>
-
-  <!-- La signature : qui édite ce portail. Le site de l'entreprise n'est pas
-       un outil que nous fabriquons, il ne se range pas dans leur rayon ; il
-       signe la page. Construite depuis REGLAGES.editeur. -->
-  <footer class="signature" id="signature" hidden></footer>
 
 </main>
 
