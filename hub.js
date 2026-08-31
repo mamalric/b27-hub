@@ -646,7 +646,7 @@ function initTheme() {
    calcul tient en une ligne. Si le poste demande moins d'animations, le
    champ est dessiné une fois, immobile, et rien ne bouge.
    --------------------------------------------------------------------- */
-const FOND = { ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0, meteo: null, amb: null };
+const FOND = { cv: null, ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0, dpr: 0, meteo: null, amb: null };
 
 // Le délai maximal d'une traînée, en images : au-delà, le tracé expire et
 // disparaît, sans exception. La première version estompait par voile
@@ -844,11 +844,7 @@ function fondAmbiance() {
   FOND.nuages = FOND.nuages || [];
   while (FOND.nuages.length < FOND.amb.nuages) FOND.nuages.push(graineNuage());
   FOND.nuages.length = FOND.amb.nuages;
-  if (FOND.statique && FOND.ctx) {
-    FOND.ctx.fillStyle = FOND.amb.fond;
-    FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
-    fondStatique();
-  }
+  if (FOND.statique && FOND.ctx) { fondEffacer(); fondStatique(); }
 }
 
 function fondAngle(x, y, t) {
@@ -1001,12 +997,53 @@ function fondHors(x, y, L, H) {
   return x < -24 || x > L + 24 || y < -90 || y > H + 24;
 }
 
+/* Le cadre se revérifie à chaque image. Les dimensions et la densité de
+   pixels n'étaient relevées qu'une fois, au chargement et au
+   redimensionnement, et la boucle leur faisait confiance pour toujours :
+   il suffisait d'une mise en veille, d'un changement d'écran ou d'une
+   perte du contexte graphique pour que la transformation du canvas
+   retombe à un, que le dessin se replie sur une fraction de la page et
+   n'en revienne plus avant rechargement. Le contrôle coûte trois lectures
+   par image, la panne durait une pause déjeuner. Rendre false, c'est dire
+   qu'il n'y a pas de surface : fenêtre réduite ou onglet ouvert en fond,
+   le navigateur annonce une largeur nulle, et redimensionner le canvas à
+   zéro le viderait pour rien. */
+function fondCadrer() {
+  const cv = FOND.cv, ctx = FOND.ctx;
+  if (!cv || !ctx) return false;
+  const L = window.innerWidth, H = window.innerHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+  if (!L || !H) return false;
+  if (L !== FOND.L || H !== FOND.H || dpr !== FOND.dpr) {
+    FOND.L = L; FOND.H = H; FOND.dpr = dpr;
+    cv.width = Math.round(L * dpr); cv.height = Math.round(H * dpr);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return true;
+}
+
+/* L'effacement porte sur la mémoire du canvas, en pixels physiques, et non
+   sur la fenêtre. Calé sur FOND.L et FOND.H, il laissait hors de sa portée
+   une bordure dès que le cadre dérivait, et les traînées s'y empilaient
+   image après image jusqu'à former un tapis vert que plus rien ne
+   reprenait. Ici, quelle que soit la transformation en cours, rien ne
+   survit à une image. */
+function fondEffacer() {
+  const cv = FOND.cv, ctx = FOND.ctx;
+  if (!cv || !ctx) return;
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = FOND.amb.fond;
+  ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.restore();
+}
+
 function fondPas() {
+  if (!fondCadrer()) { FOND.anime = requestAnimationFrame(fondPas); return; }
   const { ctx, parts, L, H } = FOND;
   const amb = FOND.amb;
   FOND.t += 0.5;
-  ctx.fillStyle = amb.fond;
-  ctx.fillRect(0, 0, L, H);   // effacement complet : rien ne survit au délai
+  fondEffacer();   // effacement complet : rien ne survit au délai
   if (amb.halo) peindreHalo(ctx);
   if (FOND.nuages && FOND.nuages.length) peindreNuages(ctx);
 
@@ -1068,8 +1105,7 @@ function fondTheme() {
   // version immobile se redessine tout de suite.
   if (!FOND.ctx) return;
   fondAmbiance();
-  FOND.ctx.fillStyle = FOND.amb.fond;
-  FOND.ctx.fillRect(0, 0, FOND.L, FOND.H);
+  fondEffacer();
 }
 
 // La version immobile : la même ambiance, dessinée une fois. Le poste a
@@ -1109,18 +1145,15 @@ function initFond() {
   const cv = $("fond");
   if (!cv || !cv.getContext) return;
   const ctx = cv.getContext("2d", { alpha: false });
+  FOND.cv = cv;
   FOND.ctx = ctx;
   FOND.statique = matchMedia("(prefers-reduced-motion: reduce)").matches;
   FOND.amb = calculerAmbiance();
   FOND.nuages = Array.from({ length: FOND.amb.nuages }, graineNuage);
 
   function taille() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
-    FOND.L = window.innerWidth; FOND.H = window.innerHeight;
-    cv.width = FOND.L * dpr; cv.height = FOND.H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = FOND.amb.fond;
-    ctx.fillRect(0, 0, FOND.L, FOND.H);
+    if (!fondCadrer()) return;
+    fondEffacer();
     if (FOND.statique) fondStatique();
   }
   taille();
@@ -1128,7 +1161,9 @@ function initFond() {
 
   if (FOND.statique) return;
 
-  FOND.parts = Array.from({ length: FOND.amb.nb }, () => fondGraine({}, FOND.L, FOND.H));
+  // Sans surface au chargement (fenêtre réduite, onglet ouvert en fond), le
+  // semis attend : la boucle repeuple ensuite une particule par image.
+  FOND.parts = FOND.L ? Array.from({ length: FOND.amb.nb }, () => fondGraine({}, FOND.L, FOND.H)) : [];
   FOND.anime = requestAnimationFrame(fondPas);
 
   // Un onglet caché n'a pas besoin de brûler la carte graphique.

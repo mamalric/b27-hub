@@ -2,6 +2,20 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-31, le fond avait pris l'herbe
+
+Défaut signalé au retour d'une pause déjeuner : une bordure d'herbe verte, épaisse, mangeait la droite et le bas de l'écran, le contenu tenait dans un rectangle propre en haut à gauche. Un rechargement suffisait à tout nettoyer, ce qui est précisément le problème : la panne s'installait toute seule et ne partait jamais d'elle-même.
+
+**Le diagnostic tient dans une mesure.** La zone propre faisait exactement 80 pour cent de la fenêtre, soit un sur 1,25, la densité de pixels du poste. Le canvas garde une mémoire dimensionnée en pixels physiques et une transformation qui y convertit les pixels de la page ; les deux étaient posées une fois pour toutes, au chargement et au redimensionnement, et la boucle d'animation leur faisait confiance ensuite. Il suffit que la transformation retombe à un, ce qu'une mise en veille, un changement d'écran ou une perte du contexte graphique font sans prévenir, pour que le dessin se replie sur une fraction du canvas. Et surtout pour que l'effacement, un rectangle calé sur les dimensions mémorisées, ne couvre plus la bordure. Le fond n'ayant que ce rectangle pour s'effacer, tout ce qui s'y peignait restait : les traînées s'y sont empilées image après image, une heure durant, jusqu'à faire ce tapis. L'herbe n'était pas une texture, c'étaient les traits du champ d'écoulement accumulés.
+
+**Reproduit avant de corriger.** En neutralisant l'effacement pendant 2400 images puis en remettant la transformation à un, le volet d'aperçu a rendu l'image du signalement, trait pour trait.
+
+**La correction rend la boucle capable de se remettre d'aplomb seule.** Le cadre se revérifie à chaque image, trois lectures, et la transformation est réaffirmée qu'elle ait dérivé ou non ; l'effacement porte désormais sur toute la mémoire du canvas, en pixels physiques, quelle que soit la transformation en cours. Une dérive, quelle qu'en soit la cause, se répare en une image, seize millisecondes, au lieu de durer jusqu'au rechargement. Deux fonctions dans `hub.js`, `fondCadrer` et `fondEffacer`, et les trois autres endroits qui effaçaient le fond passent par la seconde.
+
+**Un second défaut trouvé au passage, et mesuré en direct.** `window.innerWidth` vaut zéro quand la fenêtre est réduite ou l'onglet ouvert en fond. L'ancien code écrivait ce zéro tel quel dans les dimensions du canvas, soit un canvas de zéro par zéro qui ne dessinait plus rien tant qu'un redimensionnement ne venait pas le sauver. Une surface nulle est maintenant une image sautée, et le semis des particules attend d'avoir une page où naître.
+
+Vérifié : chargement neuf, redimensionnement dans les deux sens, changement de thème, et la panne simulée sur 2400 images qui se répare à la première. Console vide, contrôle du catalogue au vert.
+
 ## 2026-08-30, la recherche trouvait sans qu'on la voie, et le compteur mentait
 
 Deux défauts signalés coup sur coup, tous deux dus à des changements du jour.

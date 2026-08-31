@@ -5,7 +5,7 @@ type: application                             # application | outil | documentat
 statut: actif                                 # idee | actif | pause | termine | abandonne
 pitch: Portail public des outils et ressources B27 : un seul lien à transmettre.  # une phrase sur une seule ligne, 120 caractères maximum
 cree: 2026-08-29                              # AAAA-MM-JJ
-maj: 2026-08-30                               # AAAA-MM-JJ, mis à jour par Claude Code en fin de session
+maj: 2026-08-31                               # AAAA-MM-JJ, mis à jour par Claude Code en fin de session
 tags: [b27, web, hub, outils]                 # exemple : [cvc, reglementation]
 stack: HTML + CSS + JS vanilla, sans framework ni build, publié sur GitHub Pages
 lancer: ouvrir index.html, ou https://mamalric.github.io/b27-hub/
