@@ -246,6 +246,11 @@ body.aimante.defile .entete-rayon.entre{opacity:0;translate:0 calc(var(--d,1) * 
   font-size:10.5px;font-weight:700;letter-spacing:1px;
   transition:border-color var(--vitesse),color var(--vitesse),transform var(--vitesse);
 }
+/* Un display pose par la feuille de style l'emporte sur la regle hidden du
+   navigateur : sans cette ligne, le bouton restait affiche, soixante-dix-sept
+   pixels de large, alors que hidden etait bien pose. Meme garde que celle
+   que portent deja les tuiles vives. */
+.bouton-neuf[hidden]{display:none}
 .bouton-neuf:hover{border-color:var(--ligne-forte);color:var(--encre);transform:translateY(-1px)}
 .bouton-neuf[aria-expanded="true"]{border-color:var(--ligne-forte);color:var(--encre)}
 .neuf-mot{color:var(--accent)}

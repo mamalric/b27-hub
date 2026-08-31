@@ -2,6 +2,16 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-31, le bouton NEW ne s'effaçait pas vraiment
+
+Signalé aussitôt après la livraison précédente : le bouton restait affiché alors qu'il n'y avait plus rien de neuf. La mécanique était pourtant bonne, `btn.hidden` passait bien à vrai. C'est la feuille de style qui l'annulait : `.bouton-neuf` déclare `display:inline-flex`, et un display posé par la feuille de style l'emporte sur la règle `[hidden]{display:none}` du navigateur. Le bouton gardait ses soixante-dix-sept pixels, caché pour le code et visible pour l'oeil.
+
+**Une ligne suffit**, `.bouton-neuf[hidden]{display:none}`, la même garde que les tuiles vives portaient déjà pour la même raison. Les autres éléments qui naissent `hidden` dans `index.html` ont été vérifiés : les rayons n'ont pas de display à eux, la recherche en a un mais son `hidden` est retiré au démarrage. Aucun autre cas.
+
+Ma faute de vérification, et elle est instructive : j'avais contrôlé la propriété `hidden` en JavaScript, pas le `display` calculé. Lire l'état interne d'un élément ne dit rien de ce qui est à l'écran. Le contrôle porte désormais sur la largeur mesurée, qui passe de soixante-dix-sept pixels à zéro.
+
+Vérifié après rechargement : bouton à `display:none`, largeur nulle, la barre du haut reprenant ses quatre boutons d'icône. Piège du cache retrouvé au passage, comme la dernière fois : le volet d'aperçu servait l'ancienne feuille de style, il a fallu un port neuf pour voir la correction.
+
 ## 2026-08-31, le volet des nouveautes conduit a la carte
 
 Trois retouches demandees sur le volet pose ce matin, et elles le font changer de nature : il annoncait, il conduit maintenant.
