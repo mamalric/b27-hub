@@ -539,6 +539,7 @@ const TRADUCTIONS = {
 
     /* ---- le panneau À propos */
     "Le portail": "The portal",
+    "Outils à venir": "Tools coming soon",
     "Métiers en attente": "Trades awaiting a tool",
     "Dernière mise à jour du catalogue": "Catalogue last updated",
     "Thème courant": "Current theme",
@@ -547,7 +548,11 @@ const TRADUCTIONS = {
     "non renseignée": "not set",
     "Contacts": "Contacts",
     "Anomalies du catalogue": "Catalogue anomalies",
-    "Journal des versions": "Version log"
+    "Journal des versions": "Version log",
+
+    /* ---- le volet des nouveautés */
+    "Derniers outils disponibles": "Latest available tools",
+    "Voir les derniers outils disponibles": "See the latest available tools"
   }
 };
 
@@ -1767,6 +1772,16 @@ function peindreCalendrier() {
    --------------------------------------------------------------------- */
 function estOutil(o) { return (o.type || "outil") === "outil"; }
 
+/* Une porte disponible est une porte qui s'ouvre : un statut cliquable et
+   une adresse. Le compteur d'accueil annonçait dix outils quand deux
+   seulement s'ouvraient, les huit autres étant des fiches "Bientôt" sans
+   adresse. La règle est celle des cartes en attente, poussée jusqu'au
+   bout : une porte qu'on ne peut pas franchir ne se compte pas. */
+function estDisponible(o) {
+  const s = STATUTS[o.statut];
+  return !!(s && s.cliquable && o.url);
+}
+
 function clesRecherche(o) {
   const cat = categorie(o.categorie);
   const sous = o.sousCategorie ? sousCategorie(o.sousCategorie) : null;
@@ -1793,7 +1808,7 @@ function html_carte(o, index) {
   const s = STATUTS[o.statut] || STATUTS["a-venir"];
   const cat = categorie(o.categorie);
   const c = couleurSure(cat && cat.couleur);
-  const cliquable = s.cliquable && o.url;
+  const cliquable = estDisponible(o);
   const dedans =
       '<div class="carte-tete">'
     +   '<span class="carte-puce" style="--c:' + c + '">'
@@ -2583,13 +2598,17 @@ function construireRayons() {
     $("rayonRessources").hidden = false;
   }
 
-  // Les cartes en attente tiennent la place d'un métier sans projet
-  // décidé : elles s'affichent, mais annoncer qu'on en a dix-sept quand
-  // sept ne sont qu'un mot serait faux.
-  const reels = outils.filter(o => !o.attente);
+  // Le compteur annonce ce qui s'ouvre, rien d'autre. Il a d'abord compté
+  // les dix-sept cartes du rayon, puis les dix qui portaient un nom : les
+  // huit fiches "Bientôt" y restaient, sans adresse ni page derrière. Une
+  // carte en attente et un outil annoncé se ressemblent pour qui compte,
+  // ils promettent tous les deux. Le détail des uns et des autres se lit
+  // dans le panneau À propos, à sa place.
+  const reels = outils.filter(estDisponible);
+  const ouverts = liens.filter(estDisponible);
   const morceaux = [];
   if (reels.length) morceaux.push(reels.length + " " + mot(reels.length > 1 ? "outils" : "outil"));
-  if (liens.length) morceaux.push(liens.length + " " + mot(liens.length > 1 ? "ressources" : "ressource"));
+  if (ouverts.length) morceaux.push(ouverts.length + " " + mot(ouverts.length > 1 ? "ressources" : "ressource"));
   $("compte").textContent = morceaux.join("  ·  ");
 
   const accroche = champ(REGLAGES, "accroche");
@@ -2740,15 +2759,18 @@ function ligneStat(dt, dd) {
 }
 
 function remplirApropos() {
-  const outils = PORTES.filter(o => estOutil(o) && !o.attente).length;
-  const attente = PORTES.filter(o => estOutil(o) && o.attente).length;
-  const liens = PORTES.filter(o => !estOutil(o)).length;
+  const tous = PORTES.filter(estOutil);
+  const outils = tous.filter(estDisponible).length;
+  const bientot = tous.filter(o => !o.attente && !estDisponible(o)).length;
+  const attente = tous.filter(o => o.attente).length;
+  const liens = PORTES.filter(o => !estOutil(o) && estDisponible(o)).length;
   const majs = PORTES.map(o => o.maj).filter(Boolean).sort();
   const anomalies = controlerCatalogue();
 
   let h = '<div class="stats-groupe"><h3 data-ico="grille" data-ico-taille="13">' + ech(mot("Le portail")) + '</h3>'
     + '<dl class="stats-liste">'
     + ligneStat(mot("Nos outils"), outils)
+    + (bientot ? ligneStat(mot("Outils à venir"), bientot) : "")
     + (attente ? ligneStat(mot("Métiers en attente"), attente) : "")
     + ligneStat(mot("Ressources"), liens)
     + ligneStat(mot("Dernière mise à jour du catalogue"), majs.length ? dateFr(majs[majs.length - 1]) : mot("non renseignée"))
@@ -2875,6 +2897,69 @@ function initLangues() {
   });
 }
 
+/* ---------------------------------------------------------------------
+   LES NOUVEAUTÉS
+
+   Un volet qui répond à une seule question : qu'est-ce qui est nouveau et
+   que je peux ouvrir maintenant ? Il ne montre donc que des portes
+   franchissables, triées de la plus récemment mise à jour à la plus
+   ancienne, trois au plus. Une fiche "Bientôt" n'y entre pas : annoncer
+   comme neuf ce qui n'existe pas encore serait refaire, dans un coin plus
+   voyant, le défaut que le compteur d'accueil vient de perdre. Et sans
+   rien à montrer, le bouton ne paraît pas du tout.
+   --------------------------------------------------------------------- */
+const NEUF_MAX = 3;
+
+function outilsNeufs() {
+  return PORTES.filter(o => estOutil(o) && estDisponible(o))
+    .sort((a, b) => String(b.maj || "").localeCompare(String(a.maj || "")))
+    .slice(0, NEUF_MAX);
+}
+
+function html_neuf(o) {
+  const cat = categorie(o.categorie);
+  // Le nom s'abrege dans un volet de moins de trois cents pixels : l'infobulle
+  // rend le nom entier a qui le survole.
+  return '<a class="neuf-item" href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer"'
+    + ' title="' + ech(champ(o, "nom")) + '">'
+    + '<span class="neuf-puce" style="--c:' + couleurSure(cat && cat.couleur) + '"></span>'
+    + '<span class="neuf-texte">'
+    +   '<span class="neuf-nom">' + ech(champ(o, "nom")) + "</span>"
+    +   '<span class="neuf-date">' + ech(o.maj ? dateFr(o.maj) : champ(cat, "nom")) + "</span>"
+    + "</span>"
+    + '<span class="neuf-sortie">' + ico("sortie", 13) + "</span></a>";
+}
+
+function initNeuf() {
+  const btn = $("btnNeuf"), menu = $("menuNeuf");
+  if (!btn || !menu) return;
+  const neufs = outilsNeufs();
+  if (!neufs.length) return;
+  btn.hidden = false;
+  $("btnNeufNombre").textContent = String(neufs.length);
+  menu.innerHTML = '<p class="menu-neuf-titre">' + ech(mot("Derniers outils disponibles")) + "</p>"
+    + neufs.map(html_neuf).join("");
+
+  function fermer() {
+    menu.classList.remove("ouvert");
+    btn.setAttribute("aria-expanded", "false");
+  }
+  btn.addEventListener("click", ev => {
+    ev.stopPropagation();
+    const ouvert = menu.classList.toggle("ouvert");
+    btn.setAttribute("aria-expanded", String(ouvert));
+  });
+  // Ouvrir une nouveauté referme le volet : on part vers un autre onglet,
+  // le portail ne doit pas garder un menu ouvert dans le dos.
+  menu.addEventListener("click", () => fermer());
+  document.addEventListener("click", ev => {
+    if (!menu.contains(ev.target) && !btn.contains(ev.target)) fermer();
+  });
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "Escape") fermer();
+  });
+}
+
 function initApropos() {
   const dlg = $("dlgApropos");
   $("btnApropos").addEventListener("click", () => { remplirApropos(); dlg.showModal(); });
@@ -2912,6 +2997,7 @@ function init() {
   initDetailMeteo();
   initMolettePanneaux();
   initLangues();
+  initNeuf();
   chargerMeteo();
   initVeille();
 

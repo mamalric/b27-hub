@@ -49,6 +49,13 @@
 <div class="entete-rayon noprint" id="enteteRayon" aria-hidden="true"></div>
 
 <div class="haut noprint">
+  <!-- Les nouveautes : le bouton reste cache tant qu'aucun outil ne s'ouvre. -->
+  <button type="button" class="bouton-neuf" id="btnNeuf" hidden
+          aria-label="Voir les derniers outils disponibles" title="Voir les derniers outils disponibles"
+          aria-haspopup="true" aria-expanded="false" aria-controls="menuNeuf"
+          data-t="aria-label:Voir les derniers outils disponibles|title:Voir les derniers outils disponibles">
+    <span class="neuf-mot">NEW</span><span class="neuf-nombre" id="btnNeufNombre"></span>
+  </button>
   <button type="button" class="bouton-icone" id="btnTheme" aria-label="Changer de thème"
           data-t="aria-label:Changer de thème"></button>
   <button type="button" class="bouton-icone" id="btnSon" aria-label="Couper le son" title="Couper le son"></button>
@@ -74,6 +81,11 @@
      hub.js depuis le catalogue ; sous 1240 px il n'apparaît pas. -->
 <nav class="sommaire noprint" id="sommaire" aria-label="Sommaire de la page"
      data-t="aria-label:Sommaire de la page" hidden></nav>
+
+<!-- Le volet des nouveautes : les derniers outils qui s'ouvrent vraiment,
+     du plus recent au plus ancien. Rempli par hub.js. -->
+<div class="menu-neuf noprint" id="menuNeuf" role="group" aria-label="Derniers outils disponibles"
+     data-t="aria-label:Derniers outils disponibles"></div>
 
 <!-- Le menu des langues. Seul le français vit : les autres entrées sont
      des emplacements posés pour la suite. -->

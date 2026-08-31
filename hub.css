@@ -233,6 +233,58 @@ body.aimante.defile .entete-rayon.entre{opacity:0;translate:0 calc(var(--d,1) * 
 }
 .bouton-icone:hover{border-color:var(--ligne-forte);color:var(--encre);transform:translateY(-1px)}
 
+/* ========================================================== NOUVEAUTES ==
+   Une pastille "NEW" a gauche des reglages, et un volet qui liste les
+   derniers outils qui s'ouvrent vraiment. Le bouton se dessine comme les
+   autres du haut de page, en plus large parce qu'il porte un mot ; il ne
+   parait pas du tout quand rien n'est disponible, ce qui vaut mieux qu'un
+   volet vide. */
+.bouton-neuf{
+  display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 12px;cursor:pointer;
+  background:var(--carte);border:1px solid var(--ligne);color:var(--encre-2);
+  border-radius:var(--rayon-s);backdrop-filter:blur(10px);font:inherit;
+  font-size:10.5px;font-weight:700;letter-spacing:1px;
+  transition:border-color var(--vitesse),color var(--vitesse),transform var(--vitesse);
+}
+.bouton-neuf:hover{border-color:var(--ligne-forte);color:var(--encre);transform:translateY(-1px)}
+.bouton-neuf[aria-expanded="true"]{border-color:var(--ligne-forte);color:var(--encre)}
+.neuf-mot{color:var(--accent)}
+[data-theme="light"] .neuf-mot{color:#5f7f1f}
+.neuf-nombre{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:17px;height:17px;padding:0 4px;border-radius:99px;
+  background:var(--accent);color:#0a0d08;font-size:10px;line-height:1;letter-spacing:0;
+}
+
+.menu-neuf{
+  position:fixed;top:62px;right:16px;z-index:29;width:296px;max-width:calc(100vw - 32px);
+  background:var(--carte-pleine);border:1px solid var(--ligne-forte);
+  border-radius:var(--rayon-m);box-shadow:var(--ombre);padding:10px;
+  opacity:0;transform:translateY(-6px);pointer-events:none;
+  transition:opacity var(--vitesse),transform var(--vitesse);
+}
+.menu-neuf.ouvert{opacity:1;transform:none;pointer-events:auto}
+/* Le sommaire tient le bord droit des 1240 px : le volet s'ecarte du rail
+   plutot que de passer dessous, ses fleches de sortie etant justement
+   posees de ce cote. */
+@media (min-width:1240px){ .menu-neuf{right:70px} }
+.menu-neuf-titre{
+  margin:2px 4px 8px;font-size:10.5px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--discret);
+}
+.neuf-item{
+  display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:10px;
+  color:var(--encre);text-decoration:none;
+  transition:background var(--vitesse);
+}
+.neuf-item:hover{background:rgba(149,192,61,.09)}
+.neuf-puce{width:9px;height:9px;flex:0 0 auto;border-radius:99px;background:var(--c,var(--accent))}
+.neuf-texte{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.neuf-nom{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.neuf-date{font-size:11px;color:var(--discret)}
+.neuf-sortie{display:inline-flex;flex:0 0 auto;color:var(--discret)}
+.neuf-item:hover .neuf-sortie{color:var(--accent)}
+
 /* ============================================================ LANGUES ==
    Un bouton monde à côté des réglages, et un menu de langues. Seul le
    français vit pour l'instant : les autres sont des emplacements posés,

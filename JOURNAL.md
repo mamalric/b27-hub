@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-31, deux outils, pas dix, et un volet pour les voir
+
+Second signalement de la journée : "il est marqué 10 mais c'est faux". Vrai, et la correction d'hier n'était allée qu'à mi-chemin. Le compteur avait cessé de compter les sept cartes en attente, celles qui n'ont pas de nom, mais il comptait toujours les huit fiches "Bientôt" qui portent un nom, un pitch et aucune adresse. Sur les dix-sept cartes du rayon, deux seulement s'ouvrent : la Calculette ECS et Bouclage, et le Dimensionnement émetteurs Finimetal.
+
+**Le compteur annonce désormais ce qui s'ouvre, rien d'autre.** Deux outils, dix-sept ressources. Une carte en attente et un outil annoncé se ressemblent pour qui compte : ils promettent tous les deux. La disponibilité devient une notion nommée dans le code, `estDisponible`, un statut cliquable et une adresse, et c'est la même qui décide qu'une carte est un lien ou un rectangle mort. Les ressources passent au même filtre, sans changer de total puisqu'elles sont toutes en ligne.
+
+**Le détail se lit dans À propos**, à sa place : nos outils 2, outils à venir 8, métiers en attente 7, ressources 17. Rien n'est caché, la somme se refait à l'oeil, mais la page d'accueil ne promet plus.
+
+**Un volet des nouveautés en haut à droite**, demandé dans la foulée. Une pastille "NEW" avec le nombre, à gauche des réglages, et un volet qui liste les derniers outils disponibles, du plus récemment mis à jour au plus ancien, trois au plus : une pastille à la couleur du métier, le nom, la date, une flèche de sortie. Il ne montre que des portes franchissables, pour la même raison que le compteur : annoncer comme neuf ce qui n'existe pas encore aurait refait, dans un coin plus voyant, le défaut qu'on venait de corriger. Sans rien à montrer, le bouton ne paraît pas du tout. Au-dessus de 1240 pixels, le volet s'écarte du rail du sommaire plutôt que de passer dessous, ses flèches étant justement de ce côté.
+
+Vérifié dans les deux thèmes, dans les deux langues et en écran étroit : compteur à deux outils, volet qui s'ouvre et se ferme au clic, dehors et à Échap, noms traduits en anglais, panneau À propos à quatre lignes. Console vide, contrôle du catalogue au vert.
+
 ## 2026-08-31, le fond avait pris l'herbe
 
 Défaut signalé au retour d'une pause déjeuner : une bordure d'herbe verte, épaisse, mangeait la droite et le bas de l'écran, le contenu tenait dans un rectangle propre en haut à gauche. Un rechargement suffisait à tout nettoyer, ce qui est précisément le problème : la panne s'installait toute seule et ne partait jamais d'elle-même.
