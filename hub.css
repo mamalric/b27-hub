@@ -272,18 +272,42 @@ body.aimante.defile .entete-rayon.entre{opacity:0;translate:0 calc(var(--d,1) * 
   margin:2px 4px 8px;font-size:10.5px;font-weight:700;letter-spacing:.9px;
   text-transform:uppercase;color:var(--discret);
 }
+/* La ligne est un bouton : le clic descend a la carte dans la page, il ne
+   sort pas du portail. L'icone de l'outil se lit sur une plaque a la
+   couleur de son metier, la meme que sur sa carte ; une pastille de
+   couleur seule ne disait pas de quel outil il s'agissait. */
 .neuf-item{
-  display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:10px;
-  color:var(--encre);text-decoration:none;
+  display:flex;align-items:center;gap:10px;width:100%;padding:8px;
+  border:0;border-radius:10px;background:transparent;cursor:pointer;
+  color:var(--encre);font:inherit;text-align:left;
   transition:background var(--vitesse);
 }
 .neuf-item:hover{background:rgba(149,192,61,.09)}
-.neuf-puce{width:9px;height:9px;flex:0 0 auto;border-radius:99px;background:var(--c,var(--accent))}
+.neuf-puce{
+  display:grid;place-items:center;width:30px;height:30px;flex:0 0 auto;
+  border-radius:10px;background:var(--c,#5f7f1f);color:#fff;
+}
 .neuf-texte{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .neuf-nom{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .neuf-date{font-size:11px;color:var(--discret)}
-.neuf-sortie{display:inline-flex;flex:0 0 auto;color:var(--discret)}
-.neuf-item:hover .neuf-sortie{color:var(--accent)}
+.neuf-vers{display:inline-flex;flex:0 0 auto;color:var(--discret);transform:rotate(90deg)}
+.neuf-item:hover .neuf-vers{color:var(--accent)}
+
+/* La carte designee par le volet : un anneau a la couleur du metier et une
+   lueur, dix secondes, le temps que l'oeil la trouve. L'anneau ne bat pas,
+   la regle du calme vaut ici comme pour le halo du soleil ; il s'efface
+   par la transition deja portee par la carte. */
+.carte.surligne{
+  border-color:color-mix(in srgb,var(--c,#95c03d) 70%,transparent);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--c,#95c03d) 60%,transparent),
+             0 14px 34px rgba(0,0,0,.35),
+             0 0 34px color-mix(in srgb,var(--c,#95c03d) 30%,transparent);
+}
+[data-theme="light"] .carte.surligne{
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--c,#5f7f1f) 60%,transparent),
+             0 14px 30px rgba(30,40,15,.16),
+             0 0 30px color-mix(in srgb,var(--c,#5f7f1f) 24%,transparent);
+}
 
 /* ============================================================ LANGUES ==
    Un bouton monde à côté des réglages, et un menu de langues. Seul le

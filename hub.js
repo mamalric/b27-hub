@@ -552,6 +552,7 @@ const TRADUCTIONS = {
 
     /* ---- le volet des nouveautés */
     "Derniers outils disponibles": "Latest available tools",
+    "Voir dans le portail": "Show in the portal",
     "Voir les derniers outils disponibles": "See the latest available tools"
   }
 };
@@ -1819,6 +1820,7 @@ function html_carte(o, index) {
     + '<p class="carte-pitch">' + ech(champ(o, "pitch")) + "</p>"
     + html_badge(o);
   const attrs = ' class="carte apparait' + (cliquable ? "" : " attente") + '"'
+    + ' data-porte="' + ech(o.id) + '"'
     + ' style="--c:' + c + ';--i:' + index + '" data-cherche="' + ech(clesRecherche(o)) + '"';
   return cliquable
     ? "<a" + attrs + ' href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer">' + dedans + "</a>"
@@ -2909,49 +2911,114 @@ function initLangues() {
    rien à montrer, le bouton ne paraît pas du tout.
    --------------------------------------------------------------------- */
 const NEUF_MAX = 3;
+const NEUF_SURLIGNE = 10000;                    // dix secondes de surbrillance
+const CLE_NEUFS_VUS = "hub_b27_neufs_vus";
+
+/* Une nouveauté se repère par sa porte et par sa date : un outil remis à
+   jour redevient neuf, ce qui est le propre d'un volet de nouveautés. Vue,
+   elle sort de la liste et n'y revient pas, le navigateur s'en souvenant
+   comme il se souvient du thème et de la langue. */
+function neufCle(o) { return o.id + "@" + (o.maj || ""); }
+
+function neufsVus() {
+  try { return JSON.parse(localStorage.getItem(CLE_NEUFS_VUS) || "[]") || []; }
+  catch (e) { return []; }                      // stockage refusé, tout reste neuf
+}
+
+function neufMarquerVu(o) {
+  const vus = neufsVus();
+  if (vus.includes(neufCle(o))) return;
+  vus.push(neufCle(o));
+  try { localStorage.setItem(CLE_NEUFS_VUS, JSON.stringify(vus)); } catch (e) { /* non mémorisé */ }
+}
 
 function outilsNeufs() {
-  return PORTES.filter(o => estOutil(o) && estDisponible(o))
+  const vus = neufsVus();
+  return PORTES.filter(o => estOutil(o) && estDisponible(o) && !vus.includes(neufCle(o)))
     .sort((a, b) => String(b.maj || "").localeCompare(String(a.maj || "")))
     .slice(0, NEUF_MAX);
 }
 
+/* La ligne porte l'icône de l'outil sur une plaque à la couleur de son
+   métier, la même que sur sa carte : une pastille de couleur seule ne
+   disait pas de quel outil il s'agissait. Le chevron pointe vers le bas
+   parce que le clic descend dans la page, il ne sort pas du portail. */
 function html_neuf(o) {
   const cat = categorie(o.categorie);
-  // Le nom s'abrege dans un volet de moins de trois cents pixels : l'infobulle
-  // rend le nom entier a qui le survole.
-  return '<a class="neuf-item" href="' + ech(o.url) + '" target="_blank" rel="noopener noreferrer"'
-    + ' title="' + ech(champ(o, "nom")) + '">'
-    + '<span class="neuf-puce" style="--c:' + couleurSure(cat && cat.couleur) + '"></span>'
+  const nom = champ(o, "nom");
+  return '<button type="button" class="neuf-item" data-porte="' + ech(o.id) + '"'
+    + ' title="' + ech(nom) + '" aria-label="' + ech(mot("Voir dans le portail") + " : " + nom) + '">'
+    + '<span class="neuf-puce" style="--c:' + couleurSure(cat && cat.couleur) + '">'
+    +   ico(o.icone || "grille", 18) + "</span>"
     + '<span class="neuf-texte">'
-    +   '<span class="neuf-nom">' + ech(champ(o, "nom")) + "</span>"
+    +   '<span class="neuf-nom">' + ech(nom) + "</span>"
     +   '<span class="neuf-date">' + ech(o.maj ? dateFr(o.maj) : champ(cat, "nom")) + "</span>"
     + "</span>"
-    + '<span class="neuf-sortie">' + ico("sortie", 13) + "</span></a>";
+    + '<span class="neuf-vers">' + ico("chevron_d", 14) + "</span></button>";
+}
+
+let NEUF_MINUTEUR = null;
+
+/* Le clic descend à la carte et la désigne. Le chemin est celui du
+   sommaire, pas un défilement à part : le groupe se pose au foyer du
+   magnétisme, à pleine encre, le reste de la page s'estompant autour. La
+   carte prend ensuite un anneau à la couleur de son métier, dix secondes,
+   le temps que l'oeil la trouve. L'anneau ne bat pas : la règle du calme
+   vaut ici comme pour le halo du soleil. */
+function allerALaPorte(id) {
+  const carte = document.querySelector('.carte[data-porte="' + id + '"]');
+  if (!carte) return;
+  const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const groupe = carte.closest(".aimant");
+  if (groupe) {
+    const haut = aimantHaut(groupe);
+    window.scrollTo({ top: AIMANT.actif ? aimantOu(haut) : haut - 76,
+                      behavior: reduit ? "auto" : "smooth" });
+  } else {
+    carte.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "center" });
+  }
+  if (NEUF_MINUTEUR) clearTimeout(NEUF_MINUTEUR);
+  document.querySelectorAll(".carte.surligne").forEach(c => c.classList.remove("surligne"));
+  carte.classList.add("surligne");
+  NEUF_MINUTEUR = setTimeout(() => carte.classList.remove("surligne"), NEUF_SURLIGNE);
 }
 
 function initNeuf() {
   const btn = $("btnNeuf"), menu = $("menuNeuf");
   if (!btn || !menu) return;
-  const neufs = outilsNeufs();
-  if (!neufs.length) return;
-  btn.hidden = false;
-  $("btnNeufNombre").textContent = String(neufs.length);
-  menu.innerHTML = '<p class="menu-neuf-titre">' + ech(mot("Derniers outils disponibles")) + "</p>"
-    + neufs.map(html_neuf).join("");
 
   function fermer() {
     menu.classList.remove("ouvert");
     btn.setAttribute("aria-expanded", "false");
   }
+
+  // Le volet se redessine après chaque nouveauté vue : le nombre suit, et
+  // le bouton s'efface dès qu'il n'y a plus rien à annoncer.
+  function peindre() {
+    const neufs = outilsNeufs();
+    if (!neufs.length) { fermer(); btn.hidden = true; return; }
+    btn.hidden = false;
+    $("btnNeufNombre").textContent = String(neufs.length);
+    menu.innerHTML = '<p class="menu-neuf-titre">' + ech(mot("Derniers outils disponibles")) + "</p>"
+      + neufs.map(html_neuf).join("");
+  }
+  peindre();
+
   btn.addEventListener("click", ev => {
     ev.stopPropagation();
     const ouvert = menu.classList.toggle("ouvert");
     btn.setAttribute("aria-expanded", String(ouvert));
   });
-  // Ouvrir une nouveauté referme le volet : on part vers un autre onglet,
-  // le portail ne doit pas garder un menu ouvert dans le dos.
-  menu.addEventListener("click", () => fermer());
+
+  menu.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-porte]");
+    if (!b) return;
+    const o = PORTES.find(p => p.id === b.dataset.porte);
+    fermer();
+    allerALaPorte(b.dataset.porte);
+    if (o) { neufMarquerVu(o); peindre(); }
+  });
+
   document.addEventListener("click", ev => {
     if (!menu.contains(ev.target) && !btn.contains(ev.target)) fermer();
   });

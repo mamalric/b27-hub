@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-31, le volet des nouveautes conduit a la carte
+
+Trois retouches demandees sur le volet pose ce matin, et elles le font changer de nature : il annoncait, il conduit maintenant.
+
+**L'icone de l'outil remplace la pastille de couleur.** Une pastille ronde disait la couleur du metier, pas de quel outil il s'agissait. La ligne porte desormais la meme plaque que la carte, l'icone du catalogue sur le fond du lot, en trente pixels au lieu de quarante-deux.
+
+**Le clic descend a la carte au lieu de sortir du portail.** La ligne est devenue un bouton, le chevron pointe vers le bas, et le chemin est celui du sommaire : le groupe se pose au foyer du magnetisme, a pleine encre, le reste de la page s'estompant autour. La carte prend alors un anneau a la couleur de son metier pendant dix secondes, le temps que l'oeil la trouve. L'anneau ne bat pas, la regle du calme vaut ici comme pour le halo du soleil, et il s'efface par la transition que la carte porte deja. Pour retrouver la carte, il a fallu lui donner un `data-porte` : elle n'etait identifiable par rien.
+
+**Une nouveaute vue cesse d'etre neuve.** La cle memorisee est la porte et sa date, `id@maj`, ce qui laisse un outil remis a jour redevenir neuf : c'est le propre d'un volet de nouveautes. Le nombre suit, et le bouton s'efface entierement quand il n'y a plus rien a annoncer, ce qui vaut mieux qu'une pastille NEW qui crie dans le vide.
+
+Verifie dans les deux themes : icones lisibles, cible calculee a 1232 pixels pour la calculette ECS et carte entierement visible a l'arrivee, anneau present a 0,5 et 8,5 secondes, parti a 10,7, memoire des vues qui survit au rechargement, bouton cache une fois les deux vus. Le defilement doux ne s'anime pas dans le volet d'apercu, le sommaire du portail s'y comporte pareil : c'est l'environnement, pas la page.
+
 ## 2026-08-31, deux outils, pas dix, et un volet pour les voir
 
 Second signalement de la journée : "il est marqué 10 mais c'est faux". Vrai, et la correction d'hier n'était allée qu'à mi-chemin. Le compteur avait cessé de compter les sept cartes en attente, celles qui n'ont pas de nom, mais il comptait toujours les huit fiches "Bientôt" qui portent un nom, un pitch et aucune adresse. Sur les dix-sept cartes du rayon, deux seulement s'ouvrent : la Calculette ECS et Bouclage, et le Dimensionnement émetteurs Finimetal.
