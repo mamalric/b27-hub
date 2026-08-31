@@ -2,6 +2,10 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-08-31, Zoho Projects pointe vers l'espace de l'entreprise
+
+Le lien de la fiche Zoho Projects menait à la page commerciale du produit, `zoho.com/projects/`. Il mène désormais à `crmplus.zoho.eu`, l'espace européen où les collègues travaillent vraiment. La date de la porte suit, et le pitch ne bouge pas : il dit déjà qu'un compte d'entreprise est nécessaire, ce qui reste vrai et reste la question ouverte sur ces trois fiches dans un portail public.
+
 ## 2026-08-31, le bouton NEW ne s'effaçait pas vraiment
 
 Signalé aussitôt après la livraison précédente : le bouton restait affiché alors qu'il n'y avait plus rien de neuf. La mécanique était pourtant bonne, `btn.hidden` passait bien à vrai. C'est la feuille de style qui l'annulait : `.bouton-neuf` déclare `display:inline-flex`, et un display posé par la feuille de style l'emporte sur la règle `[hidden]{display:none}` du navigateur. Le bouton gardait ses soixante-dix-sept pixels, caché pour le code et visible pour l'oeil.

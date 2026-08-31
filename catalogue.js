@@ -526,14 +526,14 @@ const PORTES = [
     id: "zoho-projects",
     nom: "Zoho Projects",
     pitch: "Le suivi des projets et des tâches. Demande un compte d'entreprise.",
-    url: "https://www.zoho.com/projects/",
+    url: "https://crmplus.zoho.eu",
     categorie: "ressources",
     sousCategorie: "services",
     statut: "en-ligne",
     type: "lien",
     icone: "calendrier",
     tags: ["Zoho", "projets", "tâches", "interne"],
-    maj: "2026-08-30"
+    maj: "2026-08-31"
   },
 
   {
