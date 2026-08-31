@@ -2,9 +2,11 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
-## 2026-08-31, Zoho Projects pointe vers l'espace de l'entreprise
+## 2026-08-31, les trois fiches Zoho mènent aux espaces de l'entreprise
 
-Le lien de la fiche Zoho Projects menait à la page commerciale du produit, `zoho.com/projects/`. Il mène désormais à `crmplus.zoho.eu`, l'espace européen où les collègues travaillent vraiment. La date de la porte suit, et le pitch ne bouge pas : il dit déjà qu'un compte d'entreprise est nécessaire, ce qui reste vrai et reste la question ouverte sur ces trois fiches dans un portail public.
+Les trois liens Zoho menaient aux pages commerciales des produits sur `zoho.com`. Ils mènent désormais aux espaces européens où les collègues travaillent : `crmplus.zoho.eu` pour Projects, `expense.zoho.eu` pour Expense, `people.zoho.eu` pour People. Les dates des portes suivent.
+
+Une question posée plutôt qu'une adresse devinée : Projects avait été donné, les deux autres non, et CRM Plus ne contient ni Expense ni People. Les appliquer par analogie aurait posé deux liens faux sur un portail public. Les pitchs ne bougent pas : ils disent déjà qu'un compte d'entreprise est nécessaire, ce qui reste la question ouverte sur ces trois fiches.
 
 ## 2026-08-31, le bouton NEW ne s'effaçait pas vraiment
 

@@ -540,28 +540,28 @@ const PORTES = [
     id: "zoho-expense",
     nom: "Zoho Expense",
     pitch: "Les notes de frais et les déplacements. Demande un compte d'entreprise.",
-    url: "https://www.zoho.com/expense/",
+    url: "https://expense.zoho.eu/",
     categorie: "ressources",
     sousCategorie: "services",
     statut: "en-ligne",
     type: "lien",
     icone: "calculatrice",
     tags: ["Zoho", "notes de frais", "interne"],
-    maj: "2026-08-30"
+    maj: "2026-08-31"
   },
 
   {
     id: "zoho-people",
     nom: "Zoho People",
     pitch: "Les congés, les absences et le dossier du personnel. Demande un compte d'entreprise.",
-    url: "https://www.zoho.com/people/",
+    url: "https://people.zoho.eu/",
     categorie: "ressources",
     sousCategorie: "services",
     statut: "en-ligne",
     type: "lien",
     icone: "personne",
     tags: ["Zoho", "congés", "RH", "interne"],
-    maj: "2026-08-30"
+    maj: "2026-08-31"
   },
 
   {
