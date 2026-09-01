@@ -789,7 +789,14 @@ a.carte:active{transform:translateY(-1px) scale(.988);transition-duration:.08s}
   --aimant-loin:.88;     /* son échelle, franchement en retrait */
   --aimant-pres:1.04;    /* l'échelle du groupe au foyer */
   --aimant-titre:.16;    /* le supplément de grossissement de son titre */
-  --aimant-flou:5px;     /* le flou de ce qui est hors foyer */
+  /* Le flou est le seul poste du magnétisme qui coûte au processeur
+     graphique : recalculé à chaque image de défilement sur tous les
+     groupes hors du foyer, un filtre CSS force leur redessin à part, plus
+     cher encore sur des cartes qui portent déjà le verre du backdrop-filter.
+     5px marquait bien le lointain mais pesait sur le défilement ; 3px,
+     déjà éprouvé sur petit écran plus bas dans ce fichier, distingue tout
+     autant sans peser autant. */
+  --aimant-flou:3px;     /* le flou de ce qui est hors foyer */
 }
 body.aimante .aimant{
   opacity:calc(var(--aimant-fond) + (1 - var(--aimant-fond)) * var(--f,1));

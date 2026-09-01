@@ -652,7 +652,10 @@ function initTheme() {
    calcul tient en une ligne. Si le poste demande moins d'animations, le
    champ est dessiné une fois, immobile, et rien ne bouge.
    --------------------------------------------------------------------- */
-const FOND = { cv: null, ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0, dpr: 0, meteo: null, amb: null };
+const FOND = {
+  cv: null, ctx: null, parts: [], t: 0, anime: null, L: 0, H: 0, dpr: 0, meteo: null, amb: null,
+  allege: false, lentes: 0, dernierT: 0   // le poste allégé sur machine lente, voir fondAllegerSiLent
+};
 
 // Le délai maximal d'une traînée, en images : au-delà, le tracé expire et
 // disparaît, sans exception. La première version estompait par voile
@@ -845,12 +848,44 @@ function calculerAmbiance() {
 // ambiance et renaissent dans la nouvelle : la transition est un glissement.
 function fondAmbiance() {
   FOND.amb = calculerAmbiance();
+  // Une machine qui a montré qu'elle peinait garde un fond allégé même
+  // après un changement de météo ou de thème : l'allégement ne se pose
+  // qu'une fois, il ne se repose pas à chaque recalcul.
+  if (FOND.allege) {
+    FOND.amb.nb = Math.max(30, Math.round(FOND.amb.nb * FOND_ALLEGE_FACTEUR));
+    FOND.amb.nuages = Math.max(3, Math.round(FOND.amb.nuages * FOND_ALLEGE_FACTEUR));
+  }
   // Les nappes existantes survivent au changement d'ambiance, on ajuste
   // seulement leur nombre : le ciel glisse, il ne bascule pas.
   FOND.nuages = FOND.nuages || [];
   while (FOND.nuages.length < FOND.amb.nuages) FOND.nuages.push(graineNuage());
   FOND.nuages.length = FOND.amb.nuages;
   if (FOND.statique && FOND.ctx) { fondEffacer(); fondStatique(); }
+}
+
+/* Une machine modeste ne rattrape jamais un rythme qui lui échappe : sans
+   garde-fou, elle saccade sans fin, un fond animé plein régime image après
+   image. Le repère est le temps réel entre deux images, pas la puissance
+   annoncée par le navigateur, puisque cores et mémoire ne disent rien du
+   coût réel, qui dépend aussi de la fenêtre partagée, de l'onglet en
+   arrière-plan, de l'économie d'énergie. Quatre-vingt-dix images d'affilée
+   plus lentes que 33 ms, sous trente images par seconde, valent le geste :
+   le fond s'allège une fois, par le même chemin qu'un changement de météo,
+   et ne s'allège plus jamais une seconde fois, il ne repasse pas non plus
+   au complet, sans quoi l'aller-retour ferait le va-et-vient qu'on cherche
+   à éviter. Une pause d'onglet ne compte pas : la reprise recommence le
+   compte à zéro dès la première image rapide. */
+const FOND_ALLEGE_SEUIL_MS = 33;
+const FOND_ALLEGE_IMAGES = 90;
+const FOND_ALLEGE_FACTEUR = .6;
+
+function fondAllegerSiLent(quand) {
+  if (FOND.allege || typeof quand !== "number") return;
+  if (FOND.dernierT) {
+    FOND.lentes = quand - FOND.dernierT > FOND_ALLEGE_SEUIL_MS ? FOND.lentes + 1 : 0;
+    if (FOND.lentes > FOND_ALLEGE_IMAGES) { FOND.allege = true; fondAmbiance(); }
+  }
+  FOND.dernierT = quand;
 }
 
 function fondAngle(x, y, t) {
@@ -1044,8 +1079,9 @@ function fondEffacer() {
   ctx.restore();
 }
 
-function fondPas() {
+function fondPas(quand) {
   if (!fondCadrer()) { FOND.anime = requestAnimationFrame(fondPas); return; }
+  fondAllegerSiLent(quand);
   const { ctx, parts, L, H } = FOND;
   const amb = FOND.amb;
   FOND.t += 0.5;
@@ -1888,6 +1924,32 @@ function construireSommaire() {
   nav.hidden = false;
 }
 
+/* ---------------------------------------------------------------------
+   LE DÉFILEMENT, EN UN SEUL PASSAGE
+
+   Trois écrans réagissent au défilement, le repère du sommaire, le
+   magnétisme des groupes et la pilule d'ancrage, et posaient chacun son
+   propre écouteur et sa propre image demandée au navigateur. Sur une
+   même image de défilement, cela faisait donc jusqu'à trois écouteurs
+   déclenchés et trois `requestAnimationFrame` distincts, chacun avec son
+   propre indicateur "déjà prévu", pour un travail qui tient dans une
+   seule image. Ici, une inscription commune : chaque script qui a besoin
+   de savoir où l'on en est s'y ajoute au lieu de poser son propre
+   mécanisme, et le geste de défilement ne coûte plus qu'un écouteur et
+   une image, quel que soit le nombre d'écrans qui y répondent. */
+const SUR_DEFILEMENT = [];
+function surScrollInscrire(fn) { SUR_DEFILEMENT.push(fn); }
+(function () {
+  let prevu = false;
+  function image() {
+    prevu = false;
+    for (const fn of SUR_DEFILEMENT) fn();
+  }
+  window.addEventListener("scroll", () => {
+    if (!prevu) { prevu = true; requestAnimationFrame(image); }
+  }, { passive: true });
+})();
+
 function initSommaire() {
   const nav = $("sommaire");
   const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1926,9 +1988,7 @@ function initSommaire() {
   }
   AIMANT.surFoyer = marquer;
 
-  let prevu = false;
   function reperer() {
-    prevu = false;
     if (AIMANT.actif) return;
     const seuil = window.scrollY + innerHeight * 0.3;
     let courant = null;
@@ -1938,9 +1998,7 @@ function initSommaire() {
     });
     marquer(courant ? courant.dataset.cible : null);
   }
-  window.addEventListener("scroll", () => {
-    if (!prevu) { prevu = true; requestAnimationFrame(reperer); }
-  }, { passive: true });
+  surScrollInscrire(reperer);
   reperer();
 
   /* La vague magnétique. À l'approche du curseur, chaque bulle grossit
@@ -2480,12 +2538,7 @@ function initAimant() {
   initAimantMolette();
   initAimantClavier();
 
-  let prevu = false;
-  window.addEventListener("scroll", () => {
-    if (prevu) return;
-    prevu = true;
-    requestAnimationFrame(() => { prevu = false; aimantPeindre(); });
-  }, { passive: true });
+  surScrollInscrire(aimantPeindre);
 
   /* Le clavier ne se perd pas dans le lointain. Les cartes hors foyer ne
      reçoivent plus le curseur, mais la tabulation les atteint toujours, et
@@ -2726,9 +2779,7 @@ function initAncre() {
   const embleme = $("embleme");
   const titre = $("titrePortail");
 
-  let prevu = false;
   function surDefilement() {
-    prevu = false;
     const y = window.scrollY;
     document.body.classList.toggle("defile", y > SEUIL_ANCRE);
     if (reduit) return;
@@ -2740,9 +2791,7 @@ function initAncre() {
     embleme.style.opacity = titre.style.opacity = String(1 - p * 0.9);
     embleme.style.transform = titre.style.transform = forme;
   }
-  window.addEventListener("scroll", () => {
-    if (!prevu) { prevu = true; requestAnimationFrame(surDefilement); }
-  }, { passive: true });
+  surScrollInscrire(surDefilement);
   surDefilement();
 
   const remonter = () => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });

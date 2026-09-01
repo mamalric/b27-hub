@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-09-01, trois retouches contre les saccades
+
+Retour signale : ralentissements et animations saccadees. Diagnostic pose avant de toucher au code, trois postes trouves. Trois retenus pour cette session, une quatrieme (retirer le flou pendant le defilement actif) ecartee par l'utilisateur, crainte d'une perte visuelle trop nette.
+
+**Le flou du lointain, allege.** `--aimant-flou` passait de 5px a 3px : c'est le seul poste du magnetisme qui coute au processeur graphique, recalcule a chaque image de defilement sur jusqu'a dix-sept groupes a la fois, plus cher encore sur des cartes qui portent deja le verre du backdrop-filter. 3px etait deja eprouve plus bas dans le fichier, sur petit ecran : la meme valeur, generalisee, distingue tout autant le lointain sans peser autant.
+
+**Les ecouteurs de defilement, fusionnes.** Trois ecrans reagissaient au defilement (le repere du sommaire, le magnetisme des groupes, la pilule d'ancrage), chacun avec son propre ecouteur et sa propre image demandee au navigateur : jusqu'a trois `requestAnimationFrame` par geste de molette pour un travail qui tient dans une seule image. Une inscription commune, `surScrollInscrire`, remplace les trois : chaque script s'y ajoute, un seul ecouteur et une seule image suffisent desormais, quel que soit le nombre d'ecrans qui repondent.
+
+**Le fond animе s'allege sur machine lente, une fois, sans jamais revenir en arriere.** Le repere est le temps reel entre deux images, pas la puissance annoncee par le navigateur, qui ne dit rien du cout reel. Quatre-vingt-dix images d'affilee plus lentes que 33 ms (sous trente images par seconde) declenchent un allegement de quarante pour cent des particules et des nappes, par le meme chemin qu'un changement de meteo. Un hoquet isole ne declenche rien, une image rapide reinitialise le compte. Une fois allege, le fond le reste meme apres un changement de theme ou de meteo : l'aller-retour aurait fait le va-et-vient qu'on cherche justement a eviter.
+
+Verifie : le defilement fusionne repond bien en un seul appel (pilule, magnetisme et sommaire se recalent ensemble) ; l'allegement se declenche apres quatre-vingt-onze images lentes simulees, jamais sur des hoquets isoles entrecoupes d'images rapides, survit a un changement de theme, et ne redevient jamais complet. Console vide, controle du catalogue au vert.
+
 ## 2026-09-01, le portail accueille en clair
 
 Un nouveau visiteur arrivait en sombre, alors que la demande est desormais d'accueillir en clair. Deux endroits fixaient "dark" par defaut : le script anti-flash d'`index.html`, qui pose le theme avant le premier rendu pour eviter un eclair de l'un a l'autre, et `initTheme()` dans `hub.js`, qui prend le relais une fois le script charge. Les deux passent a "light" ; sans cette double correction, le script anti-flash aurait affiche le sombre une fraction de seconde avant que hub.js ne corrige, l'eclair inverse de celui qu'il est cense eviter. Le commentaire d'identite en tete de `hub.css` est reecrit dans le meme sens : le sombre reste l'habit fort du portail, celui ou le champ d'ecoulement prend son relief, mais ce n'est plus le premier contact. Le bouton lune/soleil et la memoire par navigateur ne changent pas : un visiteur qui choisit le sombre le retrouve a son retour, comme avant.
