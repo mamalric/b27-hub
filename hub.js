@@ -2542,8 +2542,8 @@ function initAimant() {
 
   /* Le clavier ne se perd pas dans le lointain. Les cartes hors foyer ne
      reçoivent plus le curseur, mais la tabulation les atteint toujours, et
-     elle y serait aveugle : six centièmes d'opacité sous cinq pixels de
-     flou. Dès qu'une carte prend le focus, son groupe vient au foyer, à
+     elle y serait aveugle : une carte à six centièmes d'opacité ne se lit
+     déjà pas. Dès qu'une carte prend le focus, son groupe vient au foyer, à
      l'arrêt même où la molette l'aurait posé. Un clic ne déclenche rien
      ici : la carte cliquée est forcément celle du groupe au foyer, donc
      déjà à sa place. */

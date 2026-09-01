@@ -446,8 +446,14 @@ body.aimante.defile .entete-rayon.entre{opacity:0;translate:0 calc(var(--d,1) * 
 }
 .tuiles-vives[hidden]{display:none}
 .tuile-vive{
-  background:var(--carte);border:1px solid var(--ligne);border-radius:var(--rayon-g);
-  backdrop-filter:blur(12px);padding:18px 20px;box-shadow:var(--ombre);
+  /* Pleine, pas de verre : la météo et le calendrier restent posés devant
+     le fond animé même quand il tourne fort, l'orage ou la neige ne
+     doivent jamais se deviner en transparence derrière un chiffre qu'on
+     est venu lire. --carte-pleine est déjà la couleur solide du portail,
+     celle des menus et modales ; sans matière à flouter derrière une
+     couleur opaque, le backdrop-filter ne servait plus à rien non plus. */
+  background:var(--carte-pleine);border:1px solid var(--ligne);border-radius:var(--rayon-g);
+  padding:18px 20px;box-shadow:var(--ombre);
   animation:lever .55s var(--courbe) .3s backwards;
 }
 /* La pastille repliée d'une tuile ancrée : la température d'un côté, le
@@ -789,14 +795,6 @@ a.carte:active{transform:translateY(-1px) scale(.988);transition-duration:.08s}
   --aimant-loin:.88;     /* son échelle, franchement en retrait */
   --aimant-pres:1.04;    /* l'échelle du groupe au foyer */
   --aimant-titre:.16;    /* le supplément de grossissement de son titre */
-  /* Le flou est le seul poste du magnétisme qui coûte au processeur
-     graphique : recalculé à chaque image de défilement sur tous les
-     groupes hors du foyer, un filtre CSS force leur redessin à part, plus
-     cher encore sur des cartes qui portent déjà le verre du backdrop-filter.
-     5px marquait bien le lointain mais pesait sur le défilement ; 3px,
-     déjà éprouvé sur petit écran plus bas dans ce fichier, distingue tout
-     autant sans peser autant. */
-  --aimant-flou:3px;     /* le flou de ce qui est hors foyer */
 }
 body.aimante .aimant{
   opacity:calc(var(--aimant-fond) + (1 - var(--aimant-fond)) * var(--f,1));
@@ -818,27 +816,19 @@ body.aimante .aimant{
    revanche, peut rapetisser autant qu'on veut : c'est de ce côté que se
    gagne le contraste de taille.
 
-   LE FLOU NE SE POSE QUE SUR CE QUI EST FRANCHEMENT HORS DU FOYER, et
-   c'est hub.js qui pose la classe. Un filtre, même blur(0), isole ce qu'il
-   y a derrière l'élément : posé sur le groupe au foyer, il ferait perdre
-   à ses cartes le verre de leur backdrop-filter, précisément là où on le
-   regarde. Hors foyer, l'isolation ne se voit pas, l'opacité ayant déjà
-   fait le travail.
-
-   LE LOINTAIN N'EST PAS CLIQUABLE, et c'est la même classe qui le dit. Une
-   carte à six centièmes d'opacité sous cinq pixels de flou ne se lit pas :
-   la cliquer ne peut être qu'un accident, et ouvrir un outil qu'on n'a pas
-   pu lire est le pire des accidents. Seul le groupe au foyer reçoit le
-   curseur. Le clavier, lui, garde sa route : la tabulation atteint toujours
-   les cartes du lointain, et hub.js ramène leur groupe au foyer dès qu'une
-   d'elles prend le focus, sans quoi on naviguerait à l'aveugle. */
+   LE LOINTAIN N'EST PAS CLIQUABLE, et c'est hub.js qui pose la classe qui
+   le dit. Un flou l'a marqué un temps, essayé puis retiré : recalculé à
+   chaque image de défilement sur tous les groupes hors du foyer, un
+   filtre CSS forçait leur redessin à part, plus cher encore sur des
+   cartes qui portent déjà le verre du backdrop-filter, pour un rendu que
+   l'opacité seule suffisait. Une carte à six centièmes d'opacité ne
+   se lit déjà pas : la cliquer ne peut être qu'un accident, et ouvrir un
+   outil qu'on n'a pas pu lire est le pire des accidents. Seul le groupe au
+   foyer reçoit le curseur. Le clavier, lui, garde sa route : la tabulation
+   atteint toujours les cartes du lointain, et hub.js ramène leur groupe au
+   foyer dès qu'une d'elles prend le focus, sans quoi on naviguerait à
+   l'aveugle. */
 body.aimante .aimant.flou{
-  /* Essai : le filtre est neutralisé pour voir ce que rend le lointain
-     sans flou du tout. L'opacité et l'échelle de --f continuent seules à
-     dire l'éloignement ; le groupe reste non cliquable comme avant, la
-     règle n'a rien à voir avec le flou. Remettre la ligne filter pour
-     revenir en arrière. */
-  /* filter:blur(calc((1 - var(--f,1)) * var(--aimant-flou))); */
   pointer-events:none;
 }
 /* LA BUTÉE. En bout de course, la page ne bougeait pas et ne disait rien :
@@ -1075,7 +1065,7 @@ body.aimante .aimant > h3 .groupe-puce{
 @media (max-width:720px){
   /* Une fenêtre étroite ne tient qu'un groupe ou deux : le magnétisme y
      estomperait la moitié de ce qu'on est venu lire. Il s'adoucit. */
-  :root{--aimant-fond:.18;--aimant-loin:.94;--aimant-pres:1.022;--aimant-titre:.09;--aimant-flou:3px}
+  :root{--aimant-fond:.18;--aimant-loin:.94;--aimant-pres:1.022;--aimant-titre:.09}
   .portail{padding:0 14px 84px}
   .entree{padding-top:44px}
   .embleme{width:96px;height:96px;border-radius:24px}

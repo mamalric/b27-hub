@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-09-01, le flou est retire pour de bon, les tuiles deviennent pleines
+
+**Verdict de l'utilisateur sur les deux essais de la veille : sans flou du tout, "c'est bien mieux, le flou n'apporte rien en fait".** La branche `experiment/sans-flou` est fusionnee, `experiment/flou-au-repos` abandonnee et supprimee. Plutot que de laisser une ligne `filter` commentee en travers du code, le retrait est fait pour de bon : la variable `--aimant-flou` disparait des deux points de rupture ou elle vivait, la regle `.aimant.flou` ne garde que son `pointer-events:none`, et les commentaires qui expliquaient encore le flou (dans `hub.css`, `hub.js` et `FICHE.md`) sont corriges pour dire ce qui est vrai maintenant : le lointain se lit par l'opacite et l'echelle seules, "six centiemes d'opacite" suffit a dire qu'une carte ne se lit pas, sans qu'un filtre y ajoute rien.
+
+**Les tuiles meteo et calendrier passent de vitre a plein.** Elles empruntaient `--carte`, la couleur translucide des cartes d'outils, avec un `backdrop-filter:blur(12px)` : le fond anime se devinait derriere un chiffre qu'on est venu lire, ce que l'utilisateur a signale comme genant. Elles empruntent maintenant `--carte-pleine`, deja la couleur solide des menus et modales du portail, et le flou de fond, sans plus rien a flouter derriere une couleur opaque, est retire avec elle : un cout de rendu en moins, gratuit.
+
+Verifie : fond calcule en `rgb()` sans canal alpha dans les deux themes, `backdrop-filter:none`, console vide, controle du catalogue au vert.
+
 ## 2026-09-01, essai : le lointain sans flou du tout (branche experiment/sans-flou)
 
 Second essai demande, sur une seconde branche a comparer a la premiere plutot qu'a la remplacer : et si le flou du lointain disparaissait purement et simplement, plutot que de reposer a l'arret ? Une seule ligne neutralisee dans `hub.css`, le `filter:blur(...)` de la regle `.aimant.flou`, commentee et expliquee sur place. Rien d'autre ne bouge : l'opacite et l'echelle portees par `--f` continuent seules a dire l'eloignement, et le lointain reste non cliquable comme avant, cette regle n'ayant rien a voir avec le flou.
