@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-09-01, essai : le lointain sans flou du tout (branche experiment/sans-flou)
+
+Second essai demande, sur une seconde branche a comparer a la premiere plutot qu'a la remplacer : et si le flou du lointain disparaissait purement et simplement, plutot que de reposer a l'arret ? Une seule ligne neutralisee dans `hub.css`, le `filter:blur(...)` de la regle `.aimant.flou`, commentee et expliquee sur place. Rien d'autre ne bouge : l'opacite et l'echelle portees par `--f` continuent seules a dire l'eloignement, et le lointain reste non cliquable comme avant, cette regle n'ayant rien a voir avec le flou.
+
+Verifie : filtre calcule a "none" sur les groupes hors foyer, `pointer-events:none` toujours present, opacite toujours degressive. Console vide, controle du catalogue au vert.
+
+Deux essais vivent maintenant en parallele, aucun fusionne : `experiment/flou-au-repos`, sur la base des trois retouches du jour (le flou revient a l'arret), et `experiment/sans-flou`, sur la base d'avant ces retouches (le flou ne revient jamais). Le choix attend le jugement de l'utilisateur sur l'ecran reel.
+
 ## 2026-09-01, trois retouches contre les saccades
 
 Retour signale : ralentissements et animations saccadees. Diagnostic pose avant de toucher au code, trois postes trouves. Trois retenus pour cette session, une quatrieme (retirer le flou pendant le defilement actif) ecartee par l'utilisateur, crainte d'une perte visuelle trop nette.

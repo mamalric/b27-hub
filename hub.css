@@ -833,7 +833,12 @@ body.aimante .aimant{
    les cartes du lointain, et hub.js ramène leur groupe au foyer dès qu'une
    d'elles prend le focus, sans quoi on naviguerait à l'aveugle. */
 body.aimante .aimant.flou{
-  filter:blur(calc((1 - var(--f,1)) * var(--aimant-flou)));
+  /* Essai : le filtre est neutralisé pour voir ce que rend le lointain
+     sans flou du tout. L'opacité et l'échelle de --f continuent seules à
+     dire l'éloignement ; le groupe reste non cliquable comme avant, la
+     règle n'a rien à voir avec le flou. Remettre la ligne filter pour
+     revenir en arrière. */
+  /* filter:blur(calc((1 - var(--f,1)) * var(--aimant-flou))); */
   pointer-events:none;
 }
 /* LA BUTÉE. En bout de course, la page ne bougeait pas et ne disait rien :
