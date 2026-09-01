@@ -35,7 +35,7 @@ La v7 est validée par l'utilisateur (« beaucoup mieux, j'adore ») et retouch�
 
 Trancher si le portail doit rester en `noindex` : il se veut désormais ouvert à tous, clients compris, et la balise comme `robots.txt` l'excluent des moteurs de recherche. C'est une décision d'entreprise, pas technique.
 
-Puis trancher le mode d'envoi du signalement (voir `docs/signalement.md`). RefriSelect est publié depuis le 1er septembre. Trois outils non déployés (Désenfumage, RTex Tool, Étiquette DPE) ont leur fiche en statut a-venir : publier chacun n'est plus qu'une url et un statut à changer. Le pitch de l'Étiquette DPE est à écrire, celui de RTex Tool est déduit du nom et reste à vérifier.
+Puis trancher le mode d'envoi du signalement (voir `docs/signalement.md`). RefriSelect et l'Étiquette DPE sont publiés depuis le 1er septembre. Deux outils non déployés (Désenfumage, RTex Tool) ont leur fiche en statut a-venir : publier chacun n'est plus qu'une url et un statut à changer. Le pitch de RTex Tool est déduit du nom et reste à vérifier.
 
 Trancher enfin le sort des trois services Zoho ajoutés aux ressources : ils demandent un compte d'entreprise et ne s'ouvrent pas pour un visiteur extérieur, ce que la charte exclut d'un portail public.
 

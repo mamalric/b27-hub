@@ -179,20 +179,18 @@ const PORTES = [
     maj: "2026-09-01"
   },
 
-  /* L'étiquette DPE. Le pitch et l'url restent à remplir : l'outil est
-     nommé par la maison, ce qu'il fait exactement n'a pas été dit ici. */
   {
     id: "etiquette-dpe",
     nom: "Étiquette DPE",
     pitch: "Étiquette énergie et climat d'un bâtiment.",
     en: { nom: "EPC Label", pitch: "Energy and climate label of a building." },
-    url: "",
+    url: "https://etiquette-dpe.marius-amalric45.workers.dev/",
     categorie: "thermique",
-    statut: "a-venir",
+    statut: "en-ligne",
     type: "outil",
     icone: "jauge",
     tags: ["DPE", "étiquette énergie", "classe"],
-    maj: "2026-08-30"
+    maj: "2026-09-01"
   },
 
   {

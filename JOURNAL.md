@@ -2,6 +2,10 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-09-01, l'Etiquette DPE ouvre ses portes
+
+Deuxieme outil "a-venir" publie aujourd'hui, apres RefriSelect : l'Etiquette DPE repond desormais a https://etiquette-dpe.marius-amalric45.workers.dev/, verifie avant d'ecrire l'adresse (HTTP 200). Statut passe a en-ligne, la carte redevient cliquable et compte dans "Nos outils". Le pitch etait deja ecrit, contrairement a ce que disait encore le commentaire du catalogue : la note perimee est retiree avec la publication. Deux fiches "a-venir" restent en attente d'adresse : Desenfumage, RTex Tool.
+
 ## 2026-09-01, le flou est retire pour de bon, les tuiles deviennent pleines
 
 **Verdict de l'utilisateur sur les deux essais de la veille : sans flou du tout, "c'est bien mieux, le flou n'apporte rien en fait".** La branche `experiment/sans-flou` est fusionnee, `experiment/flou-au-repos` abandonnee et supprimee. Plutot que de laisser une ligne `filter` commentee en travers du code, le retrait est fait pour de bon : la variable `--aimant-flou` disparait des deux points de rupture ou elle vivait, la regle `.aimant.flou` ne garde que son `pointer-events:none`, et les commentaires qui expliquaient encore le flou (dans `hub.css`, `hub.js` et `FICHE.md`) sont corriges pour dire ce qui est vrai maintenant : le lointain se lit par l'opacite et l'echelle seules, "six centiemes d'opacite" suffit a dire qu'une carte ne se lit pas, sans qu'un filtre y ajoute rien.
