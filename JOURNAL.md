@@ -2,6 +2,10 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-09-01, RefriSelect ouvre ses portes
+
+Premier des quatre outils "a-venir" a etre publie : RefriSelect repond desormais a https://refriselect.marius-amalric45.workers.dev/, verifie avant d'ecrire l'adresse dans le catalogue. Statut passe a en-ligne, la carte redevient cliquable et compte dans "Nos outils". Le pitch et les mots-cles, deja ecrits en aout, n'ont pas bouge : ils decrivaient deja ce que l'outil fait. Trois fiches "a-venir" restent en attente d'adresse : Desenfumage, RTex Tool, Etiquette DPE.
+
 ## 2026-08-31, les trois fiches Zoho mènent aux espaces de l'entreprise
 
 Les trois liens Zoho menaient aux pages commerciales des produits sur `zoho.com`. Ils mènent désormais aux espaces européens où les collègues travaillent : `crmplus.zoho.eu` pour Projects, `expense.zoho.eu` pour Expense, `people.zoho.eu` pour People. Les dates des portes suivent.

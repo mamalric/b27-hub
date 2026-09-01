@@ -170,13 +170,13 @@ const PORTES = [
     nom: "RefriSelect",
     pitch: "Sélection et comparaison des fluides frigorifiques d'une installation de froid.",
     en: { nom: "RefriSelect", pitch: "Selection and comparison of the refrigerants of a cooling installation." },
-    url: "",
+    url: "https://refriselect.marius-amalric45.workers.dev/",
     categorie: "climatisation",
-    statut: "a-venir",
+    statut: "en-ligne",
     type: "outil",
     icone: "flocon",
     tags: ["fluides frigorigènes", "froid", "F-Gas"],
-    maj: "2026-08-30"
+    maj: "2026-09-01"
   },
 
   /* L'étiquette DPE. Le pitch et l'url restent à remplir : l'outil est
