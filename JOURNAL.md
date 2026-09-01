@@ -2,6 +2,10 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-09-01, le portail accueille en clair
+
+Un nouveau visiteur arrivait en sombre, alors que la demande est desormais d'accueillir en clair. Deux endroits fixaient "dark" par defaut : le script anti-flash d'`index.html`, qui pose le theme avant le premier rendu pour eviter un eclair de l'un a l'autre, et `initTheme()` dans `hub.js`, qui prend le relais une fois le script charge. Les deux passent a "light" ; sans cette double correction, le script anti-flash aurait affiche le sombre une fraction de seconde avant que hub.js ne corrige, l'eclair inverse de celui qu'il est cense eviter. Le commentaire d'identite en tete de `hub.css` est reecrit dans le meme sens : le sombre reste l'habit fort du portail, celui ou le champ d'ecoulement prend son relief, mais ce n'est plus le premier contact. Le bouton lune/soleil et la memoire par navigateur ne changent pas : un visiteur qui choisit le sombre le retrouve a son retour, comme avant.
+
 ## 2026-09-01, RefriSelect ouvre ses portes
 
 Premier des quatre outils "a-venir" a etre publie : RefriSelect repond desormais a https://refriselect.marius-amalric45.workers.dev/, verifie avant d'ecrire l'adresse dans le catalogue. Statut passe a en-ligne, la carte redevient cliquable et compte dans "Nos outils". Le pitch et les mots-cles, deja ecrits en aout, n'ont pas bouge : ils decrivaient deja ce que l'outil fait. Trois fiches "a-venir" restent en attente d'adresse : Desenfumage, RTex Tool, Etiquette DPE.

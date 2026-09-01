@@ -630,7 +630,7 @@ function appliquerTheme(t) {
 function initTheme() {
   let memorise = null;
   try { memorise = localStorage.getItem(CLE_THEME); } catch (e) { /* stockage refusé */ }
-  appliquerTheme(memorise === "light" || memorise === "dark" ? memorise : "dark");
+  appliquerTheme(memorise === "light" || memorise === "dark" ? memorise : "light");
   $("btnTheme").addEventListener("click", () => {
     const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     try { localStorage.setItem(CLE_THEME, t); } catch (e) { /* tant pis, non mémorisé */ }
