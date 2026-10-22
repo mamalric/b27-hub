@@ -101,6 +101,20 @@ const PORTES = [
   },
 
   {
+    id: "temperatures-reference",
+    nom: "Températures de référence",
+    pitch: "Température extérieure de base hiver (NF P52-612/CN) et été d'un site, depuis son adresse, sa commune ou son département.",
+    en: { nom: "Design Outdoor Temperatures", pitch: "Winter (NF P52-612/CN) and summer design outdoor temperatures of a site, from its address, town or department." },
+    url: "https://mamalric.github.io/temperatures-reference/",
+    categorie: "chauffage",
+    statut: "en-ligne",
+    type: "outil",
+    icone: "thermometre",
+    tags: ["NF EN 12831", "température de base", "climatisation", "altitude"],
+    maj: "2026-10-22"
+  },
+
+  {
     id: "dimensionnement-gaine-ventilation",
     nom: "Dimensionnement Gaine de ventilation",
     pitch: "Sections, vitesses et pertes de charge des réseaux aérauliques, tronçon par tronçon.",

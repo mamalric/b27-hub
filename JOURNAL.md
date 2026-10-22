@@ -2,6 +2,15 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-10-22, les Températures de référence rejoignent le chauffage
+
+Nouvel outil publié dans son propre dépôt, comme les autres : https://github.com/mamalric/temperatures-reference, en ligne sur https://mamalric.github.io/temperatures-reference/. Il donne la température extérieure de base hiver (NF EN 12831, complément NF P52-612/CN, tableaux D.1a et D.1b) et une température de base été calculée sur les données horaires ERA5 au point du site, à partir d'une adresse, d'une commune, d'un département ou d'un clic sur la carte. Carte ajoutée au catalogue dans la catégorie Chauffage, statut en-ligne, icône thermomètre. Une carte ne pouvant appartenir qu'à une catégorie, le côté été est rattrapé par le mot-clé "climatisation", qui la fait remonter dans la recherche. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme, sans avertissement.
+
+## 2026-09-09
+- Fiche modifiée depuis le gestionnaire : lancer.
+- Fiche modifiée depuis le gestionnaire : statut (statut : actif vers termine).
+- Fiche modifiée depuis le gestionnaire : site.
+
 ## 2026-09-01, l'Etiquette DPE ouvre ses portes
 
 Deuxieme outil "a-venir" publie aujourd'hui, apres RefriSelect : l'Etiquette DPE repond desormais a https://etiquette-dpe.marius-amalric45.workers.dev/, verifie avant d'ecrire l'adresse (HTTP 200). Statut passe a en-ligne, la carte redevient cliquable et compte dans "Nos outils". Le pitch etait deja ecrit, contrairement a ce que disait encore le commentaire du catalogue : la note perimee est retiree avec la publication. Deux fiches "a-venir" restent en attente d'adresse : Desenfumage, RTex Tool.

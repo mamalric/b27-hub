@@ -2,15 +2,17 @@
 id: 2026-08-29-hub-d-accueil-outils-et-app    # AAAA-MM-JJ-slug, écrit une fois, jamais modifié (même si le dossier bouge)
 nom: Hub d'accueil outils et app              # nom affiché
 type: application                             # application | outil | documentation | travail | affaire
-statut: actif                                 # idee | actif | pause | termine | abandonne
+statut: termine                               # idee | actif | pause | termine | abandonne
 pitch: Portail public des outils et ressources B27 : un seul lien à transmettre.  # une phrase sur une seule ligne, 120 caractères maximum
 cree: 2026-08-29                              # AAAA-MM-JJ
-maj: 2026-09-01                               # AAAA-MM-JJ, mis à jour par Claude Code en fin de session
+maj: 2026-10-22                               # AAAA-MM-JJ, mis à jour par Claude Code en fin de session
 tags: [b27, web, hub, outils]                 # exemple : [cvc, reglementation]
 stack: HTML + CSS + JS vanilla, sans framework ni build, publié sur GitHub Pages
-lancer: ouvrir index.html, ou https://mamalric.github.io/b27-hub/
+lancer: ouvrir index.html
 depot: https://github.com/mamalric/b27-hub    # URL du dépôt git, vide sinon
+site: https://mamalric.github.io/b27-hub/
 ---
+
 
 # Hub d'accueil outils et app
 
