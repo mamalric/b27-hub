@@ -6,6 +6,8 @@
 
 Nouvel outil publié dans son propre dépôt, comme les autres : https://github.com/mamalric/temperatures-reference, en ligne sur https://mamalric.github.io/temperatures-reference/. Il donne la température extérieure de base hiver (NF EN 12831, complément NF P52-612/CN, tableaux D.1a et D.1b) et une température de base été calculée sur les données horaires ERA5 au point du site, à partir d'une adresse, d'une commune, d'un département ou d'un clic sur la carte. Carte ajoutée au catalogue dans la catégorie Chauffage, statut en-ligne, icône thermomètre. Une carte ne pouvant appartenir qu'à une catégorie, le côté été est rattrapé par le mot-clé "climatisation", qui la fait remonter dans la recherche. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme, sans avertissement.
 
+Le lien du portail s'affichait sans image dans Teams et Outlook : les balises Open Graph n'avaient ni image ni adresse. Ajout de `apercu.jpg` (1200 x 630, logo sur plaque au centre pour survivre au recadrage carré des vignettes, lignes de flux et pastilles des métiers) et des balises `og:image`, `og:url`, `og:site_name`, `og:locale` et `twitter:card`. Teams garde un aperçu en cache quelque temps : un lien déjà collé peut rester sans image jusqu'à expiration.
+
 ## 2026-09-09
 - Fiche modifiée depuis le gestionnaire : lancer.
 - Fiche modifiée depuis le gestionnaire : statut (statut : actif vers termine).
