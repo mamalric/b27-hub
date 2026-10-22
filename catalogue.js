@@ -117,8 +117,8 @@ const PORTES = [
   {
     id: "dimensionnement-chaussees",
     nom: "Dimensionnement des chaussées",
-    pitch: "Structures de chaussée neuves selon la méthode rationnelle française (NF P98-086) : calcul de Burmister et vérification à la fatigue.",
-    en: { nom: "Pavement Design", pitch: "New pavement structures with the French rational method (NF P98-086): Burmister multilayer analysis and fatigue checks." },
+    pitch: "Structures de chaussée neuves selon la NF P98-086 : calcul de Burmister, vérification à la fatigue, à l'orniérage et au gel-dégel.",
+    en: { nom: "Pavement Design", pitch: "New pavement structures to NF P98-086: Burmister multilayer analysis, fatigue, rutting and frost checks." },
     url: "https://mamalric.github.io/dimensionnement-chaussees/",
     categorie: "vrd",
     statut: "beta",

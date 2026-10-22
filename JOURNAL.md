@@ -2,6 +2,10 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-10-22, le dimensionnement des chaussées passe en version 2
+
+L'outil vérifie maintenant aussi le gel-dégel : la carte le dit dans son pitch, en français comme en anglais. Son pictogramme change à la demande de l'utilisateur : une voiture de profil posée sur les couches de chaussée, au trait plus fin que les autres icônes du portail (1,5 au lieu de 2, porté par un groupe à l'intérieur du tracé `chaussee` de `hub.js`), le même que le favicon de l'outil. Catalogue contrôlé : conforme.
+
 ## 2026-10-22, le VRD a son premier outil : le dimensionnement des chaussées
 
 Nouvel outil publié dans son propre dépôt : https://github.com/mamalric/dimensionnement-chaussees, en ligne sur https://mamalric.github.io/dimensionnement-chaussees/. Il dimensionne les chaussées neuves selon la méthode rationnelle française (NF P98-086), celle du logiciel Alizé-LCPC : massif multicouche de Burmister sous le jumelage de 65 kN, puis vérification à la fatigue et à l'orniérage. Demandé par le pôle VRD.
