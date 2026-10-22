@@ -2,6 +2,10 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-10-22, le dimensionnement des chaussées passe en version 4
+
+À la demande de l'utilisateur, le pictogramme de la carte remplace la voiture par un camion porteur posé sur les couches de chaussée, au même trait de 1,5 (tracé `chaussee` de `hub.js`), le même que le favicon de l'outil. L'outil ouvre maintenant les projets Alizé2 (.zmsp) et affiche ses résultats dans la convention d'Alizé ; la carte ne change pas autrement. Catalogue contrôlé : conforme.
+
 ## 2026-10-22, le dimensionnement des chaussées passe en version 2
 
 L'outil vérifie maintenant aussi le gel-dégel : la carte le dit dans son pitch, en français comme en anglais. Son pictogramme change à la demande de l'utilisateur : une voiture de profil posée sur les couches de chaussée, au trait plus fin que les autres icônes du portail (1,5 au lieu de 2, porté par un groupe à l'intérieur du tracé `chaussee` de `hub.js`), le même que le favicon de l'outil. Catalogue contrôlé : conforme.
