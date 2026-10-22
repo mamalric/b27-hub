@@ -2,6 +2,14 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-10-22, le VRD a son premier outil : le dimensionnement des chaussées
+
+Nouvel outil publié dans son propre dépôt : https://github.com/mamalric/dimensionnement-chaussees, en ligne sur https://mamalric.github.io/dimensionnement-chaussees/. Il dimensionne les chaussées neuves selon la méthode rationnelle française (NF P98-086), celle du logiciel Alizé-LCPC : massif multicouche de Burmister sous le jumelage de 65 kN, puis vérification à la fatigue et à l'orniérage. Demandé par le pôle VRD.
+
+La carte remplace la carte "À venir" qui tenait la place du métier VRD et assainissement, comme le prévoit le commentaire des cartes en attente. Statut bêta plutôt qu'en-ligne : le moteur retrouve les sorties publiées d'Alizé, mais le collègue VRD doit encore le confronter à ses propres calculs. Le mot-clé "Alizé" fait remonter la carte dans la recherche, sans que le nom du logiciel apparaisse sur la carte.
+
+Une icône nouvelle dans `hub.js`, `chaussee` : Lucide n'a pas de structure de chaussée, elle est dessinée dans le même trait, un jumelage posé sur les couches, celle du favicon de l'outil. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme, après réduction des mots-clés à quatre (la carte n'en affiche pas plus).
+
 ## 2026-10-22, les Températures de référence rejoignent le chauffage
 
 Nouvel outil publié dans son propre dépôt, comme les autres : https://github.com/mamalric/temperatures-reference, en ligne sur https://mamalric.github.io/temperatures-reference/. Il donne la température extérieure de base hiver (NF EN 12831, complément NF P52-612/CN, tableaux D.1a et D.1b) et une température de base été calculée sur les données horaires ERA5 au point du site, à partir d'une adresse, d'une commune, d'un département ou d'un clic sur la carte. Carte ajoutée au catalogue dans la catégorie Chauffage, statut en-ligne, icône thermomètre. Une carte ne pouvant appartenir qu'à une catégorie, le côté été est rattrapé par le mot-clé "climatisation", qui la fait remonter dans la recherche. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme, sans avertissement.

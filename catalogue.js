@@ -115,6 +115,20 @@ const PORTES = [
   },
 
   {
+    id: "dimensionnement-chaussees",
+    nom: "Dimensionnement des chaussées",
+    pitch: "Structures de chaussée neuves selon la méthode rationnelle française (NF P98-086) : calcul de Burmister et vérification à la fatigue.",
+    en: { nom: "Pavement Design", pitch: "New pavement structures with the French rational method (NF P98-086): Burmister multilayer analysis and fatigue checks." },
+    url: "https://mamalric.github.io/dimensionnement-chaussees/",
+    categorie: "vrd",
+    statut: "beta",
+    type: "outil",
+    icone: "chaussee",
+    tags: ["voirie", "Alizé", "Burmister", "NF P98-086"],
+    maj: "2026-10-22"
+  },
+
+  {
     id: "dimensionnement-gaine-ventilation",
     nom: "Dimensionnement Gaine de ventilation",
     pitch: "Sections, vitesses et pertes de charge des réseaux aérauliques, tronçon par tronçon.",
@@ -276,21 +290,6 @@ const PORTES = [
      que personne n'avait validés. Une carte qui attend se contente
      désormais de dire qu'elle attend. Remplacer l'une d'elles, c'est
      remplir son nom, son pitch, son icône et son url. */
-
-  {
-    id: "a-venir-vrd",
-    nom: "À venir",
-    pitch: "Un outil de ce métier est en préparation. Sa fiche sera remplie quand il naîtra.",
-    en: { nom: "Coming soon", pitch: "A tool for this trade is in preparation. Its card will be filled in when it exists." },
-    url: "",
-    categorie: "vrd",
-    statut: "a-venir",
-    attente: true,        // une carte qui tient la place, pas un outil : elle ne se compte pas
-    type: "outil",
-    icone: "horloge",
-    tags: ["à venir", "en préparation"],
-    maj: "2026-08-30"
-  },
 
   {
     id: "a-venir-electricite",
