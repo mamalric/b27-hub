@@ -128,6 +128,25 @@ const PORTES = [
     maj: "2026-10-22"
   },
 
+  // La Bible technique est faite par la maison, comme les outils, mais elle
+  // couvre tous les métiers : elle se range donc dans les ressources, en
+  // carte d'outil plutôt qu'en lien extérieur. Bêta tant que ses fiches
+  // portent encore des affirmations à vérifier.
+  {
+    id: "bible-technique",
+    nom: "Bible technique",
+    pitch: "Aide-mémoire visuel CVC, plomberie, SSI et thermique : une fiche par notion, schéma interactif, chiffres clés et pièges.",
+    en: { nom: "Technical Handbook", pitch: "Visual memo for HVAC, plumbing, fire safety and thermal: one sheet per topic, interactive diagram, key figures and pitfalls." },
+    url: "https://mamalric.github.io/bible-technique/",
+    categorie: "ressources",
+    sousCategorie: "technique",
+    statut: "beta",
+    type: "outil",
+    icone: "livre",
+    tags: ["aide-mémoire", "clapet coupe-feu", "SSI", "VISA"],
+    maj: "2026-10-27"
+  },
+
   {
     id: "dimensionnement-gaine-ventilation",
     nom: "Dimensionnement Gaine de ventilation",
