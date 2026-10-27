@@ -6,7 +6,7 @@
 
 Nouvelle ressource maison publiée dans son propre dépôt : https://github.com/mamalric/bible-technique, en ligne sur https://mamalric.github.io/bible-technique/. C'est un aide-mémoire visuel (CVC, plomberie, SSI, thermique), une fiche par notion, avec schéma interactif, chiffres clés, arbre de décision, vérifications et pièges, chaque affirmation portant un badge de source. Mise en ligne avec l'accord de la direction.
 
-La carte est un outil, puisque la maison la fabrique, mais elle couvre tous les métiers : elle est rangée dans la catégorie Ressources et référentiels, qui forme ainsi un groupe en fin de "Nos outils", juste avant le rayon des ressources extérieures. Statut bêta tant que ses fiches portent encore des affirmations à vérifier ; icône livre. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme. Rendu vérifié en local : la carte s'affiche avec son badge bêta, console vide.
+La carte est un outil, puisque la maison la fabrique, mais elle couvre tous les métiers : elle est rangée dans la catégorie Ressources et référentiels, qui forme ainsi un groupe en fin de "Nos outils", juste avant le rayon des ressources extérieures. Statut bêta tant que ses fiches portent encore des affirmations à vérifier ; icône livre. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme. Rendu vérifié en local : la carte s'affiche avec son badge bêta, console vide. À la demande de l'utilisateur, le pitch ne nomme plus les métiers : "Aide-mémoire visuel : une fiche par notion, schéma interactif, chiffres clés et pièges." (de même en anglais).
 
 ## 2026-10-22, le dimensionnement des chaussées passe en version 4
 

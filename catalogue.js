@@ -135,8 +135,8 @@ const PORTES = [
   {
     id: "bible-technique",
     nom: "Bible technique",
-    pitch: "Aide-mémoire visuel CVC, plomberie, SSI et thermique : une fiche par notion, schéma interactif, chiffres clés et pièges.",
-    en: { nom: "Technical Handbook", pitch: "Visual memo for HVAC, plumbing, fire safety and thermal: one sheet per topic, interactive diagram, key figures and pitfalls." },
+    pitch: "Aide-mémoire visuel : une fiche par notion, schéma interactif, chiffres clés et pièges.",
+    en: { nom: "Technical Handbook", pitch: "Visual memo: one sheet per topic, interactive diagram, key figures and pitfalls." },
     url: "https://mamalric.github.io/bible-technique/",
     categorie: "ressources",
     sousCategorie: "technique",
