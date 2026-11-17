@@ -31,7 +31,7 @@ La page est construite à l'exécution à partir de `catalogue.js`, seul fichier
 Aucune donnée collectée, balise `noindex` et `robots.txt`. Requêtes externes, toutes facultatives et sans compte : la météo Open-Meteo (relevé courant, puis prévisions et qualité de l'air quand on ouvre le panneau détaillé), la géolocalisation si le visiteur la demande, et le géocodage inverse de l'API Adresse de l'État qui donne son nom à la ville.
 
 ## Prochaine étape
-Le calendrier v13 (fériés, vacances scolaires, bulle de détail, réglages) attend le verdict de l'utilisateur et sa mise en ligne. Les vacances scolaires sont connues jusqu'au début de l'été 2028 : quand le ministère publie l'année 2028-2029, régénérer la table `VACANCES` avec `src/vacances_scolaires.py`.
+Le calendrier v13 (fériés, vacances scolaires, bulle de détail, réglages), publié le 17 novembre 2026, attend le verdict de l'utilisateur. Les vacances scolaires sont connues jusqu'au début de l'été 2028 : quand le ministère publie l'année 2028-2029, régénérer la table `VACANCES` avec `src/vacances_scolaires.py`.
 
 Le magnétisme du déroulé attend le verdict de l'utilisateur, amplifié une fois à sa demande. Son amplitude se règle en un endroit : les quatre variables `--aimant-*` en tête de la section MAGNÉTISME de `hub.css` (opacité de fond, échelle au loin, échelle au foyer, grossissement du titre), plus `AIMANT_ECART` et `AIMANT_COLLE` dans `hub.js` pour la largeur de la vague et la force de l'aimantation. L'échelle au foyer ne doit pas dépasser 1,042, au-delà la page déborde à droite. Le lointain avait aussi un flou, `--aimant-flou`, essayé puis retiré début septembre : il coûtait au processeur graphique sans rien apporter que l'opacité ne disait déjà.
 
