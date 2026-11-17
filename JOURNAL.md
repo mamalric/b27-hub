@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-11-17, le VRD a son deuxième outil : la gestion des eaux pluviales
+
+Nouvel outil publié dans son propre dépôt : https://github.com/mamalric/gestion-eaux-pluviales, en ligne sur https://mamalric.github.io/gestion-eaux-pluviales/. Il remplace la calculette Excel de rétention et d'infiltration du collègue VRD : méthode des pluies (guide CERTU 2003, IT 77), débit de pointe par la formule de Caquot avec sous-bassins assemblés, collecteurs par Manning-Strickler, ouvrages de stockage (fascicule 70-II), note de calcul et synthèse, coefficients de Montana par station (calculés sur les pluies 6 minutes publiques de Météo-France ou repris de la calculette).
+
+La carte se range dans VRD et assainissement, à côté du dimensionnement des chaussées, en statut bêta tant que le collègue VRD ne l'a pas confrontée à une affaire déjà calculée à l'Excel. La carte plomberie "Dimensionnement Eaux pluviales" (chéneaux et descentes, DTU 60.11, à venir) reste à part : elle vise l'échelle du bâtiment. Une icône nouvelle dans `hub.js`, `bassin` : un nuage de pluie au-dessus d'un bassin en eau, au trait de 1,5 comme `chaussee`, le même que le favicon de l'outil. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme ; carte vérifiée dans le portail servi en local, console vide.
+
 ## 2026-10-27, la Bible technique rejoint le portail
 
 Nouvelle ressource maison publiée dans son propre dépôt : https://github.com/mamalric/bible-technique, en ligne sur https://mamalric.github.io/bible-technique/. C'est un aide-mémoire visuel (CVC, plomberie, SSI, thermique), une fiche par notion, avec schéma interactif, chiffres clés, arbre de décision, vérifications et pièges, chaque affirmation portant un badge de source. Mise en ligne avec l'accord de la direction.

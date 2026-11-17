@@ -128,6 +128,24 @@ const PORTES = [
     maj: "2026-10-22"
   },
 
+  // Remplace la calculette Excel de rétention et d'infiltration du collègue VRD.
+  // Bêta tant qu'il ne l'a pas confrontée à une affaire déjà calculée à l'Excel.
+  // À l'échelle de la parcelle et du réseau : la carte plomberie
+  // "dimensionnement-eaux-pluviales" (chéneaux, DTU 60.11) reste à part.
+  {
+    id: "gestion-eaux-pluviales",
+    nom: "Gestion des eaux pluviales",
+    pitch: "Rétention et infiltration par la méthode des pluies, débit de pointe de Caquot, sous-bassins, collecteurs et ouvrages de stockage.",
+    en: { nom: "Stormwater Management", pitch: "Detention and infiltration by the rainfall method, Caquot peak flow, sub-catchments, sewers and storage structures." },
+    url: "https://mamalric.github.io/gestion-eaux-pluviales/",
+    categorie: "vrd",
+    statut: "beta",
+    type: "outil",
+    icone: "bassin",
+    tags: ["assainissement", "rétention", "Caquot", "Montana"],
+    maj: "2026-11-17"
+  },
+
   // La Bible technique est faite par la maison, comme les outils, mais elle
   // couvre tous les métiers : elle se range donc dans les ressources, en
   // carte d'outil plutôt qu'en lien extérieur. Bêta tant que ses fiches
