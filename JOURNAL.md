@@ -2,6 +2,18 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-11-17, le calendrier se détaille : fériés, vacances scolaires, bulle et réglages
+
+À la demande de l'utilisateur, la tuile calendrier passe en v13. Le noir sur aplat vert se lisait mal en thème clair : le numéro de semaine devient une pastille douce, vert foncé sur vert pâle, et le jour courant s'écrit en blanc sur un vert profond (#4e6b1c, contraste de 6 pour 1). En thème sombre, le jour courant garde l'accent et son encre noire, très lisible.
+
+Les jours fériés s'affichent en orange. Ils se calculent en local : les onze fêtes légales de l'article L3133-1 du code du travail, Pâques par l'algorithme de Meeus, l'Ascension 39 jours après et le lundi de Pentecôte 50 jours après. En option, ceux d'Alsace-Moselle (article L3134-13) : le Vendredi saint, dans les communes ayant un temple protestant ou une église mixte, et le second jour de Noël. Les deux articles ont été lus sur Légifrance le 17 novembre 2026 ; les dates calculées de l'Ascension concordent avec les ponts du calendrier scolaire.
+
+Les vacances scolaires se dessinent en pointillés sous les jours, une couleur et une hauteur fixe par zone (A bleu, B violet, C rose), pour que les traits d'une zone se suivent de jour en jour. Les dates viennent du jeu de données officiel du ministère de l'Éducation nationale ("Le calendrier scolaire", data.education.gouv.fr, Licence Ouverte), recopiées dans la table `VACANCES` de `hub.js` : années 2024-2025 à 2027-2028, la dernière connue seulement jusqu'au début de l'été 2028. Pour l'été, ce sont les dates des élèves. La table se régénère avec `python src/vacances_scolaires.py 2025-2026 2026-2027 ...` quand le ministère publie une nouvelle année ; au-delà de la dernière date, la tuile le signale. Pas de requête de plus : tout reste local.
+
+Un clic sur un jour ouvre une bulle de détail : la date en toutes lettres, la semaine, le rang du jour dans l'année, l'écart avec aujourd'hui, le férié et son article, et les vacances de chaque zone avec leurs dates, les zones de même période regroupées. Elle se ferme au clic dehors, par Échap ou au défilement. Un engrenage, à droite du mois, ouvre les réglages : fériés (et Alsace-Moselle), zones affichées avec leurs académies, numéros de semaine, week-ends teintés ; ils restent dans le navigateur (`hub_b27_calendrier`). Une légende sous la grille ne dit que ce qui est affiché. Les jours sont devenus des boutons, atteignables au clavier. Textes traduits en anglais.
+
+Contrôlé dans le portail servi en local : console vide, fériés de novembre 2026 (1er et 11), pointillés de la Toussaint, vacances d'hiver 2027 décalées par zone, Vendredi saint 2027 avec l'option Alsace-Moselle, thèmes clair et sombre, largeur de 375 px sans défilement horizontal. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme. Non publié : `main` et la mise en ligne attendent l'accord de l'utilisateur.
+
 ## 2026-11-17, le VRD a son deuxième outil : la gestion des eaux pluviales
 
 Nouvel outil publié dans son propre dépôt : https://github.com/mamalric/gestion-eaux-pluviales, en ligne sur https://mamalric.github.io/gestion-eaux-pluviales/. Il remplace la calculette Excel de rétention et d'infiltration du collègue VRD : méthode des pluies (guide CERTU 2003, IT 77), débit de pointe par la formule de Caquot avec sous-bassins assemblés, collecteurs par Manning-Strickler, ouvrages de stockage (fascicule 70-II), note de calcul et synthèse, coefficients de Montana par station (calculés sur les pluies 6 minutes publiques de Météo-France ou repris de la calculette).

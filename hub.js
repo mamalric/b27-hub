@@ -24,6 +24,9 @@
    pourquoi et les leçons vont dans JOURNAL.md, qui est fait pour ça.
    --------------------------------------------------------------------- */
 const CHANGELOG = [
+  { v: "v13", date: "2026-11-17", titre: "Le calendrier se détaille",
+    texte: "Les jours fériés s'affichent en orange et les vacances scolaires en pointillés de couleur, un trait par zone. Un clic sur un jour ouvre son détail, l'engrenage règle l'affichage. Le jour et la semaine courants se lisent mieux en thème clair." },
+
   { v: "v12", date: "2026-08-30", titre: "Le portail parle anglais",
     texte: "Le cadre, nos outils, les métiers et les domaines se lisent en anglais, le choix se mémorisant comme le thème. Les fiches de ressources restent en français : elles mènent à des sites français." },
 
@@ -540,6 +543,44 @@ const TRADUCTIONS = {
     "avril": "April", "mai": "May", "juin": "June",
     "juillet": "July", "août": "August", "septembre": "September",
     "octobre": "October", "novembre": "November", "décembre": "December",
+    "Mois précédent": "Previous month",
+    "Mois suivant": "Next month",
+    "Calendrier du mois": "Month calendar",
+    "Réglages du calendrier": "Calendar settings",
+    "Férié": "Holiday",
+    "Vacances": "Holidays",
+    "Vacances publiées jusqu’au": "School holidays published until",
+    "jour": "day",
+    "Jour férié": "Public holiday",
+    "Jour ouvré": "Working day",
+    "Week-end": "Weekend",
+    "Code du travail": "French Labour Code",
+    "Zone": "Zone", "Zones": "Zones", "du": "from", "au": "to",
+    "1er janvier": "New Year’s Day", "Lundi de Pâques": "Easter Monday",
+    "1er mai": "1 May, Labour Day", "8 mai": "8 May, Victory in Europe Day",
+    "Ascension": "Ascension Day", "Lundi de Pentecôte": "Whit Monday",
+    "14 juillet": "14 July, Bastille Day", "Assomption": "Assumption Day",
+    "Toussaint": "All Saints’ Day", "11 novembre": "11 November, Armistice Day",
+    "Noël": "Christmas Day", "Vendredi saint": "Good Friday", "Second jour de Noël": "St Stephen’s Day",
+    "Vacances de la Toussaint": "All Saints’ holidays", "Vacances de Noël": "Christmas holidays",
+    "Vacances d'hiver": "Winter holidays", "Vacances de printemps": "Spring holidays",
+    "Pont de l'Ascension": "Ascension long weekend", "Vacances d'été": "Summer holidays",
+    "Début des vacances d'été": "Start of the summer holidays",
+    "Jours fériés": "Public holidays",
+    "Afficher les jours fériés": "Show public holidays",
+    "En orange dans la grille": "In orange in the grid",
+    "Ajouter ceux d’Alsace-Moselle": "Add the Alsace-Moselle ones",
+    "Vendredi saint et second jour de Noël": "Good Friday and St Stephen’s Day",
+    "Code du travail, article L3133-1 : onze fêtes légales. En Alsace-Moselle, l’article L3134-13 ajoute le Vendredi saint, dans les communes ayant un temple protestant ou une église mixte, et le second jour de Noël.":
+      "French Labour Code, article L3133-1: eleven public holidays. In Alsace-Moselle, article L3134-13 adds Good Friday, in towns with a Protestant or shared church, and St Stephen’s Day.",
+    "Vacances scolaires": "School holidays",
+    "Calendrier officiel du ministère de l’Éducation nationale, en pointillés sous les jours, publié jusqu’au":
+      "Official calendar of the French Ministry of Education, dotted under the days, published until",
+    "Affichage": "Display",
+    "Numéros de semaine": "Week numbers",
+    "La colonne S, semaines ISO": "The W column, ISO weeks",
+    "Week-ends teintés": "Shaded weekends",
+    "Ces réglages restent dans ce navigateur.": "These settings stay in this browser.",
 
     /* ---- le panneau À propos */
     "Le portail": "The portal",
@@ -1734,6 +1775,11 @@ function initDetailMeteo() {
    Les semaines ISO sur l'axe vertical, les jours en tête, les week-ends
    teintés : c'est la monnaie du bureau d'études, où tout se planifie en
    numéro de semaine. Entièrement calculé en local.
+
+   Les jours fériés se calculent, Pâques compris ; les vacances scolaires
+   viennent du calendrier officiel, recopié dans VACANCES. Un jour s'ouvre
+   en bulle de détail au clic, l'engrenage ouvre les réglages, qui restent
+   dans le navigateur comme le thème.
    --------------------------------------------------------------------- */
 const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin",
               "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
@@ -1750,7 +1796,148 @@ function semaineISO(d) {
   return Math.ceil(((x - debut) / 86400000 + 1) / 7);
 }
 
+// Un jour s'écrit AAAA-MM-JJ, en heure locale : la clé des fériés et des
+// vacances, qui se compare comme une chaîne.
+function cleJour(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
+    + "-" + String(d.getDate()).padStart(2, "0");
+}
+function jourDeCle(c) {
+  const [a, m, j] = c.split("-").map(Number);
+  return new Date(a, m - 1, j);
+}
+function decaler(d, n) {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+}
+
+/* ---- les réglages, gardés dans ce navigateur */
+const CLE_CALENDRIER = "hub_b27_calendrier";
+const CAL_DEFAUT = { feries: true, alsace: false, zones: ["A", "B", "C"], semaines: true, weekends: true };
+
+function calReglages() {
+  let r = null;
+  try { r = JSON.parse(localStorage.getItem(CLE_CALENDRIER) || "null"); } catch (e) { /* illisible : défauts */ }
+  r = Object.assign({}, CAL_DEFAUT, r && typeof r === "object" ? r : {});
+  const z = Array.isArray(r.zones) ? r.zones : CAL_DEFAUT.zones;
+  r.zones = ["A", "B", "C"].filter(x => z.indexOf(x) !== -1);
+  return r;
+}
+function calMemoriser(r) {
+  try { localStorage.setItem(CLE_CALENDRIER, JSON.stringify(r)); } catch (e) { /* non mémorisé */ }
+}
+
+/* ---- les jours fériés
+   Code du travail, article L3133-1 : onze fêtes légales. En Alsace-Moselle,
+   l'article L3134-13 ajoute le Vendredi saint, dans les communes ayant un
+   temple protestant ou une église mixte, et le second jour de Noël. Pâques
+   par l'algorithme de Meeus, Jones et Butcher (calendrier grégorien) ;
+   l'Ascension tombe 39 jours après, le lundi de Pentecôte 50 jours après. */
+function paques(an) {
+  const a = an % 19, b = Math.floor(an / 100), c = an % 100;
+  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const n = h + l - 7 * m + 114;
+  return new Date(an, Math.floor(n / 31) - 1, (n % 31) + 1);
+}
+
+const FERIES_FAITS = {};
+function feries(an, alsace) {
+  const cle = an + (alsace ? "-am" : "");
+  if (FERIES_FAITS[cle]) return FERIES_FAITS[cle];
+  const p = paques(an), f = {};
+  const poser = (d, nom, article) => { f[cleJour(d)] = { nom, article }; };
+  const L1 = "L3133-1", L2 = "L3134-13";
+  poser(new Date(an, 0, 1), "1er janvier", L1);
+  if (alsace) poser(decaler(p, -2), "Vendredi saint", L2);
+  poser(decaler(p, 1), "Lundi de Pâques", L1);
+  poser(new Date(an, 4, 1), "1er mai", L1);
+  poser(new Date(an, 4, 8), "8 mai", L1);
+  poser(decaler(p, 39), "Ascension", L1);
+  poser(decaler(p, 50), "Lundi de Pentecôte", L1);
+  poser(new Date(an, 6, 14), "14 juillet", L1);
+  poser(new Date(an, 7, 15), "Assomption", L1);
+  poser(new Date(an, 10, 1), "Toussaint", L1);
+  poser(new Date(an, 10, 11), "11 novembre", L1);
+  poser(new Date(an, 11, 25), "Noël", L1);
+  if (alsace) poser(new Date(an, 11, 26), "Second jour de Noël", L2);
+  return (FERIES_FAITS[cle] = f);
+}
+
+/* ---- les vacances scolaires
+   Calendrier officiel du ministère de l'Éducation nationale (jeu de
+   données "Le calendrier scolaire", data.education.gouv.fr, Licence
+   Ouverte). Une ligne par période : premier et dernier jour sans cours,
+   inclus, nom, zones. La table se régénère avec src/vacances_scolaires.py
+   quand le ministère publie une nouvelle année ; pour l'été, ce sont les
+   dates des élèves. */
+const VACANCES = [
+  ["2024-10-19", "2024-11-03", "Vacances de la Toussaint", "ABC"],
+  ["2024-12-21", "2025-01-05", "Vacances de Noël", "ABC"],
+  ["2025-02-08", "2025-02-23", "Vacances d'hiver", "B"],
+  ["2025-02-15", "2025-03-02", "Vacances d'hiver", "C"],
+  ["2025-02-22", "2025-03-09", "Vacances d'hiver", "A"],
+  ["2025-04-05", "2025-04-21", "Vacances de printemps", "B"],
+  ["2025-04-12", "2025-04-27", "Vacances de printemps", "C"],
+  ["2025-04-19", "2025-05-04", "Vacances de printemps", "A"],
+  ["2025-05-29", "2025-06-01", "Pont de l'Ascension", "ABC"],
+  ["2025-07-05", "2025-08-31", "Vacances d'été", "ABC"],
+  ["2025-10-18", "2025-11-02", "Vacances de la Toussaint", "ABC"],
+  ["2025-12-20", "2026-01-04", "Vacances de Noël", "ABC"],
+  ["2026-02-07", "2026-02-22", "Vacances d'hiver", "A"],
+  ["2026-02-14", "2026-03-01", "Vacances d'hiver", "B"],
+  ["2026-02-21", "2026-03-08", "Vacances d'hiver", "C"],
+  ["2026-04-04", "2026-04-19", "Vacances de printemps", "A"],
+  ["2026-04-11", "2026-04-26", "Vacances de printemps", "B"],
+  ["2026-04-18", "2026-05-03", "Vacances de printemps", "C"],
+  ["2026-05-14", "2026-05-17", "Pont de l'Ascension", "ABC"],
+  ["2026-07-04", "2026-08-31", "Vacances d'été", "ABC"],
+  ["2026-10-17", "2026-11-01", "Vacances de la Toussaint", "ABC"],
+  ["2026-12-19", "2027-01-03", "Vacances de Noël", "ABC"],
+  ["2027-02-06", "2027-02-21", "Vacances d'hiver", "C"],
+  ["2027-02-13", "2027-02-28", "Vacances d'hiver", "A"],
+  ["2027-02-20", "2027-03-07", "Vacances d'hiver", "B"],
+  ["2027-04-03", "2027-04-18", "Vacances de printemps", "C"],
+  ["2027-04-10", "2027-04-25", "Vacances de printemps", "A"],
+  ["2027-04-17", "2027-05-02", "Vacances de printemps", "B"],
+  ["2027-05-07", "2027-05-07", "Pont de l'Ascension", "ABC"],
+  ["2027-07-03", "2027-09-01", "Vacances d'été", "ABC"],
+  ["2027-10-23", "2027-11-07", "Vacances de la Toussaint", "ABC"],
+  ["2027-12-18", "2028-01-02", "Vacances de Noël", "ABC"],
+  ["2028-02-05", "2028-02-20", "Vacances d'hiver", "B"],
+  ["2028-02-12", "2028-02-27", "Vacances d'hiver", "C"],
+  ["2028-02-19", "2028-03-05", "Vacances d'hiver", "A"],
+  ["2028-04-08", "2028-04-23", "Vacances de printemps", "B"],
+  ["2028-04-15", "2028-05-01", "Vacances de printemps", "C"],
+  ["2028-04-22", "2028-05-08", "Vacances de printemps", "A"],
+  ["2028-05-25", "2028-05-28", "Pont de l'Ascension", "ABC"],
+  ["2028-07-04", "2028-07-04", "Début des vacances d'été", "ABC"],
+];
+const VACANCES_FIN = VACANCES.reduce((m, v) => (v[1] > m ? v[1] : m), "");
+const ZONES = {
+  A: "Besançon, Bordeaux, Clermont-Ferrand, Dijon, Grenoble, Limoges, Lyon, Poitiers",
+  B: "Aix-Marseille, Amiens, Lille, Nancy-Metz, Nantes, Nice, Normandie, Orléans-Tours, Reims, Rennes, Strasbourg",
+  C: "Créteil, Montpellier, Paris, Toulouse, Versailles"
+};
+
+// Les périodes de vacances d'un jour, pour les zones demandées.
+function vacancesDu(cle, zones) {
+  const out = [];
+  VACANCES.forEach(v => {
+    if (v[0] > cle || cle > v[1]) return;
+    const z = v[3].split("").filter(x => zones.indexOf(x) !== -1);
+    if (z.length) out.push({ debut: v[0], fin: v[1], nom: v[2], zones: z });
+  });
+  return out;
+}
+
+/* ---- la tuile */
 function peindreCalendrier() {
+  fermerBulleJour();
+  const R = calReglages();
   const auj = new Date();
   const vue = new Date(auj.getFullYear(), auj.getMonth() + calDecalage, 1);
 
@@ -1759,49 +1946,267 @@ function peindreCalendrier() {
   premier.setDate(1 - ((vue.getDay() + 6) % 7));
 
   const semaineAuj = semaineISO(auj);
+  const cleAuj = cleJour(auj);
 
   let h = '<div class="tv-chip" aria-hidden="true"><span class="tv-chip-s">S</span><b>'
-    + semaineISO(auj) + "</b></div>"
+    + semaineAuj + "</b></div>"
     + '<div class="tv-plein">'
     + '<div class="tv-tete"><h3>' + ech(mot("Calendrier")) + '</h3><span class="espace"></span>'
-    + '<span class="cal-semaine">' + mot("Semaine") + " " + semaineISO(auj) + "</span>"
+    + '<span class="cal-semaine">' + mot("Semaine") + " " + semaineAuj + "</span>"
     + '<span class="cal-nav">'
-    +   '<button type="button" id="calPrec" aria-label="Mois précédent">' + ico("chevron_g", 13) + "</button>"
-    +   '<button type="button" id="calSuiv" aria-label="Mois suivant">' + ico("chevron_d", 13) + "</button>"
+    +   '<button type="button" id="calPrec" aria-label="' + ech(mot("Mois précédent")) + '">' + ico("chevron_g", 13) + "</button>"
+    +   '<button type="button" id="calSuiv" aria-label="' + ech(mot("Mois suivant")) + '">' + ico("chevron_d", 13) + "</button>"
     + "</span></div>"
-    + '<div class="cal-mois">' + mot(MOIS[vue.getMonth()]) + " " + vue.getFullYear() + "</div>"
-    + '<div class="cal-grille" role="grid" aria-label="Calendrier du mois">';
+    + '<div class="cal-titre"><span class="cal-mois">' + mot(MOIS[vue.getMonth()]) + " " + vue.getFullYear() + "</span>"
+    +   '<button type="button" class="cal-reglages" id="calReglages" title="' + ech(mot("Réglages du calendrier"))
+    +   '" aria-label="' + ech(mot("Réglages du calendrier")) + '">' + ico("engrenage", 14) + "</button></div>"
+    + '<div class="cal-grille' + (R.semaines ? "" : " sans-semaines") + '" aria-label="'
+    + ech(mot("Calendrier du mois")) + '">';
 
-  h += '<span class="cal-ent" title="' + mot("Semaine") + '">S</span>';
+  if (R.semaines) h += '<span class="cal-ent" title="' + mot("Semaine") + '">S</span>';
   ["L", "M", "M", "J", "V", "S", "D"].forEach((j, i) =>
-    h += '<span class="cal-ent' + (i >= 5 ? " cal-we" : "") + '">' + j + "</span>");
+    h += '<span class="cal-ent' + (i >= 5 && R.weekends ? " cal-we" : "") + '">' + j + "</span>");
 
   const d = new Date(premier);
+  let dernierVu = cleJour(d);
   for (let sem = 0; sem < 6; sem++) {
     // Un mois tient sur 4 à 6 lignes de semaine : on s'arrête dès que la
     // ligne entière appartient au mois suivant.
     if (sem >= 4 && d.getMonth() !== vue.getMonth()) break;
     const num = semaineISO(d);
     const active = calDecalage === 0 && num === semaineAuj;
-    h += '<span class="cal-num' + (active ? " sem-act" : "") + '">' + num + "</span>";
+    if (R.semaines) h += '<span class="cal-num' + (active ? " sem-act" : "") + '">' + num + "</span>";
     for (let j = 0; j < 7; j++) {
-      const duMois = d.getMonth() === vue.getMonth();
-      const estAuj = d.getFullYear() === auj.getFullYear()
-        && d.getMonth() === auj.getMonth() && d.getDate() === auj.getDate();
+      const cle = cleJour(d);
+      const ferie = R.feries ? feries(d.getFullYear(), R.alsace)[cle] : null;
+      const vac = vacancesDu(cle, R.zones);
       const cls = ["cal-jour"];
-      if (j >= 5) cls.push("cal-we");
-      if (!duMois) cls.push("cal-hors");
+      if (j >= 5 && R.weekends) cls.push("cal-we");
+      if (d.getMonth() !== vue.getMonth()) cls.push("cal-hors");
       if (active) cls.push("cal-lig-act");
-      if (estAuj) cls.push("cal-auj");
-      h += '<span class="' + cls.join(" ") + '">' + d.getDate() + "</span>";
+      if (ferie) cls.push("cal-ferie");
+      if (cle === cleAuj) cls.push("cal-auj");
+      // Un trait pointillé par zone en vacances, chacune à sa hauteur fixe :
+      // les traits d'une même zone se suivent de jour en jour.
+      let traits = "";
+      vac.forEach(v => v.zones.forEach(z => {
+        traits += '<i class="cal-vac z-' + z + '" style="--rang:' + R.zones.indexOf(z) + '"></i>';
+      }));
+      h += '<button type="button" class="' + cls.join(" ") + '" data-j="' + cle + '"'
+        + (cle === cleAuj ? ' aria-current="date"' : "") + ">" + d.getDate() + traits + "</button>";
+      dernierVu = cle;
       d.setDate(d.getDate() + 1);
     }
   }
-  h += "</div></div>";
+  h += "</div>";
 
-  $("tuileCalendrier").innerHTML = h;
+  // La légende ne dit que ce qui est affiché.
+  if (R.feries || R.zones.length) {
+    h += '<div class="cal-legende">';
+    if (R.feries) h += '<span><i class="leg-ferie"></i>' + ech(mot("Férié")) + "</span>";
+    if (R.zones.length) {
+      h += '<span class="leg-vacances">' + ech(mot("Vacances")) + "</span>";
+      R.zones.forEach(z => { h += '<span><i class="leg-vac z-' + z + '"></i>' + z + "</span>"; });
+    }
+    h += "</div>";
+    if (R.zones.length && dernierVu > VACANCES_FIN) {
+      h += '<p class="cal-note">' + ech(mot("Vacances publiées jusqu’au")) + " "
+        + ech(dateCourte(jourDeCle(VACANCES_FIN), true)) + "</p>";
+    }
+  }
+  h += "</div>";
+
+  const tuile = $("tuileCalendrier");
+  tuile.innerHTML = h;
   $("calPrec").addEventListener("click", () => { calDecalage--; peindreCalendrier(); });
   $("calSuiv").addEventListener("click", () => { calDecalage++; peindreCalendrier(); });
+  $("calReglages").addEventListener("click", ouvrirReglagesCalendrier);
+  tuile.querySelectorAll(".cal-jour").forEach(b =>
+    b.addEventListener("click", ev => {
+      if (document.body.classList.contains("defile")) return;   // pastille : on remonte
+      ev.stopPropagation();
+      basculerBulleJour(b);
+    }));
+}
+
+/* ---- la bulle de détail d'un jour */
+let bulleJour = null;     // l'élément, créé une fois
+let bulleSource = null;   // le bouton du jour ouvert
+
+function locale() { return LANGUE.courante === "en" ? "en-GB" : "fr-FR"; }
+function dateCourte(d, annee) {
+  return d.toLocaleDateString(locale(), { weekday: "short", day: "numeric", month: "short", year: annee ? "numeric" : undefined });
+}
+function dansCombien(n) {
+  const en = LANGUE.courante === "en";
+  if (n === 0) return en ? "today" : "aujourd’hui";
+  if (n === 1) return en ? "tomorrow" : "demain";
+  if (n === -1) return en ? "yesterday" : "hier";
+  const a = Math.abs(n);
+  if (en) return n > 0 ? "in " + a + " days" : a + " days ago";
+  return n > 0 ? "dans " + a + " jours" : "il y a " + a + " jours";
+}
+
+function html_bulleJour(cle) {
+  const R = calReglages();
+  const d = jourDeCle(cle);
+  const auj = new Date();
+  const ecart = Math.round((d - new Date(auj.getFullYear(), auj.getMonth(), auj.getDate())) / 86400000);
+  const debutAn = new Date(d.getFullYear(), 0, 1);
+  const rang = Math.round((d - debutAn) / 86400000) + 1;
+  const total = Math.round((new Date(d.getFullYear() + 1, 0, 1) - debutAn) / 86400000);
+  const longue = d.toLocaleDateString(locale(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  let h = '<div class="cb-tete"><b>' + ech(longue.charAt(0).toUpperCase() + longue.slice(1)) + "</b>"
+    + '<button type="button" class="cb-fermer" aria-label="' + ech(mot("Fermer")) + '">' + ico("fermer", 13) + "</button></div>"
+    + '<p class="cb-sous">' + mot("Semaine") + " " + semaineISO(d) + " · "
+    + ech(mot("jour")) + " " + rang + "/" + total + " · " + ech(dansCombien(ecart)) + "</p>";
+
+  const ferie = feries(d.getFullYear(), R.alsace)[cle];
+  const we = d.getDay() === 0 || d.getDay() === 6;
+  h += '<ul class="cb-liste">';
+  if (ferie) {
+    h += '<li><i class="leg-ferie"></i><span><b>' + ech(mot("Jour férié")) + " : " + ech(mot(ferie.nom)) + "</b>"
+      + "<small>" + ech(mot("Code du travail")) + ", art. " + ferie.article
+      + (ferie.article === "L3134-13" ? " (Alsace-Moselle)" : "") + "</small></span></li>";
+  } else {
+    h += '<li><i class="leg-neutre"></i><span>' + ech(mot(we ? "Week-end" : "Jour ouvré")) + "</span></li>";
+  }
+  // Les vacances de toutes les zones, même masquées dans la grille : la
+  // bulle est faite pour le détail. Les zones de même date se regroupent.
+  vacancesDu(cle, ["A", "B", "C"]).forEach(v => {
+    const visibles = v.zones.filter(z => R.zones.indexOf(z) !== -1);
+    const trait = (visibles.length ? visibles : v.zones)[0];
+    h += '<li><i class="leg-vac z-' + trait + '"></i><span><b>' + ech(mot(v.nom)) + "</b>"
+      + "<small>" + ech(mot(v.zones.length > 1 ? "Zones" : "Zone")) + " " + v.zones.join(", ")
+      + " · " + (v.debut === v.fin
+        ? ech(dateCourte(jourDeCle(v.debut), true))
+        : ech(mot("du")) + " " + ech(dateCourte(jourDeCle(v.debut))) + " " + ech(mot("au")) + " "
+          + ech(dateCourte(jourDeCle(v.fin), true)))
+      + "</small></span></li>";
+  });
+  if (cle > VACANCES_FIN) {
+    h += '<li><i class="leg-neutre"></i><span><small>' + ech(mot("Vacances publiées jusqu’au")) + " "
+      + ech(dateCourte(jourDeCle(VACANCES_FIN), true)) + "</small></span></li>";
+  }
+  h += "</ul>";
+  return h;
+}
+
+function basculerBulleJour(bouton) {
+  if (bulleSource === bouton) { fermerBulleJour(); return; }
+  if (!bulleJour) {
+    bulleJour = document.createElement("div");
+    bulleJour.className = "cal-bulle noprint";
+    bulleJour.setAttribute("role", "dialog");
+    document.body.appendChild(bulleJour);
+    bulleJour.addEventListener("click", ev => {
+      ev.stopPropagation();
+      if (ev.target.closest(".cb-fermer")) fermerBulleJour(true);
+    });
+    document.addEventListener("click", () => fermerBulleJour());
+    document.addEventListener("keydown", ev => { if (ev.key === "Escape") fermerBulleJour(true); });
+    window.addEventListener("scroll", () => fermerBulleJour(), { passive: true });
+    window.addEventListener("resize", () => fermerBulleJour());
+  }
+  bulleSource && bulleSource.classList.remove("cal-choisi");
+  bulleSource = bouton;
+  bouton.classList.add("cal-choisi");
+  bulleJour.innerHTML = html_bulleJour(bouton.dataset.j);
+  bulleJour.setAttribute("aria-label", bouton.dataset.j);
+  bulleJour.hidden = false;
+
+  // Sous le jour, centrée sur lui, sans sortir de l'écran ; au-dessus s'il
+  // n'y a pas la place dessous.
+  const r = bouton.getBoundingClientRect();
+  const l = bulleJour.offsetWidth, ht = bulleJour.offsetHeight, marge = 8;
+  let x = r.left + r.width / 2 - l / 2;
+  x = Math.max(marge, Math.min(x, window.innerWidth - l - marge));
+  let y = r.bottom + marge;
+  if (y + ht > window.innerHeight - marge) y = Math.max(marge, r.top - ht - marge);
+  bulleJour.style.left = Math.round(x) + "px";
+  bulleJour.style.top = Math.round(y) + "px";
+  bulleJour.classList.remove("cb-pose");
+  void bulleJour.offsetWidth;   // relance l'animation d'entrée
+  bulleJour.classList.add("cb-pose");
+}
+
+function fermerBulleJour(rendreFocus) {
+  if (!bulleJour || bulleJour.hidden) return;
+  bulleJour.hidden = true;
+  if (bulleSource) {
+    bulleSource.classList.remove("cal-choisi");
+    if (rendreFocus && document.body.contains(bulleSource)) bulleSource.focus();
+  }
+  bulleSource = null;
+}
+
+/* ---- le panneau des réglages, ouvert par l'engrenage */
+function html_reglagesCalendrier() {
+  const R = calReglages();
+  const case_ = (cle, coche, texte, sous, trait) =>
+    '<label><input type="checkbox" data-reglage="' + cle + '"' + (coche ? " checked" : "") + ">"
+    + '<span><span class="cc-nom">' + (trait ? '<i class="leg-vac z-' + trait + '"></i>' : "") + ech(texte) + "</span>"
+    + (sous ? "<small>" + ech(sous) + "</small>" : "") + "</span></label>";
+
+  return '<div class="stats-groupe"><h3 data-ico="calendrier" data-ico-taille="13">' + ech(mot("Jours fériés")) + "</h3>"
+    + '<div class="md-composer cal-composer">'
+    + case_("feries", R.feries, mot("Afficher les jours fériés"), mot("En orange dans la grille"))
+    + case_("alsace", R.alsace, mot("Ajouter ceux d’Alsace-Moselle"), mot("Vendredi saint et second jour de Noël"))
+    + "</div>"
+    + '<p class="note">' + ech(mot("Code du travail, article L3133-1 : onze fêtes légales. En Alsace-Moselle, l’article L3134-13 ajoute le Vendredi saint, dans les communes ayant un temple protestant ou une église mixte, et le second jour de Noël.")) + "</p></div>"
+
+    + '<div class="stats-groupe"><h3 data-ico="soleil" data-ico-taille="13">' + ech(mot("Vacances scolaires")) + "</h3>"
+    + '<div class="md-composer cal-composer">'
+    + ["A", "B", "C"].map(z => case_("zone-" + z, R.zones.indexOf(z) !== -1, mot("Zone") + " " + z, ZONES[z], z)).join("")
+    + "</div>"
+    + '<p class="note">' + ech(mot("Calendrier officiel du ministère de l’Éducation nationale, en pointillés sous les jours, publié jusqu’au")) + " "
+    + ech(dateCourte(jourDeCle(VACANCES_FIN), true)) + ".</p></div>"
+
+    + '<div class="stats-groupe"><h3 data-ico="engrenage" data-ico-taille="13">' + ech(mot("Affichage")) + "</h3>"
+    + '<div class="md-composer cal-composer">'
+    + case_("semaines", R.semaines, mot("Numéros de semaine"), mot("La colonne S, semaines ISO"))
+    + case_("weekends", R.weekends, mot("Week-ends teintés"), "")
+    + "</div>"
+    + '<p class="note">' + ech(mot("Ces réglages restent dans ce navigateur.")) + "</p></div>";
+}
+
+function ouvrirReglagesCalendrier(ev) {
+  if (ev) ev.stopPropagation();
+  if (document.body.classList.contains("defile")) return;
+  fermerBulleJour();
+  const dlg = $("dlgCalendrier");
+  const corps = $("calReglagesCorps");
+  corps.innerHTML = html_reglagesCalendrier();
+  poserIcones(corps);
+  corps.querySelectorAll("[data-reglage]").forEach(c => c.addEventListener("change", () => {
+    const R = calReglages();
+    const k = c.dataset.reglage;
+    if (k.indexOf("zone-") === 0) {
+      const z = k.slice(5);
+      R.zones = ["A", "B", "C"].filter(x => (x === z ? c.checked : R.zones.indexOf(x) !== -1));
+    } else {
+      R[k] = c.checked;
+    }
+    // L'Alsace-Moselle n'a de sens qu'avec les fériés affichés.
+    const al = corps.querySelector('[data-reglage="alsace"]');
+    al.disabled = !R.feries;
+    calMemoriser(R);
+    peindreCalendrier();
+  }));
+  corps.querySelector('[data-reglage="alsace"]').disabled = !calReglages().feries;
+  dlg.showModal();
+}
+
+function initReglagesCalendrier() {
+  const dlg = $("dlgCalendrier");
+  $("btnCalFermer").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", ev => {
+    const r = dlg.getBoundingClientRect();
+    const dedans = ev.clientX >= r.left && ev.clientX <= r.right
+      && ev.clientY >= r.top && ev.clientY <= r.bottom;
+    if (!dedans) dlg.close();
+  });
 }
 
 /* ---------------------------------------------------------------------
@@ -3115,6 +3520,7 @@ function init() {
   initAncre();
   initApropos();
   initDetailMeteo();
+  initReglagesCalendrier();
   initMolettePanneaux();
   initLangues();
   initNeuf();
