@@ -2,6 +2,12 @@
 
 <!-- Dernière entrée en haut. Une entrée par session de travail ou par décision. Date au format AAAA-MM-JJ. -->
 
+## 2026-11-19, toutes les icônes viennent de Lucide
+
+À la demande de l'utilisateur, chaque icône du portail est désormais un tracé copié tel quel de Lucide (https://lucide.dev/icons/), jamais dessiné à la main. Les tracés de `TRACES_ICONES` (`hub.js`) et de `ICO` (`signalement.js`) ont été comparés un à un au catalogue Lucide (paquet lucide-static 1.68.0, et 0.468.0 pour les tracés d'avant la refonte de certaines icônes) : 46 sur 51 et 9 sur 10 étaient déjà des tracés Lucide exacts. Six ne l'étaient pas et sont remplacés : `bureau` devient briefcase, `son` volume-2, `muet` volume-x, le bouton d'arrêt de la dictée square, `chaussee` truck (le camion demandé le 22 octobre, sans les couches de chaussée ni le trait de 1,5) et `bassin` dam, un ouvrage de retenue, préféré à cloud-rain pour ne pas doubler le nuage de pluie de la carte plomberie des eaux pluviales du bâtiment. Le commentaire d'en-tête de `TRACES_ICONES` pose la règle ; chaque tracé remplacé porte en commentaire le nom de son icône Lucide.
+
+Contrôlé dans le portail servi en local : le camion et le barrage sur les deux cartes VRD, le bouton son qui bascule entre volume-2 et volume-x, console vide. Catalogue contrôlé par `tests/verifier_catalogue.py` : conforme. Reste hors du portail : les favicons des deux outils VRD (dimensionnement des chaussées, gestion des eaux pluviales) gardent leurs anciens dessins, dans leurs propres dépôts. Non publié : attend l'accord de l'utilisateur, et part avec la note du 17 novembre.
+
 ## 2026-11-17, le calendrier se détaille : fériés, vacances scolaires, bulle et réglages
 
 À la demande de l'utilisateur, la tuile calendrier passe en v13. Le noir sur aplat vert se lisait mal en thème clair : le numéro de semaine devient une pastille douce, vert foncé sur vert pâle, et le jour courant s'écrit en blanc sur un vert profond (#4e6b1c, contraste de 6 pour 1). En thème sombre, le jour courant garde l'accent et son encre noire, très lisible.
